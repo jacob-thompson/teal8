@@ -11,5 +11,8 @@ OUT = chip8
 $(OUT): $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS)
 
+run:
+	./$(OUT)
+
 clean:
 	rm -f $(OBJ) $(OUT)
