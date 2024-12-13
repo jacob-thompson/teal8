@@ -3,10 +3,23 @@
 
 #define MEMORY_IN_BYTES 4096
 #define FONT_IN_BYTES 80
+#define FONT_START_ADDRESS 0x050
+#define FONT_END_ADDRESS 0x09F
+#define STACK_SIZE 16
+#define TIMER_DECAY_RATE 60
 
-int main(void)
+typedef struct {
+    unsigned char memory[MEMORY_IN_BYTES]; // 4KB memory
+    unsigned char stack[STACK_SIZE]; // 16 16-bit registers
+    unsigned short ix; // 16-bit register
+    unsigned short pc; // program counter
+    unsigned char sp; // stack pointer
+    int8_t dtimer; // delay timer
+    int8_t stimer; // sound timer
+} chip8;
+
+void write_font_to_memory(unsigned char *memory)
 {
-    unsigned char memory[MEMORY_IN_BYTES];
     unsigned char font[FONT_IN_BYTES] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
         0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -26,8 +39,17 @@ int main(void)
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
     };
 
-    for (int loc = 0x050, fi = 0; loc <= 0x09F && fi < FONT_IN_BYTES; loc++, fi++) {
-        memory[loc] = font[fi];
+    for (int loc = FONT_START_ADDRESS; loc <= FONT_END_ADDRESS; loc++) {
+        memory[loc] = font[loc - FONT_START_ADDRESS];
         printf("address %x: %x\n", loc, memory[loc]);
     }
+}
+
+int main(void)
+{
+    chip8 chip8;
+
+    write_font_to_memory(chip8.memory);
+
+    return 0;
 }
