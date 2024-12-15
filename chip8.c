@@ -1,12 +1,18 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <SDL.h>
+#include <SDL_timer.h>
+#include <SDL_image.h>
 
 #define MEMORY_IN_BYTES 4096
 #define FONT_IN_BYTES 80
 #define FONT_START_ADDRESS 0x050
 #define FONT_END_ADDRESS 0x09F
 #define STACK_SIZE 16
-#define TIMER_DECAY_RATE 60
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 320
 
 typedef struct {
     unsigned char memory[MEMORY_IN_BYTES]; // 4KB memory
@@ -18,7 +24,7 @@ typedef struct {
     int8_t stimer; // sound timer
 } chip8;
 
-void write_font_to_memory(unsigned char *memory)
+void write_font_to_memory(unsigned char* memory)
 {
     unsigned char font[FONT_IN_BYTES] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -39,10 +45,8 @@ void write_font_to_memory(unsigned char *memory)
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
     };
 
-    for (int loc = FONT_START_ADDRESS; loc <= FONT_END_ADDRESS; loc++) {
+    for (int loc = FONT_START_ADDRESS; loc <= FONT_END_ADDRESS; loc++)
         memory[loc] = font[loc - FONT_START_ADDRESS];
-        printf("address %x: %x\n", loc, memory[loc]);
-    }
 }
 
 int main(void)
@@ -50,6 +54,76 @@ int main(void)
     chip8 chip8;
 
     write_font_to_memory(chip8.memory);
+
+    // initialize SDL
+    if(SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+        fprintf(stderr, "error initializing SDL: %s\n", SDL_GetError());
+        return 1;
+    }
+
+    // create a window
+    SDL_Window* window = SDL_CreateWindow("CHIP-8 Emulator", 
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+    if (window == NULL) {
+        fprintf(stderr, "error creating window: %s\n", SDL_GetError());
+        return 1;
+    }
+
+    // create a renderer
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (renderer == NULL) {
+        fprintf(stderr, "error creating renderer: %s\n", SDL_GetError());
+        return 1;
+    }
+
+    // create grid of pixels
+    bool pixels[SCREEN_HEIGHT][SCREEN_WIDTH];
+    for (int y = 0; y < SCREEN_HEIGHT; y++) {
+        for (int x = 0; x < SCREEN_WIDTH; x++) {
+            pixels[y][x] = false;
+        }
+    }
+    pixels[4][4] = true;
+
+    // main loop
+    bool running = true;
+    while (running) {
+
+        // handle events
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                running = false;
+            }
+        }
+
+        // draw background
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        // draw pixels
+        for (int y = 0; y < SCREEN_HEIGHT; y++) {
+            for (int x = 0; x < SCREEN_WIDTH; x++) {
+                if (pixels[y / 10][x / 10]) {
+                    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                    SDL_RenderDrawPoint(renderer, x, y);
+                }
+            }
+        }
+
+        // present the renderer
+        SDL_RenderPresent(renderer);
+
+        // 60 frames per second
+        SDL_Delay(1000 / 60);
+    }
+
+
+    // clean up
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+
+    SDL_Quit();
 
     return 0;
 }
