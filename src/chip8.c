@@ -7,7 +7,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "usage: %s <rom>\n", argv[0]);
         return 1;
     } else {
-        printf("opening rom: %s\n", argv[1]);
+        fprintf(stdout, "opening rom: %s\n", argv[1]);
     }
 
     emulator chip8;
@@ -17,13 +17,15 @@ int main(int argc, char **argv)
     if (rom == NULL) {
         fprintf(stderr, "error opening rom: %s\n", argv[1]);
         return 1;
+    } else {
+        fprintf(stdout, "rom opened successfully\n");
     }
 
     write_rom_to_memory(&chip8, rom);
     //print_memory(&chip8);
 
     display display;
-    if (init_display(&display) != 0) { 
+    if (init_display(&display) != 0) {
         fprintf(stderr, "error creating SDL display: %s\n", SDL_GetError());
         return 1;
     }
@@ -33,12 +35,15 @@ int main(int argc, char **argv)
     uint8_t spriteY;
     uint8_t spriteHeight;
 
+    // main loop
     while (display.powered_on) {
 
-        // handle events
+        // event loop
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
+
+                // handle key presses
                 case SDL_KEYDOWN:
                     switch (event.key.keysym.sym) {
                         case SDLK_ESCAPE:
@@ -91,12 +96,14 @@ int main(int argc, char **argv)
                             break;
                         case SDLK_v:
                             printf("v\n");
-                    }
+                    } // switch (event.key.keysym.sym)
                     break;
+
+                // quit gracefully
                 case SDL_QUIT:
                     display.powered_on = false;
-            }
-        }
+            } // switch (event.type)
+        } // event loop
 
         // fetch opcode
         // this is a 2 byte opcode, so we need to shift the first byte by 8 bits
@@ -126,7 +133,7 @@ int main(int argc, char **argv)
                     default:
                         // call RCA 1802 program at address NNN
                         break;
-                }
+                } // switch (opcode & 0x00FF)
                 break;
             case 0x1:
                 // jump to address NNN
@@ -193,7 +200,7 @@ int main(int argc, char **argv)
                     case 0x7:
                     break; //todo delete this line
                     // set Vx to Vy - Vx,
-                }
+                } // switch (opcode & 0x000F)
                 break;
             case 0x9:
                 // skip next instruction if Vx != Vy
@@ -236,7 +243,7 @@ int main(int argc, char **argv)
                     case 0xA1:
                         // skip next instruction if key with the value of Vx is not pressed
                         break;
-                }
+                } // switch (opcode & 0x00FF)
                 break;
             case 0xF:
                 switch (opcode & 0x00FF) {
@@ -267,11 +274,11 @@ int main(int argc, char **argv)
                     case 0x65:
                         // fill V0 to Vx with values from memory starting at address I
                         break;
-                }
+                } // switch (opcode & 0x00FF)
                 break;
-        }
+        } // switch (opcode >> 12)
 
-        // draw
+        // draw the frame
         if (draw_background(&display) != 0) {
             fprintf(stderr, "error drawing background\n");
             return 1;
@@ -285,7 +292,8 @@ int main(int argc, char **argv)
         SDL_RenderPresent(display.renderer);
 
         SDL_Delay(1000 / 60); // 60 loops per second
-    }
+
+    } // main loop
 
     // cleanup
     SDL_DestroyRenderer(display.renderer);
