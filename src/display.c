@@ -38,11 +38,9 @@ int draw_background(display* chip8_display)
 
 int draw_pixels(display* chip8_display)
 {
-    // set the draw color to white
     if (SDL_SetRenderDrawColor(chip8_display->renderer, 255, 255, 255, 255) != EXIT_SUCCESS)
         return EXIT_FAILURE;
 
-    // draw pixels
     for (int y = 0; y < SCREEN_HEIGHT; y++) {
         for (int x = 0; x < SCREEN_WIDTH; x++) {
             if (chip8_display->pixels[y / 10][x / 10] && SDL_RenderDrawPoint(chip8_display->renderer, x, y) != EXIT_SUCCESS)

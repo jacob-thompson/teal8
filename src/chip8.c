@@ -1,26 +1,105 @@
-#include "../include/chip8.h"
+#include "../include/emulator.h"
+#include "../include/display.h"
 
-void write_font_to_memory(unsigned char* memory)
+int main(void)
 {
-    unsigned char font[FONT_IN_BYTES] = {
-        0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
-        0x20, 0x60, 0x20, 0x20, 0x70, // 1
-        0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
-        0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
-        0x90, 0x90, 0xF0, 0x10, 0x10, // 4
-        0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
-        0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
-        0xF0, 0x10, 0x20, 0x40, 0x40, // 7
-        0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
-        0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
-        0xF0, 0x90, 0xF0, 0x90, 0x90, // A
-        0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
-        0xF0, 0x80, 0x80, 0x80, 0xF0, // C
-        0xE0, 0x90, 0x90, 0x90, 0xE0, // D
-        0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
-        0xF0, 0x80, 0xF0, 0x80, 0x80  // F
-    };
+    chip8 chip8;
+    write_font_to_memory(chip8.memory);
 
-    for (int loc = FONT_START_ADDRESS; loc <= FONT_END_ADDRESS; loc++)
-        memory[loc] = font[loc - FONT_START_ADDRESS];
+    display display;
+    if (init_display(&display) != 0) { 
+        fprintf(stderr, "error creating SDL display: %s\n", SDL_GetError());
+        return 1;
+    }
+    display.pixels[4][4] = true;
+
+    while (display.powered_on) {
+
+        // handle events
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+                case SDL_KEYDOWN:
+                    switch (event.key.keysym.sym) {
+                        case SDLK_ESCAPE:
+                            display.powered_on = false;
+                            break;
+                        case SDLK_1:
+                            printf("1\n");
+                            break;
+                        case SDLK_2:
+                            printf("2\n");
+                            break;
+                        case SDLK_3:
+                            printf("3\n");
+                            break;
+                        case SDLK_4:
+                            printf("4\n");
+                            break;
+                        case SDLK_q:
+                            printf("q\n");
+                            break;
+                        case SDLK_w:
+                            printf("w\n");
+                            break;
+                        case SDLK_e:
+                            printf("e\n");
+                            break;
+                        case SDLK_r:
+                            printf("r\n");
+                            break;
+                        case SDLK_a:
+                            printf("a\n");
+                            break;
+                        case SDLK_s:
+                            printf("s\n");
+                            break;
+                        case SDLK_d:
+                            printf("d\n");
+                            break;
+                        case SDLK_f:
+                            printf("f\n");
+                            break;
+                        case SDLK_z:
+                            printf("z\n");
+                            break;
+                        case SDLK_x:
+                            printf("x\n");
+                            break;
+                        case SDLK_c:
+                            printf("c\n");
+                            break;
+                        case SDLK_v:
+                            printf("v\n");
+                            break;
+                    }
+                    break;
+                case SDL_QUIT:
+                    display.powered_on = false;
+                    break;
+            }
+        }
+
+        // draw
+        if (draw_background(&display) != 0) {
+            fprintf(stderr, "error drawing background\n");
+            return 1;
+        }
+
+        if (draw_pixels(&display) != 0) {
+            fprintf(stderr, "error drawing pixels\n");
+            return 1;
+        }
+
+        SDL_RenderPresent(display.renderer);
+
+        SDL_Delay(1000 / 60); // 60 loops per second
+    }
+
+    // cleanup
+    SDL_DestroyRenderer(display.renderer);
+    SDL_DestroyWindow(display.window);
+    SDL_Quit();
+
+    return 0;
 }

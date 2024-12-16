@@ -1,5 +1,5 @@
 .DS_STORE
 .cache
-bin/main
+bin/chip8
 build/*.o
 compile_commands.json
