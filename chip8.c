@@ -98,15 +98,25 @@ int main(void)
         }
 
         // draw background
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
+        if (SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255) != 0) {
+            fprintf(stderr, "error setting render draw color: %s\n", SDL_GetError());
+            return 1;
+        }
+        if (SDL_RenderClear(renderer) != 0) {
+            fprintf(stderr, "error clearing renderer: %s\n", SDL_GetError());
+            return 1;
+        }
 
         // draw pixels
+        if (SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255) != 0) {
+            fprintf(stderr, "error setting render draw color: %s\n", SDL_GetError());
+            return 1;
+        }
         for (int y = 0; y < SCREEN_HEIGHT; y++) {
             for (int x = 0; x < SCREEN_WIDTH; x++) {
-                if (pixels[y / 10][x / 10]) {
-                    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-                    SDL_RenderDrawPoint(renderer, x, y);
+                if (pixels[y / 10][x / 10] && SDL_RenderDrawPoint(renderer, x, y) != 0) {
+                    fprintf(stderr, "error drawing point: %s\n", SDL_GetError());
+                    return 1;
                 }
             }
         }
@@ -118,11 +128,9 @@ int main(void)
         SDL_Delay(1000 / 60);
     }
 
-
     // clean up
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-
     SDL_Quit();
 
     return 0;
