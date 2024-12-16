@@ -92,8 +92,65 @@ int main(void)
         // handle events
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                running = false;
+            switch (event.type) {
+                case SDL_KEYDOWN:
+                    switch (event.key.keysym.sym) {
+                        case SDLK_ESCAPE:
+                            running = false;
+                            break;
+                        case SDLK_1:
+                            printf("1\n");
+                            break;
+                        case SDLK_2:
+                            printf("2\n");
+                            break;
+                        case SDLK_3:
+                            printf("3\n");
+                            break;
+                        case SDLK_4:
+                            printf("4\n");
+                            break;
+                        case SDLK_q:
+                            printf("q\n");
+                            break;
+                        case SDLK_w:
+                            printf("w\n");
+                            break;
+                        case SDLK_e:
+                            printf("e\n");
+                            break;
+                        case SDLK_r:
+                            printf("r\n");
+                            break;
+                        case SDLK_a:
+                            printf("a\n");
+                            break;
+                        case SDLK_s:
+                            printf("s\n");
+                            break;
+                        case SDLK_d:
+                            printf("d\n");
+                            break;
+                        case SDLK_f:
+                            printf("f\n");
+                            break;
+                        case SDLK_z:
+                            printf("z\n");
+                            break;
+                        case SDLK_x:
+                            printf("x\n");
+                            break;
+                        case SDLK_c:
+                            printf("c\n");
+                            break;
+                        case SDLK_v:
+                            printf("v\n");
+                            break;
+                    }
+                    break;
+                case SDL_QUIT:
+                    running = false;
+                    break;
             }
         }
 
