@@ -1,6 +1,6 @@
 #include "../include/display.h"
 
-int init_display(display* display)
+int init_display(display *display)
 {
     if(SDL_Init(SDL_INIT_EVERYTHING) != EXIT_SUCCESS) {
         fprintf(stderr, "error initializing SDL: %s\n", SDL_GetError());
@@ -25,25 +25,25 @@ int init_display(display* display)
     return EXIT_SUCCESS;
 }
 
-int draw_background(display* chip8_display)
+int draw_background(display *display)
 {
-    if (SDL_SetRenderDrawColor(chip8_display->renderer, 0, 0, 0, 255) != EXIT_SUCCESS)
+    if (SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255) != EXIT_SUCCESS)
         return EXIT_FAILURE;
 
-    if (SDL_RenderClear(chip8_display->renderer) != EXIT_SUCCESS)
+    if (SDL_RenderClear(display->renderer) != EXIT_SUCCESS)
         return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
 }
 
-int draw_pixels(display* chip8_display)
+int draw_pixels(display *display)
 {
-    if (SDL_SetRenderDrawColor(chip8_display->renderer, 255, 255, 255, 255) != EXIT_SUCCESS)
+    if (SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255) != EXIT_SUCCESS)
         return EXIT_FAILURE;
 
     for (int y = 0; y < SCREEN_HEIGHT; y++) {
         for (int x = 0; x < SCREEN_WIDTH; x++) {
-            if (chip8_display->pixels[y / 10][x / 10] && SDL_RenderDrawPoint(chip8_display->renderer, x, y) != EXIT_SUCCESS)
+            if (display->pixels[y / 10][x / 10] && SDL_RenderDrawPoint(display->renderer, x, y) != EXIT_SUCCESS)
                 return EXIT_FAILURE;
         }
     }

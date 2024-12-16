@@ -1,6 +1,6 @@
 #include "../include/emulator.h"
 
-void write_font_to_memory(unsigned char* memory)
+void write_font_to_memory(unsigned char *memory)
 {
     unsigned char font[FONT_IN_BYTES] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -23,4 +23,22 @@ void write_font_to_memory(unsigned char* memory)
 
     for (int loc = FONT_START_ADDRESS; loc <= FONT_END_ADDRESS; loc++)
         memory[loc] = font[loc - FONT_START_ADDRESS];
+}
+
+void write_rom_to_memory(emulator *chip8, FILE *rom)
+{
+    chip8->pc = PROGRAM_START_ADDRESS;
+    while (fread(&chip8->memory[chip8->pc], 1, 1, rom) == 1)
+        chip8->pc++;
+    chip8->pc = PROGRAM_START_ADDRESS;
+}
+
+void print_memory(emulator *chip8)
+{
+    for (int i = 0; i < MEMORY_IN_BYTES; i++) {
+        if (i % 16 == 0)
+            printf("\n");
+        printf("%02X ", chip8->memory[i]);
+    }
+    printf("\n");
 }

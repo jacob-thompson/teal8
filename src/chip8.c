@@ -3,15 +3,24 @@
 
 int main(void)
 {
-    chip8 chip8;
+    emulator chip8;
     write_font_to_memory(chip8.memory);
+
+    FILE *rom = fopen("roms/ibm_logo.c8", "rb");
+    if (rom == NULL) {
+        fprintf(stderr, "error opening rom\n");
+        return 1;
+    }
+
+    write_rom_to_memory(&chip8, rom);
+    //print_memory(&chip8);
 
     display display;
     if (init_display(&display) != 0) { 
         fprintf(stderr, "error creating SDL display: %s\n", SDL_GetError());
         return 1;
     }
-    display.pixels[4][4] = true;
+    //display.pixels[4][4] = true;
 
     while (display.powered_on) {
 
@@ -79,6 +88,11 @@ int main(void)
                     break;
             }
         }
+
+        // fetch opcode
+        chip8.ix = (chip8.memory[chip8.pc] << 8) | chip8.memory[chip8.pc + 1];
+        chip8.pc += 2;
+        printf("opcode: %04x\n", chip8.ix);
 
         // draw
         if (draw_background(&display) != 0) {
