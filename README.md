@@ -6,19 +6,19 @@ https://tobiasvl.github.io/blog/write-a-chip-8-emulator/
 
 ## requirements
 
-- SDL2
+### SDL2
 
-MACOS:
+MacOS:
 ```bash
 brew install sdl2
 ```
 
-WINDOWS:
+Windows:
 ```bash
 vcpkg install sdl2
 ```
 
-UBUNTU:
+Ubuntu:
 ```bash
 sudo apt-get install libsdl2-dev
 ```
