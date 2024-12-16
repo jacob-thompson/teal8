@@ -4,13 +4,11 @@ CHIP-8 Emulator (work-in-progress)
 
 https://tobiasvl.github.io/blog/write-a-chip-8-emulator/
 
-## Requirements
+## Pre-requisites
 
 ### SDL2
 
-[SDL2](https://www.libsdl.org/) is used for rendering the graphics and handling input.
-
-SDL2 can be installed by:
+[SDL2](https://www.libsdl.org/) is used for rendering the graphics and handling input. It can be installed by:
 - using a package manager (e.g. `brew`, `vcpkg`, `apt-get`, `pacman`, `dnf`)
 - downloading one of the [precompiled binaries](https://github.com/libsdl-org/SDL/releases/latest)
 - downloading the [source code](https://github.com/libsdl-org/SDL) and [compiling it](https://wiki.libsdl.org/Installation)
@@ -42,7 +40,7 @@ Fedora:
 sudo dnf install SDL2-devel
 ```
 
-## install
+## Install
 
 ```bash
 git clone https://github.com/jacob-thompson/chip-8.git
@@ -50,7 +48,7 @@ cd chip-8
 make
 ```
 
-## run
+## Run
 
 ```bash
 make run <path-to-rom>
