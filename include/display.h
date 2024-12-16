@@ -19,6 +19,12 @@ typedef struct display {
 } display;
 
 /**
+    * Reset the display.
+    * @param display the display
+*/
+void reset_display(display *display);
+
+/**
     * Initialize the display.
     * @param display the display
     * @return 0 on success, 1 on failure

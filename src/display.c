@@ -1,5 +1,12 @@
 #include "../include/display.h"
 
+void reset_display(display *display)
+{
+    for (int y = 0; y < SCREEN_HEIGHT; y++)
+        for (int x = 0; x < SCREEN_WIDTH; x++)
+            display->pixels[y][x] = false;
+}
+
 int init_display(display *display)
 {
     if(SDL_Init(SDL_INIT_EVERYTHING) != EXIT_SUCCESS) {
@@ -16,9 +23,7 @@ int init_display(display *display)
     if (display->renderer == NULL)
         return EXIT_FAILURE;
 
-    for (int y = 0; y < SCREEN_HEIGHT; y++)
-        for (int x = 0; x < SCREEN_WIDTH; x++)
-            display->pixels[y][x] = false;
+    reset_display(display);
 
     display->powered_on = true;
 
