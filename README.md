@@ -22,20 +22,3 @@ UBUNTU:
 ```bash
 sudo apt-get install libsdl2-dev
 ```
-
-- SDL2_image
-
-MACOS:
-```bash
-brew install sdl2_image
-```
-
-WINDOWS:
-```bash
-vcpkg install sdl2-image
-```
-
-UBUNTU:
-```bash
-sudo apt-get install libsdl2-image-dev
-```
