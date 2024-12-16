@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define MEMORY_IN_BYTES 4096
 #define FONT_IN_BYTES 80
@@ -23,6 +24,24 @@ typedef struct {
     int8_t dtimer; // delay timer
     int8_t stimer; // sound timer
 } emulator;
+
+/**
+    * Verify that the rom file is a valid chip8 rom.
+    * @param rom the rom file
+    * @return the rom file
+    * @return NULL if the rom file is not a valid chip8 rom
+*/
+FILE *verified_rom(FILE *rom);
+
+/**
+    * Get the rom file.
+    * @param rom the rom file
+    * @return the rom file
+    * @return NULL if the rom file could not be opened
+    * @return NULL if the rom file is NULL
+    * @return NULL if the rom file is not a valid chip8 rom
+*/
+FILE *get_rom(const char* rom);
 
 /**
     * Write the font to the memory of the emulator.

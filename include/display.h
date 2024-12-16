@@ -19,7 +19,7 @@ typedef struct display {
 } display;
 
 /**
-    * Reset the display.
+    * Clear the pixels of the display.
     * @param display the display
 */
 void reset_display(display *display);

@@ -1,15 +1,21 @@
 #include "../include/emulator.h"
 #include "../include/display.h"
-#include <stdint.h>
 
-int main(void)
+int main(int argc, char **argv)
 {
+    if (argc != 2) {
+        fprintf(stderr, "usage: %s <rom>\n", argv[0]);
+        return 1;
+    } else {
+        printf("opening rom: %s\n", argv[1]);
+    }
+
     emulator chip8;
     write_font_to_memory(chip8.memory);
 
-    FILE *rom = fopen("roms/ibm_logo.c8", "rb");
+    FILE *rom = get_rom(argv[1]);
     if (rom == NULL) {
-        fprintf(stderr, "error opening rom\n");
+        fprintf(stderr, "error opening rom: %s\n", argv[1]);
         return 1;
     }
 

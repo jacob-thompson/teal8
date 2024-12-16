@@ -1,3 +1,11 @@
+# If the first argument is "run"...
+ifeq (run,$(firstword $(MAKECMDGOALS)))
+  # use the rest as arguments for "run"
+  RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  # ...and turn them into do-nothing targets
+  $(eval $(RUN_ARGS):;@:)
+endif
+
 CC=gcc
 CFLAGS=-I. -Wall -Wno-unused-command-line-argument
 SDLFLAGS=`sdl2-config --libs --cflags`
@@ -15,7 +23,10 @@ $(OUT): $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(SDLFLAGS)
 
 run:
-	./$(OUT)
+	./$(OUT) $(RUN_ARGS)
+
+test:
+	./$(OUT) roms/ibm_logo.ch8
 
 clean:
 	rm -f $(OBJ) $(OUT)

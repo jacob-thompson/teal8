@@ -1,5 +1,60 @@
 #include "../include/emulator.h"
 
+FILE *verified_rom(FILE *rom)
+{
+    // a valid chip8 rom starts with 0x00E0
+    unsigned char buffer[2];
+    fread(buffer, 1, 2, rom);
+    if (buffer[0] != 0x00 || buffer[1] != 0xE0)
+        return NULL;
+    rewind(rom);
+
+    return rom;
+}
+
+FILE *get_rom(const char *rom)
+{
+    char *filename = malloc(sizeof(char) * 50);
+    FILE *rom_file = NULL;
+
+    sprintf(filename, "roms/%s.c8", rom);
+    rom_file = fopen(filename, "rb");
+    if (rom_file != NULL) {
+        free(filename);
+        return verified_rom(rom_file);
+    }
+
+    sprintf(filename, "roms/%s.ch8", rom);
+    rom_file = fopen(filename, "rb");
+    if (rom_file != NULL) {
+        free(filename);
+        return verified_rom(rom_file);
+    }
+
+    sprintf(filename, "roms/%s.chip8", rom);
+    rom_file = fopen(filename, "rb");
+    if (rom_file != NULL) {
+        free(filename);
+        return verified_rom(rom_file);
+    }
+
+    sprintf(filename, "roms/%s", rom);
+    rom_file = fopen(filename, "rb");
+    if (rom_file != NULL) {
+        free(filename);
+        return verified_rom(rom_file);
+    }
+
+    sprintf(filename, "%s", rom);
+    rom_file = fopen(filename, "rb");
+    if (rom_file != NULL) {
+        free(filename);
+        return verified_rom(rom_file);
+    }
+
+    return NULL;
+}
+
 void write_font_to_memory(unsigned char *memory)
 {
     unsigned char font[FONT_IN_BYTES] = {
