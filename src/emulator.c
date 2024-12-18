@@ -35,8 +35,8 @@ FILE *getRom(const char *rom)
 
     sprintf(filename, "%s", rom);
     if (strcmp(filename,"octojamtitle") == 0) {
-        int random = randomNumber(1, 5);
-        sprintf(filename, "roms/octojam%dtitle.ch8", random);
+        int randomTitleRom = randomNumber(1, 10);
+        sprintf(filename, "roms/octojam%dtitle.ch8", randomTitleRom);
         rom_file = fopen(filename, "rb");
         if (rom_file != NULL) {
             free(filename);
