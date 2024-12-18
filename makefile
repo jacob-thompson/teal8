@@ -26,7 +26,7 @@ run:
 	./$(OUT) $(RUN_ARGS)
 
 test:
-	./$(OUT) roms/ibm_logo.ch8
+	./$(OUT) roms/test_opcode.ch8
 
 clean:
 	rm -f $(OBJ) $(OUT)
