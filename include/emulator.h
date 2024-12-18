@@ -1,6 +1,9 @@
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
+
+#include "../include/display.h"
+#include "../include/stack.h"
+#include "../include/timers.h"
 
 #define MEMORY_IN_BYTES 4096
 #define FONT_IN_BYTES 80
@@ -9,33 +12,11 @@
 #define FONT_END_ADDRESS 0x09F
 #define PROGRAM_START_ADDRESS 0x200
 
-#define STACK_SIZE 16
 #define REGISTERS 16
 
 /**
-    * The timers struct.
-    * Contains the delay timer and the sound timer.
-    * The delay timer is used for timing the events of games.
-    * The sound timer is used for sound effects.
-*/
-typedef struct {
-    int8_t delay;
-    int8_t sound;
-} timers;
-
-/**
-    * The stack struct.
-    * Contains the stack and the stack pointer.
-    * The stack pointer points to the top of the stack.
-*/
-typedef struct {
-    unsigned short s[STACK_SIZE]; // 16 16-bit registers
-    unsigned short *sp; // stack pointer
-} stack;
-
-/**
     * The emulator struct.
-    * Contains the memory, stack, registers, program counter, stack pointer, delay timer, and sound timer.
+    * This struct contains the memory, registers, index register, program counter, timers, stack, and display.
 */
 typedef struct {
     uint8_t memory[MEMORY_IN_BYTES]; // 4KB memory
@@ -44,6 +25,7 @@ typedef struct {
     unsigned short pc; // program counter
     timers timers; // delay and sound timers
     stack stack; // stack
+    display display; // display
 } emulator;
 
 /**
@@ -93,22 +75,16 @@ void printMemory(emulator *chip8);
 int randomNumber(int min, int max);
 
 /**
-    * Get the number of stacked addresses.
-    * @param stack the stack
-    * @return the number of stacked addresses
+    * Fetch the opcode from the memory of the emulator.
+    * The opcode is 2 bytes long.
+    * @param chip8 the emulator
+    * @return the opcode
 */
-int stacked(stack *stack);
+unsigned short fetchOpcode(emulator *chip8);
 
 /**
-    * Push a value onto the stack.
-    * @param s the stack
-    * @param value the value to push onto the stack
+    * Decode the opcode.
+    * @param chip8 the emulator
+    * @param opcode the opcode
 */
-void stackPush(stack *stack, unsigned short *value);
-
-/**
-    * Pop a value from the stack.
-    * @param s the stack
-    * @param poppedValue value to store popped address
-*/
-void stackPop(stack *stack, unsigned short *poppedValue);
+void decodeOpcode(emulator *chip8, unsigned short opcode);

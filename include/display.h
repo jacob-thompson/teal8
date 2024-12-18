@@ -34,6 +34,13 @@ void resetDisplay(display *display);
 int initDisplay(display *display);
 
 /**
+    * Handle an event.
+    * @param display the display
+    * @param event the event
+*/
+void handleEvent(display *display, SDL_Event *event);
+
+/**
     * Draw the background of the display.
     * @param display the display
     * @return 0 on success, 1 on failure

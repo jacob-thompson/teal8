@@ -6,17 +6,20 @@ ifeq (run,$(firstword $(MAKECMDGOALS)))
   $(eval $(RUN_ARGS):;@:)
 endif
 
+IDIR=include
+BDIR=build
 CC=gcc
 CFLAGS=-I. -Wall -Wno-unused-command-line-argument
 SDLFLAGS=`sdl2-config --libs --cflags`
 SDLFLAGS+=-I/opt/homebrew/Cellar/sdl2/*/include
-_DEPS = emulator.h display.h
-DEPS = $(patsubst %, include/%, $(_DEPS))
-OBJ = build/emulator.o build/display.o build/chip8.o
-OUT = bin/chip8
+_DEPS=emulator.h display.h stack.h timers.h
+DEPS=$(patsubst %, $(IDIR)/%, $(_DEPS))
+_OBJ=emulator.o display.o stack.o chip8.o
+OBJ=$(patsubst %, $(BDIR)/%, $(_OBJ))
+OUT=bin/chip8
 .PHONY: clean
 
-build/%.o: src/%.c $(DEPS) clean
+$(BDIR)/%.o: src/%.c $(DEPS) clean
 	$(CC) -c -o $@ $< $(CFLAGS) $(SDLFLAGS)
 
 $(OUT): $(OBJ)

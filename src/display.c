@@ -34,6 +34,71 @@ int initDisplay(display *display)
     return EXIT_SUCCESS;
 }
 
+void handleEvent(display *display, SDL_Event *event)
+{
+    switch (event->type) {
+        // handle key presses
+        case SDL_KEYDOWN:
+            switch (event->key.keysym.sym) {
+                case SDLK_ESCAPE:
+                    display->powered_on = false;
+                    break;
+                case SDLK_1:
+                    display->key_pressed[0x1] = true;
+                    break;
+                case SDLK_2:
+                    display->key_pressed[0x2] = true;
+                    break;
+                case SDLK_3:
+                    display->key_pressed[0x3] = true;
+                    break;
+                case SDLK_4:
+                    display->key_pressed[0xC] = true;
+                    break;
+                case SDLK_q:
+                    display->key_pressed[0x4] = true;
+                    break;
+                case SDLK_w:
+                    display->key_pressed[0x5] = true;
+                    break;
+                case SDLK_e:
+                    display->key_pressed[0x6] = true;
+                    break;
+                case SDLK_r:
+                    display->key_pressed[0xD] = true;
+                    break;
+                case SDLK_a:
+                    display->key_pressed[0x7] = true;
+                    break;
+                case SDLK_s:
+                    display->key_pressed[0x8] = true;
+                    break;
+                case SDLK_d:
+                    display->key_pressed[0x9] = true;
+                    break;
+                case SDLK_f:
+                    display->key_pressed[0xE] = true;
+                    break;
+                case SDLK_z:
+                    display->key_pressed[0xA] = true;
+                    break;
+                case SDLK_x:
+                    display->key_pressed[0x0] = true;
+                    break;
+                case SDLK_c:
+                    display->key_pressed[0xB] = true;
+                    break;
+                case SDLK_v:
+                    display->key_pressed[0xF] = true;
+            }
+            break;
+
+        // quit gracefully
+        case SDL_QUIT:
+            display->powered_on = false;
+    }
+}
+
 int drawBackground(display *display)
 {
     if (SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255) != EXIT_SUCCESS)
