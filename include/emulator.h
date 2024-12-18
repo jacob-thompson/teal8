@@ -10,28 +10,41 @@
 #define PROGRAM_START_ADDRESS 0x200
 
 #define STACK_SIZE 16
+#define REGISTERS 16
+
+/**
+    * The timers struct.
+    * Contains the delay timer and the sound timer.
+    * The delay timer is used for timing the events of games.
+    * The sound timer is used for sound effects.
+*/
+typedef struct {
+    int8_t delay;
+    int8_t sound;
+} timers;
+
+/**
+    * The stack struct.
+    * Contains the stack and the stack pointer.
+    * The stack pointer points to the top of the stack.
+*/
+typedef struct {
+    unsigned short s[STACK_SIZE]; // 16 16-bit registers
+    unsigned short *sp; // stack pointer
+} stack;
 
 /**
     * The emulator struct.
     * Contains the memory, stack, registers, program counter, stack pointer, delay timer, and sound timer.
 */
 typedef struct {
-    unsigned char memory[MEMORY_IN_BYTES]; // 4KB memory
-    unsigned char stack[STACK_SIZE]; // 16 16-bit registers
-    unsigned short ix; // 16-bit register
+    uint8_t memory[MEMORY_IN_BYTES]; // 4KB memory
+    uint8_t v[REGISTERS]; // 16 8-bit registers
+    unsigned short ix; // 16-bit index register
     unsigned short pc; // program counter
-    unsigned char sp; // stack pointer
-    int8_t dtimer; // delay timer
-    int8_t stimer; // sound timer
+    timers timers; // delay and sound timers
+    stack stack; // stack
 } emulator;
-
-/**
-    * Verify that the rom file is a valid chip8 rom.
-    * @param rom the rom file
-    * @return the rom file
-    * @return NULL if the rom file is not a valid chip8 rom
-*/
-FILE *verified_rom(FILE *rom);
 
 /**
     * Get the rom file.
@@ -41,14 +54,20 @@ FILE *verified_rom(FILE *rom);
     * @return NULL if the rom file is NULL
     * @return NULL if the rom file is not a valid chip8 rom
 */
-FILE *get_rom(const char* rom);
+FILE *getRom(const char *rom);
+
+/**
+    * Initialize the emulator.
+    * @param chip8 the emulator
+*/
+void initializeEmulator(emulator *chip8, FILE *rom);
 
 /**
     * Write the font to the memory of the emulator.
     * font data is written into memory between 0x050 and 0x09F.
     * @param memory the memory of the emulator
 */
-void write_font_to_memory(unsigned char* memory);
+void writeFontToMemory(unsigned char *memory);
 
 /**
     * Write the rom to the memory of the emulator.
@@ -56,11 +75,40 @@ void write_font_to_memory(unsigned char* memory);
     * @param chip8 the emulator
     * @param rom the rom file
 */
-void write_rom_to_memory(emulator* chip8, FILE* rom);
+void writeRomToMemory(emulator *chip8, FILE *rom);
 
 /**
     * Print the memory of the emulator.
     * For debugging purposes.
     * @param chip8 the emulator
 */
-void print_memory(emulator* chip8);
+void printMemory(emulator *chip8);
+
+/**
+    * Generate a random number between min and max.
+    * @param min the minimum number
+    * @param max the maximum number
+    * @return the random number
+*/
+int randomNumber(int min, int max);
+
+/**
+    * Get the number of stacked addresses.
+    * @param stack the stack
+    * @return the number of stacked addresses
+*/
+int stacked(stack *stack);
+
+/**
+    * Push a value onto the stack.
+    * @param s the stack
+    * @param value the value to push onto the stack
+*/
+void stackPush(stack *stack, unsigned short *value);
+
+/**
+    * Pop a value from the stack.
+    * @param s the stack
+    * @param poppedValue value to store popped address
+*/
+void stackPop(stack *stack, unsigned short *poppedValue);

@@ -1,13 +1,13 @@
 #include "../include/display.h"
 
-void reset_display(display *display)
+void resetDisplay(display *display)
 {
     for (int y = 0; y < SCREEN_HEIGHT; y++)
         for (int x = 0; x < SCREEN_WIDTH; x++)
             display->pixels[y][x] = false;
 }
 
-int init_display(display *display)
+int initDisplay(display *display)
 {
     if(SDL_Init(SDL_INIT_EVERYTHING) != EXIT_SUCCESS)
         return EXIT_FAILURE;
@@ -27,14 +27,14 @@ int init_display(display *display)
     if (display->renderer == NULL)
         return EXIT_FAILURE;
 
-    reset_display(display);
+    resetDisplay(display);
 
     display->powered_on = true;
 
     return EXIT_SUCCESS;
 }
 
-int draw_background(display *display)
+int drawBackground(display *display)
 {
     if (SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255) != EXIT_SUCCESS)
         return EXIT_FAILURE;
@@ -45,7 +45,7 @@ int draw_background(display *display)
     return EXIT_SUCCESS;
 }
 
-int draw_pixels(display *display)
+int drawPixels(display *display)
 {
     if (SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255) != EXIT_SUCCESS)
         return EXIT_FAILURE;
@@ -56,4 +56,10 @@ int draw_pixels(display *display)
                 return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
+}
+
+void clearKeys(bool *keys)
+{
+    for (int i = 0x0; i <= 0xF; i++)
+        keys[i] = false;
 }

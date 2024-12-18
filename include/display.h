@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 
+#define KEY_COUNT 16
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 320
 #define EXIT_SUCCESS 0
@@ -16,31 +17,38 @@ typedef struct display {
     SDL_Renderer *renderer;
     bool pixels[SCREEN_HEIGHT][SCREEN_WIDTH];
     bool powered_on;
+    bool key_pressed[KEY_COUNT];
 } display;
 
 /**
     * Clear the pixels of the display.
     * @param display the display
 */
-void reset_display(display *display);
+void resetDisplay(display *display);
 
 /**
     * Initialize the display.
     * @param display the display
     * @return 0 on success, 1 on failure
 */
-int init_display(display *display);
+int initDisplay(display *display);
 
 /**
     * Draw the background of the display.
     * @param display the display
     * @return 0 on success, 1 on failure
 */
-int draw_background(display *display);
+int drawBackground(display *display);
 
 /**
     * Draw the pixels of the display.
     * @param display the display
     * @return 0 on success, 1 on failure
 */
-int draw_pixels(display *display);
+int drawPixels(display *display);
+
+/**
+    * Clear keypress events.
+    * @param keys the keys to be cleared
+*/
+void clearKeys(bool *keys);

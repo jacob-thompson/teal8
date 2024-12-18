@@ -1,18 +1,6 @@
 #include "../include/emulator.h"
 
-FILE *verified_rom(FILE *rom)
-{
-    // a valid chip8 rom starts with 0x00E0
-    unsigned char buffer[2];
-    fread(buffer, 1, 2, rom);
-    if (buffer[0] != 0x00 || buffer[1] != 0xE0)
-        return NULL;
-    rewind(rom);
-
-    return rom;
-}
-
-FILE *get_rom(const char *rom)
+FILE *getRom(const char *rom)
 {
     char *filename = malloc(sizeof(char) * 50);
     FILE *rom_file = NULL;
@@ -21,41 +9,41 @@ FILE *get_rom(const char *rom)
     rom_file = fopen(filename, "rb");
     if (rom_file != NULL) {
         free(filename);
-        return verified_rom(rom_file);
+        return rom_file;
     }
 
     sprintf(filename, "roms/%s.ch8", rom);
     rom_file = fopen(filename, "rb");
     if (rom_file != NULL) {
         free(filename);
-        return verified_rom(rom_file);
+        return rom_file;
     }
 
     sprintf(filename, "roms/%s.chip8", rom);
     rom_file = fopen(filename, "rb");
     if (rom_file != NULL) {
         free(filename);
-        return verified_rom(rom_file);
+        return rom_file;
     }
 
     sprintf(filename, "roms/%s", rom);
     rom_file = fopen(filename, "rb");
     if (rom_file != NULL) {
         free(filename);
-        return verified_rom(rom_file);
+        return rom_file;
     }
 
     sprintf(filename, "%s", rom);
     rom_file = fopen(filename, "rb");
     if (rom_file != NULL) {
         free(filename);
-        return verified_rom(rom_file);
+        return rom_file;
     }
 
     return NULL;
 }
 
-void write_font_to_memory(unsigned char *memory)
+void writeFontToMemory(unsigned char *memory)
 {
     unsigned char font[FONT_IN_BYTES] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -80,7 +68,7 @@ void write_font_to_memory(unsigned char *memory)
         memory[loc] = font[loc - FONT_START_ADDRESS];
 }
 
-void write_rom_to_memory(emulator *chip8, FILE *rom)
+void writeRomToMemory(emulator *chip8, FILE *rom)
 {
     chip8->pc = PROGRAM_START_ADDRESS;
     while (fread(&chip8->memory[chip8->pc], 1, 1, rom) == 1)
@@ -88,12 +76,70 @@ void write_rom_to_memory(emulator *chip8, FILE *rom)
     chip8->pc = PROGRAM_START_ADDRESS;
 }
 
-void print_memory(emulator *chip8)
+void printMemory(emulator *chip8)
 {
     for (int i = 0; i < MEMORY_IN_BYTES; i++) {
         if (i % 16 == 0)
-            printf("\n");
-        printf("%02X ", chip8->memory[i]);
+            fprintf(stdout, "\n");
+        fprintf(stdout, "%02X ", chip8->memory[i]);
     }
-    printf("\n");
+    fprintf(stdout, "\n");
+}
+
+int randomNumber(int min, int max)
+{
+
+    if (min == max)
+        return min;
+
+    // swap the numbers if min is greater than max
+    if (min > max) {
+        min ^= max;
+        max ^= min;
+        min ^= max;
+    }
+
+    int range = max - min + 1;
+
+    // chop off the high end of rand()
+    // so that the entire range is evenly divided by range
+    int x;
+    while (1) {
+        x = rand();
+        if (x < RAND_MAX / range * range)
+            break;
+    }
+
+    return x % range + min;
+}
+
+int stacked(stack *stack)
+{
+    int count = 0;
+    for (int i = 0; stack->s[i] != '\0'; i++)
+        count++;
+    return count;
+}
+
+void stackPush(stack *stack, unsigned short *value)
+{
+    if (stacked(stack) < STACK_SIZE) {
+        stack->s[stacked(stack)] = *value;
+        stack->sp++;
+    }
+    else {
+        fprintf(stderr, "Stack overflow\n");
+    }
+}
+
+void stackPop(stack *stack, unsigned short *poppedValue)
+{
+    if (stacked(stack) > 0) {
+        stack->sp--;
+        *poppedValue = stack->s[stacked(stack) - 1];
+        stack->s[stacked(stack)] = '\0';
+    }
+    else {
+        fprintf(stderr, "Stack underflow\n");
+    }
 }
