@@ -34,6 +34,15 @@ FILE *getRom(const char *rom)
     }
 
     sprintf(filename, "%s", rom);
+    if (strcmp(filename,"octojamtitle") == 0) {
+        int random = randomNumber(1, 5);
+        sprintf(filename, "roms/octojam%dtitle.ch8", random);
+        rom_file = fopen(filename, "rb");
+        if (rom_file != NULL) {
+            free(filename);
+            return rom_file;
+        }
+    }
     rom_file = fopen(filename, "rb");
     if (rom_file != NULL) {
         free(filename);
@@ -371,6 +380,8 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     if ((pixel & (0x80 >> xline)) != 0) {
                         if (chip8->display.pixels[(spriteY + yline) % SCREEN_HEIGHT][(spriteX + xline) % SCREEN_WIDTH])
                             chip8->v[0xF] = 1;
+                        else
+                            chip8->v[0xF] = 0;
                         chip8->display.pixels[(spriteY + yline) % SCREEN_HEIGHT][(spriteX + xline) % SCREEN_WIDTH] ^= true;
                     }
                 }

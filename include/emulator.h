@@ -39,12 +39,6 @@ typedef struct {
 FILE *getRom(const char *rom);
 
 /**
-    * Initialize the emulator.
-    * @param chip8 the emulator
-*/
-void initializeEmulator(emulator *chip8, FILE *rom);
-
-/**
     * Write the font to the memory of the emulator.
     * font data is written into memory between 0x050 and 0x09F.
     * @param memory the memory of the emulator
@@ -58,6 +52,12 @@ void writeFontToMemory(unsigned char *memory);
     * @param rom the rom file
 */
 void writeRomToMemory(emulator *chip8, FILE *rom);
+
+/**
+    * Initialize the emulator.
+    * @param chip8 the emulator
+*/
+void initializeEmulator(emulator *chip8, FILE *rom);
 
 /**
     * Print the memory of the emulator.
