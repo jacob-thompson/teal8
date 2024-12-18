@@ -26,7 +26,7 @@ run:
 	./$(OUT) $(RUN_ARGS)
 
 test:
-	./$(OUT) roms/test_opcode.ch8
+	./$(OUT) roms/corax+.ch8
 
 clean:
 	rm -f $(OBJ) $(OUT)
