@@ -2,7 +2,7 @@
 
 FILE *getRom(const char *rom)
 {
-    char *filename = malloc(sizeof(char) * 50);
+    char *filename = malloc(sizeof(char) * 64);
     FILE *rom_file = NULL;
 
     sprintf(filename, "roms/%s.c8", rom);

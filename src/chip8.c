@@ -467,10 +467,8 @@ int main(int argc, char **argv)
                         // we can then fill V0 to Vx with values from memory starting at address I
                         for (int i = 0; i <= ((opcode & 0x0F00) >> 8); i++)
                             chip8.v[i] = chip8.memory[chip8.ix + i];
-                        break;
-                } // switch (opcode & 0x00FF)
-                break;
-        } // switch (opcode >> 12)
+                }
+        } // decode opcode
 
         // update timers
         if (chip8.timers.delay > 0)
