@@ -39,57 +39,131 @@ void handleEvent(display *display, SDL_Event *event)
     switch (event->type) {
         // handle key presses
         case SDL_KEYUP:
-            switch (event->key.keysym.sym) {
-                case SDLK_ESCAPE:
+            switch (event->key.keysym.scancode) {
+                case SDL_SCANCODE_ESCAPE:
                     display->powered_on = false;
                     break;
-                case SDLK_1:
-                    display->key_pressed[0x1] = true;
+                case SDL_SCANCODE_1:
+                    display->keyDown[0x1] = false;
+                    display->keyUp[0x1] = true;
                     break;
-                case SDLK_2:
-                    display->key_pressed[0x2] = true;
+                case SDL_SCANCODE_2:
+                    display->keyDown[0x2] = false;
+                    display->keyUp[0x2] = true;
                     break;
-                case SDLK_3:
-                    display->key_pressed[0x3] = true;
+                case SDL_SCANCODE_3:
+                    display->keyDown[0x3] = false;
+                    display->keyUp[0x3] = true;
                     break;
-                case SDLK_4:
-                    display->key_pressed[0xC] = true;
+                case SDL_SCANCODE_4:
+                    display->keyDown[0xC] = false;
+                    display->keyUp[0xC] = true;
                     break;
-                case SDLK_q:
-                    display->key_pressed[0x4] = true;
+                case SDL_SCANCODE_Q:
+                    display->keyDown[0x4] = false;
+                    display->keyUp[0x4] = true;
                     break;
-                case SDLK_w:
-                    display->key_pressed[0x5] = true;
+                case SDL_SCANCODE_W:
+                    display->keyDown[0x5] = false;
+                    display->keyUp[0x5] = true;
                     break;
-                case SDLK_e:
-                    display->key_pressed[0x6] = true;
+                case SDL_SCANCODE_E:
+                    display->keyDown[0x6] = false;
+                    display->keyUp[0x6] = true;
                     break;
-                case SDLK_r:
-                    display->key_pressed[0xD] = true;
+                case SDL_SCANCODE_R:
+                    display->keyDown[0xD] = false;
+                    display->keyUp[0xD] = true;
                     break;
-                case SDLK_a:
-                    display->key_pressed[0x7] = true;
+                case SDL_SCANCODE_A:
+                    display->keyDown[0x7] = false;
+                    display->keyUp[0x7] = true;
                     break;
-                case SDLK_s:
-                    display->key_pressed[0x8] = true;
+                case SDL_SCANCODE_S:
+                    display->keyDown[0x8] = false;
+                    display->keyUp[0x8] = true;
                     break;
-                case SDLK_d:
-                    display->key_pressed[0x9] = true;
+                case SDL_SCANCODE_D:
+                    display->keyDown[0x9] = false;
+                    display->keyUp[0x9] = true;
                     break;
-                case SDLK_f:
-                    display->key_pressed[0xE] = true;
+                case SDL_SCANCODE_F:
+                    display->keyDown[0xE] = false;
+                    display->keyUp[0xE] = true;
                     break;
-                case SDLK_z:
-                    display->key_pressed[0xA] = true;
+                case SDL_SCANCODE_Z:
+                    display->keyDown[0xA] = false;
+                    display->keyUp[0xA] = true;
                     break;
-                case SDLK_x:
-                    display->key_pressed[0x0] = true;
+                case SDL_SCANCODE_X:
+                    display->keyDown[0x0] = false;
+                    display->keyUp[0x0] = true;
                     break;
-                case SDLK_c:
-                    display->key_pressed[0xB] = true;
+                case SDL_SCANCODE_C:
+                    display->keyDown[0xB] = false;
+                    display->keyUp[0xB] = true;
                     break;
-                case SDLK_v:
-                    display->key_pressed[0xF] = true;
+                case SDL_SCANCODE_V:
+                    display->keyDown[0xF] = false;
+                    display->keyUp[0xF] = true;
+                    break;
+                default:
+                    break;
+            }
+            break;
+
+        case SDL_KEYDOWN:
+            switch (event->key.keysym.scancode) {
+                case SDL_SCANCODE_1:
+                    display->keyDown[0x1] = true;
+                    break;
+                case SDL_SCANCODE_2:
+                    display->keyDown[0x2] = true;
+                    break;
+                case SDL_SCANCODE_3:
+                    display->keyDown[0x3] = true;
+                    break;
+                case SDL_SCANCODE_4:
+                    display->keyDown[0xC] = true;
+                    break;
+                case SDL_SCANCODE_Q:
+                    display->keyDown[0x4] = true;
+                    break;
+                case SDL_SCANCODE_W:
+                    display->keyDown[0x5] = true;
+                    break;
+                case SDL_SCANCODE_E:
+                    display->keyDown[0x6] = true;
+                    break;
+                case SDL_SCANCODE_R:
+                    display->keyDown[0xD] = true;
+                    break;
+                case SDL_SCANCODE_A:
+                    display->keyDown[0x7] = true;
+                    break;
+                case SDL_SCANCODE_S:
+                    display->keyDown[0x8] = true;
+                    break;
+                case SDL_SCANCODE_D:
+                    display->keyDown[0x9] = true;
+                    break;
+                case SDL_SCANCODE_F:
+                    display->keyDown[0xE] = true;
+                    break;
+                case SDL_SCANCODE_Z:
+                    display->keyDown[0xA] = true;
+                    break;
+                case SDL_SCANCODE_X:
+                    display->keyDown[0x0] = true;
+                    break;
+                case SDL_SCANCODE_C:
+                    display->keyDown[0xB] = true;
+                    break;
+                case SDL_SCANCODE_V:
+                    display->keyDown[0xF] = true;
+                    break;
+                default:
+                    break;
             }
             break;
 

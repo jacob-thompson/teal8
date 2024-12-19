@@ -17,7 +17,8 @@ typedef struct display {
     SDL_Renderer *renderer;
     bool pixels[SCREEN_HEIGHT][SCREEN_WIDTH];
     bool powered_on;
-    bool key_pressed[KEY_COUNT];
+    bool keyDown[KEY_COUNT];
+    bool keyUp[KEY_COUNT];
 } display;
 
 /**

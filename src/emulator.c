@@ -416,7 +416,7 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // and then shifting it 8 bits to the right
                     // we can then check if the key with the value of Vx is pressed
                     // if it is pressed, we can skip the next instruction
-                    if (chip8->display.key_pressed[chip8->v[(opcode & 0x0F00) >> 8]])
+                    if (chip8->display.keyDown[chip8->v[(opcode & 0x0F00) >> 8]])
                         chip8->pc += 2;
                     break;
                 case 0xA1:
@@ -425,7 +425,7 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // and then shifting it 8 bits to the right
                     // we can then check if the key with the value of Vx is not pressed
                     // if it is not pressed, we can skip the next instruction
-                    if (!chip8->display.key_pressed[chip8->v[(opcode & 0x0F00) >> 8]])
+                    if (!chip8->display.keyDown[chip8->v[(opcode & 0x0F00) >> 8]])
                         chip8->pc += 2;
                     break;
             }
@@ -443,17 +443,15 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // wait for a key press, store the value of the key in Vx
                     // we can get the index of Vx by ANDing the opcode with 0x0F00
                     // and then shifting it 8 bits to the right
-                    // we can then wait for a key press
-                    // we can do this by checking if any key is pressed
-                    // if a key is pressed, we can store the value of the key in Vx
-                    // we can do this by getting the value of the key that is pressed
-                    // we can then set Vx to this value
-                    // we can then continue to the next instruction
-                    //
-                    // TODO: implement this
-                    while (true) {
-                        break;
-                    }
+                    // if a key is released, we can store the value of the key in Vx
+                    chip8->pc -= 2;
+                    for (int i = 0x0; i <= 0xF; i++)
+                        if (chip8->display.keyUp[i]) {
+                            chip8->v[(opcode & 0x0F00) >> 8] = i;
+                            chip8->pc += 2;
+                            break;
+                        }
+
                     break;
                 case 0x15:
                     // set the delay timer to Vx

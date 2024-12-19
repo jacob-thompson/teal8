@@ -64,7 +64,7 @@ int main(int argc, char **argv)
         }
 
         // events
-        clearKeys(chip8.display.key_pressed);
+        clearKeys(chip8.display.keyUp);
 
         SDL_Event event;
         while (SDL_PollEvent(&event))
