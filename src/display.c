@@ -13,7 +13,7 @@ int initDisplay(display *display)
         return EXIT_FAILURE;
 
     display->window = SDL_CreateWindow(
-        "CHIP-8 Emulator",
+        "CHIP-8",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         SCREEN_WIDTH,

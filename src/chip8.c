@@ -56,6 +56,7 @@ int main(int argc, char **argv)
                 chip8.timers.delay--;
             }
             if (chip8.timers.sound > 0) {
+                SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "beep\n");
                 chip8.timers.sound--;
             }
             chip8.timers.lastUpdate = ticks;

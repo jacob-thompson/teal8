@@ -24,6 +24,7 @@ FILE *getRom(const char *rom)
     char *filename = malloc(sizeof(char) * 64);
     FILE *rom_file = NULL;
 
+
     sprintf(filename, "roms/%s.c8", rom);
     rom_file = fopen(filename, "rb");
     if (rom_file != NULL) {
@@ -53,6 +54,19 @@ FILE *getRom(const char *rom)
     }
 
     sprintf(filename, "%s", rom);
+    if ( // test roms
+        strcmp(filename, "beep") == 0 ||
+        strcmp(filename, "corax+") == 0 ||
+        strcmp(filename, "keypad") == 0 ||
+        strcmp(filename, "flags") == 0
+    ) {
+        sprintf(filename, "roms/test/%s.ch8", rom);
+        rom_file = fopen(filename, "rb");
+        if (rom_file != NULL) {
+            free(filename);
+            return rom_file;
+        }
+    }
     if (strcmp(filename, "octojamtitle") == 0) {
         int randomTitleRom = randomNumber(1, 10);
         sprintf(filename, "roms/octojam%dtitle.ch8", randomTitleRom);

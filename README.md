@@ -1,10 +1,6 @@
 # chip-8
 
-chip-8 emulator (work-in-progress)
-
-https://tobiasvl.github.io/blog/write-a-chip-8-emulator/
-https://github.com/Timendus/chip8-test-suite
-https://johnearnest.github.io/chip8Archive/
+chip-8 interpreter written in C
 
 ## prerequisites
 
@@ -15,7 +11,7 @@ https://johnearnest.github.io/chip8Archive/
 - downloading one of the [precompiled binaries](https://github.com/libsdl-org/SDL/releases/latest)
 - downloading the [source code](https://github.com/libsdl-org/SDL) and [compiling it](https://wiki.libsdl.org/Installation)
 
-## install
+## compile
 
 ```bash
 git clone https://github.com/jacob-thompson/chip-8.git
@@ -40,3 +36,20 @@ For roms in the `roms/` directory, you can omit the rom's file path and extensio
 > - `<rate>` is the rate at which instructions should be executed (in Hz)
 >   * The default and maximum instruction rate is 1000 Hz
 >   * The instruction rate is rounded to the nearest divisor of 1000 Hz (e.g. 500 Hz, 250 Hz, 125 Hz, ...)
+
+## controls
+
+The controls are mapped to the following keys:
+
+```
+1 2 3 4
+Q W E R
+A S D F
+Z X C V
+```
+
+## special thanks
+
+- [tobiasvl](https://tobiasvl.github.io/blog/write-a-chip-8-emulator/)
+- [Timendus](https://github.com/Timendus/chip8-test-suite)
+- [johnearnest](https://johnearnest.github.io/chip8Archive/)
