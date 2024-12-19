@@ -24,7 +24,7 @@ make
 ## run
 
 ```bash
-make run <rom> <rate>
+./chip8 <rom> <rate>
 ```
 
 > [!NOTE]

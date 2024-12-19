@@ -21,7 +21,7 @@ BDIR = build
 _OBJ = emulator.o display.o stack.o chip8.o
 OBJ = $(patsubst %, $(BDIR)/%, $(_OBJ))
 
-OUT = bin/chip8
+OUT = chip8
 
 .PHONY: clean
 
