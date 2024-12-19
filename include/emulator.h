@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <time.h>
 
 #include "../include/display.h"
 #include "../include/stack.h"

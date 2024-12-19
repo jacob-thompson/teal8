@@ -8,10 +8,12 @@ CC = gcc
 
 CFLAGS = -I.
 CFLAGS += -Wall
-CFLAGS += -Wno-unused-command-line-argument
 
 SDLFLAGS = `sdl2-config --libs --cflags`
+ifeq ($(shell uname), Darwin)
+CFLAGS += -Wno-unused-command-line-argument
 SDLFLAGS += -I/opt/homebrew/Cellar/sdl2/*/include
+endif
 
 IDIR = include
 _DEPS = emulator.h display.h stack.h timers.h
