@@ -1,4 +1,5 @@
 #include "../include/emulator.h"
+#include <stdint.h>
 
 uint16_t roundRate(int rate)
 {
@@ -158,6 +159,8 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
 {
     uint16_t poppedAddress;
     uint8_t spriteX, spriteY, spriteHeight;
+    uint8_t minuend, subtrahend;
+    uint8_t operand, addend;
 
     switch (opcode >> 12) {
         case 0x0:
@@ -291,8 +294,10 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // we can then add Vy to Vx
                     // if there is a carry, we can set VF to 1
                     // if there is no carry, we can set VF to 0
+                    operand = chip8->v[(opcode & 0x0F00) >> 8];
+                    addend = chip8->v[(opcode & 0x00F0) >> 4];
                     chip8->v[(opcode & 0x0F00) >> 8] += chip8->v[(opcode & 0x00F0) >> 4];
-                    if (chip8->v[(opcode & 0x0F00) >> 8] > 255)
+                    if (operand > 0xFF - addend)
                         chip8->v[0xF] = 1;
                     else
                         chip8->v[0xF] = 0;
@@ -307,8 +312,10 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // we can then subtract Vy from Vx
                     // if there is a borrow, we can set VF to 0
                     // if there is no borrow, we can set VF to 1
+                    minuend = chip8->v[(opcode & 0x0F00) >> 8];
+                    subtrahend = chip8->v[(opcode & 0x00F0) >> 4];
                     chip8->v[(opcode & 0x0F00) >> 8] -= chip8->v[(opcode & 0x00F0) >> 4];
-                    if (chip8->v[(opcode & 0x0F00) >> 8] > chip8->v[(opcode & 0x00F0) >> 4])
+                    if (minuend < subtrahend)
                         chip8->v[0xF] = 0;
                     else
                         chip8->v[0xF] = 1;
@@ -317,13 +324,13 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // shift Vx right by 1, set VF to the least significant bit of Vx before the shift
                     // we can get the index of Vx by ANDing the opcode with 0x0F00
                     // and then shifting it 8 bits to the right
+                    // we can then set Vx to the value of Vy
                     // we can then shift Vx right by 1
                     // we can then set VF to the least significant bit of Vx before the shift
-                    // we can do this by ANDing Vx with 0x01
-                    // we can then set VF to this value
-                    // we can then set Vx to the shifted value
-                    chip8->v[0xF] = chip8->v[(opcode & 0x0F00) >> 8] & 0x01;
+                    operand = chip8->v[(opcode & 0x0F00) >> 8];
+                    chip8->v[(opcode & 0x0F00) >> 8] = chip8->v[(opcode & 0x00F0) >> 4];
                     chip8->v[(opcode & 0x0F00) >> 8] >>= 1;
+                    chip8->v[0xF] = operand & 0x01;
                     break;
                 case 0x7:
                     // set Vx to Vy - Vx, set VF to 0 if there is a borrow
@@ -334,22 +341,25 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // we can then set Vx to Vy - Vx
                     // if there is a borrow, we can set VF to 0
                     // if there is no borrow, we can set VF to 1
-                    chip8->v[(opcode & 0x0F00) >> 8] = chip8->v[(opcode & 0x00F0) >> 4] - chip8->v[(opcode & 0x0F00) >> 8];
-                    if (chip8->v[(opcode & 0x00F0) >> 4] > chip8->v[(opcode & 0x0F00) >> 8])
+                    minuend = chip8->v[(opcode & 0x00F0) >> 4];
+                    subtrahend = chip8->v[(opcode & 0x0F00) >> 8];
+                    chip8->v[(opcode & 0x0F00) >> 8] = minuend - subtrahend;
+                    if (minuend < subtrahend)
                         chip8->v[0xF] = 0;
                     else
                         chip8->v[0xF] = 1;
                     break;
                 case 0xE:
-                    // shift Vx left by 1, set VF to the most significant bit of Vx before the shift
+                    // shift Vx left by 1, set VF to the least significant bit of Vx before the shift
                     // we can get the index of Vx by ANDing the opcode with 0x0F00
                     // and then shifting it 8 bits to the right
-                    // we can then shift Vx left by 1
+                    // we can then set Vx to the value of Vy
+                    // we can then shift Vx right by 1
                     // we can then set VF to the most significant bit of Vx before the shift
-                    // we can do this by ANDing Vx with 0x80
-                    // we can then set Vx to the shifted value
-                    chip8->v[0xF] = chip8->v[(opcode & 0x0F00) >> 8] & 0x80;
+                    operand = chip8->v[(opcode & 0x0F00) >> 8];
+                    chip8->v[(opcode & 0x0F00) >> 8] = chip8->v[(opcode & 0x00F0) >> 4];
                     chip8->v[(opcode & 0x0F00) >> 8] <<= 1;
+                    chip8->v[0xF] = operand >> 7;
                     break;
             }
             break;
