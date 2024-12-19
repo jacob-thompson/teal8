@@ -4,7 +4,7 @@ int main(int argc, char **argv)
 {
     srand(time(NULL));
 
-    unsigned int rate = DEFAULT_INSTRUCTION_RATE;
+    uint16_t rate = DEFAULT_INSTRUCTION_RATE;
     if (argc < 2 || argc > 3) {
         fprintf(stderr, "usage: %s <rom> <rate> (default rate: %d)\n", argv[0], DEFAULT_INSTRUCTION_RATE);
         return 1;
@@ -33,11 +33,12 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    unsigned short opcode;
+    uint32_t ticks = SDL_GetTicks();
+
+    uint16_t opcode;
 
     // main loop
     while (chip8.display.powered_on) {
-
         clearKeys(chip8.display.key_pressed);
 
         SDL_Event event;
@@ -52,15 +53,24 @@ int main(int argc, char **argv)
         decodeOpcode(&chip8, opcode);
 
         // update timers
-        if (chip8.timers.delay < 0)
-            chip8.timers.delay = 0;
-        else if (chip8.timers.delay > 0)
-            chip8.timers.delay -= (rate / TIMER_RATE);
+        // use SDL_GetTicks() to get the number of milliseconds since the program started
+        // since the timers are decremented at a rate of 60Hz, we can use this to decrement the timers
+        // the timers are decremented at a rate of 60Hz, so we need to decrement them every 1000 / 60 milliseconds
+        //printf("ticks: %d\n", ticks);
+        ticks = SDL_GetTicks();
+        if (ticks - chip8.timers.lastUpdate >= 1000 / TIMER_RATE) {
+            if (chip8.timers.delay > 0) {
+                chip8.timers.delay--;
+            }
+            if (chip8.timers.sound > 0) {
+                chip8.timers.sound--;
+            }
+            chip8.timers.lastUpdate = ticks;
+        } else if (ticks < chip8.timers.lastUpdate) {
+            chip8.timers.lastUpdate = ticks;
+        }
 
-        if (chip8.timers.sound < 0)
-            chip8.timers.sound = 0;
-        else if (chip8.timers.sound > 0)
-            chip8.timers.sound -= (rate / TIMER_RATE);
+        SDL_Delay(1000 / rate);
 
         // draw the frame
         if (drawBackground(&chip8.display) != 0) {
@@ -74,9 +84,6 @@ int main(int argc, char **argv)
         }
 
         SDL_RenderPresent(chip8.display.renderer);
-
-        SDL_Delay(1000 / rate); // caps loops per second at rate
-
     }
 
     // cleanup

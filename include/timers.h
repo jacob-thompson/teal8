@@ -9,4 +9,5 @@
 typedef struct {
     int8_t delay;
     int8_t sound;
+    uint32_t lastUpdate;
 } timers;

@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include <stdlib.h>
 
 #include "../include/display.h"
@@ -24,8 +23,8 @@
 typedef struct {
     uint8_t memory[MEMORY_IN_BYTES]; // 4KB memory
     uint8_t v[REGISTERS]; // 16 8-bit registers
-    unsigned short ix; // 16-bit index register
-    unsigned short pc; // program counter
+    uint16_t ix; // 16-bit index register
+    uint16_t pc; // program counter
     timers timers; // delay and sound timers
     stack stack; // stack
     display display; // display
@@ -83,7 +82,7 @@ int randomNumber(int min, int max);
     * @param chip8 the emulator
     * @return the opcode
 */
-unsigned short fetchOpcode(emulator *chip8);
+uint16_t fetchOpcode(emulator *chip8);
 
 /**
     * Decode the opcode.

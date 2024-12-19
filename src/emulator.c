@@ -54,7 +54,7 @@ FILE *getRom(const char *rom)
 
 void writeFontToMemory(unsigned char *memory)
 {
-    unsigned char font[FONT_IN_BYTES] = {
+    uint8_t font[FONT_IN_BYTES] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
         0x20, 0x60, 0x20, 0x20, 0x70, // 1
         0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -128,14 +128,14 @@ int randomNumber(int min, int max)
     return x % range + min;
 }
 
-unsigned short fetchOpcode(emulator *chip8)
+uint16_t fetchOpcode(emulator *chip8)
 {
     return (chip8->memory[chip8->pc] << 8) | chip8->memory[chip8->pc + 1];
 }
 
 void decodeOpcode(emulator *chip8, unsigned short opcode)
 {
-    unsigned short poppedAddress;
+    uint16_t poppedAddress;
     uint8_t spriteX, spriteY, spriteHeight;
 
     switch (opcode >> 12) {

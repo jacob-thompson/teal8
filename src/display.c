@@ -38,7 +38,7 @@ void handleEvent(display *display, SDL_Event *event)
 {
     switch (event->type) {
         // handle key presses
-        case SDL_KEYDOWN:
+        case SDL_KEYUP:
             switch (event->key.keysym.sym) {
                 case SDLK_ESCAPE:
                     display->powered_on = false;

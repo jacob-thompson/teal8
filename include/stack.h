@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #define STACK_SIZE 16
 
 /**
@@ -6,8 +8,8 @@
     * The stack pointer points to the top of the stack.
 */
 typedef struct {
-    unsigned short s[STACK_SIZE]; // 16 16-bit registers
-    unsigned short *sp; // stack pointer
+    uint16_t s[STACK_SIZE]; // 16 16-bit registers
+    uint16_t *sp; // stack pointer
 } stack;
 
 /**
