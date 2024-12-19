@@ -17,9 +17,6 @@ void stackPush(stack *stack, unsigned short *value)
         stack->sp++;
         //printf("Pushed %d\n", *value);
     }
-    else {
-        fprintf(stderr, "Stack overflow\n");
-    }
 }
 
 void stackPop(stack *stack, unsigned short *poppedValue)
@@ -29,8 +26,5 @@ void stackPop(stack *stack, unsigned short *poppedValue)
         *poppedValue = stack->s[stacked(stack) - 1];
         stack->s[stacked(stack) - 1] = '\0';
         //printf("Popped %d\n", *poppedValue);
-    }
-    else {
-        fprintf(stderr, "Stack underflow\n");
     }
 }

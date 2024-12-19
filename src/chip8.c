@@ -6,31 +6,31 @@ int main(int argc, char **argv)
 
     uint16_t rate = DEFAULT_INSTRUCTION_RATE;
     if (argc < 2 || argc > 3) {
-        fprintf(stderr, "usage: %s <rom> <rate> (default rate: %d)\n", argv[0], DEFAULT_INSTRUCTION_RATE);
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "usage: %s <rom> <rate>\n", argv[0]);
         return EXIT_FAILURE;
     } else if (argc == 3) {
         rate = atoi(argv[2]);
         rate = roundRate(rate);
     }
 
-    fprintf(stdout, "opening rom: %s\n", argv[1]);
+    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "opening rom: %s\n", argv[1]);
 
     FILE *rom = getRom(argv[1]);
     if (rom == NULL) {
-        fprintf(stderr, "error opening rom: %s\n", argv[1]);
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error opening rom: %s\n", argv[1]);
         return EXIT_FAILURE;
     } else {
-        fprintf(stdout, "rom opened successfully\n");
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "rom opened successfully\n");
     }
 
     emulator chip8;
     initializeEmulator(&chip8, rom);
     if (initDisplay(&chip8.display) != 0) {
-        fprintf(stderr, "error creating SDL display: %s\n", SDL_GetError());
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error creating SDL display: %s\n", SDL_GetError());
         return EXIT_FAILURE;
     }
 
-    fprintf(stdout, "running %s at %d Hz\n", argv[1], rate);
+    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "running %s at %d Hz\n", argv[1], rate);
 
     fclose(rom); // the rom is written to memory, so we can close it now
 
@@ -81,12 +81,12 @@ int main(int argc, char **argv)
 
         // draw the frame
         if (drawBackground(&chip8.display) != 0) {
-            fprintf(stderr, "error drawing background\n");
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error drawing background: %s\n", SDL_GetError());
             return EXIT_FAILURE;
         }
 
         if (drawPixels(&chip8.display) != 0) {
-            fprintf(stderr, "error drawing pixels\n");
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error drawing pixels: %s\n", SDL_GetError());
             return EXIT_FAILURE;
         }
 
