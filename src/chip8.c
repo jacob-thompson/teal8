@@ -10,10 +10,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     } else if (argc == 3) {
         rate = atoi(argv[2]);
-        if (rate <= 0) {
-            fprintf(stderr, "invalid rate: %d\n", rate);
-            return EXIT_FAILURE;
-        }
+        rate = roundRate(rate);
     }
 
     fprintf(stdout, "opening rom: %s\n", argv[1]);
@@ -32,6 +29,10 @@ int main(int argc, char **argv)
         fprintf(stderr, "error creating SDL display: %s\n", SDL_GetError());
         return EXIT_FAILURE;
     }
+
+    fprintf(stdout, "running %s at %d Hz\n", argv[1], rate);
+
+    fclose(rom); // the rom is written to memory, so we can close it now
 
     uint32_t ticks;
     uint16_t opcode;

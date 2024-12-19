@@ -1,5 +1,23 @@
 #include "../include/emulator.h"
 
+uint16_t roundRate(int rate)
+{
+    if (rate <= 0 || rate > 1000)
+        return DEFAULT_INSTRUCTION_RATE;
+
+    uint8_t significant = 0;
+    uint16_t divisors[12] = {1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000};
+    for (int i = 0; i < 12; i++)
+        if (rate == divisors[i])
+            return rate;
+        else if (rate < divisors[i] && !significant)
+            significant = i;
+
+    uint16_t lowerDiff = rate - divisors[significant - 1];
+    uint16_t upperDiff = divisors[significant] - rate;
+    return lowerDiff < upperDiff ? divisors[significant - 1] : divisors[significant];
+}
+
 FILE *getRom(const char *rom)
 {
     char *filename = malloc(sizeof(char) * 64);
