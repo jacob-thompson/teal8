@@ -30,4 +30,4 @@ make run <rom> <rate>
 > [!NOTE]
 > - `<rom>` is the path to the ROM file
 > - `<rate>` is the rate at which the emulator should run (in Hz)
-> - The default rate is 700 Hz
+> - The default rate is 1000 Hz

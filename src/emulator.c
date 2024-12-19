@@ -89,6 +89,9 @@ void initializeEmulator(emulator *chip8, FILE *rom)
 {
     writeFontToMemory(chip8->memory);
     writeRomToMemory(chip8, rom);
+
+    chip8->lastUpdate = 0;
+    chip8->timers.lastUpdate = 0;
 }
 
 void printMemory(emulator *chip8)

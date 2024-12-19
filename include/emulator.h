@@ -11,7 +11,7 @@
 #define FONT_END_ADDRESS 0x09F
 #define PROGRAM_START_ADDRESS 0x200
 
-#define DEFAULT_INSTRUCTION_RATE 700
+#define DEFAULT_INSTRUCTION_RATE 1000
 #define TIMER_RATE 60
 
 #define REGISTERS 16
@@ -25,6 +25,7 @@ typedef struct {
     uint8_t v[REGISTERS]; // 16 8-bit registers
     uint16_t ix; // 16-bit index register
     uint16_t pc; // program counter
+    uint32_t lastUpdate; // last update tick
     timers timers; // delay and sound timers
     stack stack; // stack
     display display; // display
