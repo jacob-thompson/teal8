@@ -45,7 +45,8 @@ test:
 
 clean:
 ifeq ($(OS), Windows_NT)
-	del $(OBJ) $(OUT)
+	cd $(BDIR) && del $(_OBJ)
+	cd .. && del $(OUT)
 else
 	rm -f $(OBJ) $(OUT)
 endif
