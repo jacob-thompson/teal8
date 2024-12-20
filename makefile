@@ -23,7 +23,11 @@ BDIR = build
 _OBJ = emulator.o display.o stack.o chip8.o
 OBJ = $(patsubst %, $(BDIR)/%, $(_OBJ))
 
+ifeq ($(OS),Windows_NT)
+OUT = chip8.exe
+else
 OUT = chip8
+endif
 
 .PHONY: clean
 
@@ -40,4 +44,8 @@ test:
 	./$(OUT) corax+
 
 clean:
+ifeq ($(OS), Windows_NT)
+	del $(OBJ) $(OUT)
+else
 	rm -f $(OBJ) $(OUT)
+endif
