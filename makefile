@@ -41,8 +41,13 @@ endif
 
 .PHONY: clean
 
+ifeq ($(OS),Windows_NT)
+$(BDIR)\%.o: src\%.c $(DEPS) clean
+	$(CC) -c -o $@ $< $(CFLAGS) $(SDLFLAGS)
+else
 $(BDIR)/%.o: src/%.c $(DEPS) clean
 	$(CC) -c -o $@ $< $(CFLAGS) $(SDLFLAGS)
+endif
 
 $(OUT): $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(SDLFLAGS)
