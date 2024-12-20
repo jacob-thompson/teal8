@@ -7,7 +7,7 @@ chip-8 interpreter written in C
 ### SDL2
 
 [SDL2](https://www.libsdl.org/) is used to render the graphics and handle the input. This library can be installed by:
-- using a package manager (e.g. `brew`, `vcpkg`, `apt`, `pacman`, `dnf`)
+- using a package manager (e.g. `brew`, `apt`, `pacman`, `dnf`)
 - downloading one of the [precompiled binaries](https://github.com/libsdl-org/SDL/releases/latest)
 - downloading the [source code](https://github.com/libsdl-org/SDL) and [compiling it](https://wiki.libsdl.org/Installation)
 
