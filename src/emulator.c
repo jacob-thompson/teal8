@@ -126,6 +126,9 @@ void initializeEmulator(emulator *chip8, FILE *rom)
     writeFontToMemory(chip8->memory);
     writeRomToMemory(chip8, rom);
 
+    clearKeys(chip8->display.keyDown);
+    clearKeys(chip8->display.keyUp);
+
     chip8->lastUpdate = 0;
     chip8->timers.lastUpdate = 0;
 }
@@ -279,6 +282,7 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // and then shifting it 4 bits to the right
                     // we can then set Vx to Vx OR Vy
                     chip8->v[(opcode & 0x0F00) >> 8] |= chip8->v[(opcode & 0x00F0) >> 4];
+                    chip8->v[0xF] = 0;
                     break;
                 case 0x2:
                     // set Vx to Vx AND Vy
@@ -289,6 +293,7 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // and then shifting it 4 bits to the right
                     // we can then set Vx to Vx AND Vy
                     chip8->v[(opcode & 0x0F00) >> 8] &= chip8->v[(opcode & 0x00F0) >> 4];
+                    chip8->v[0xF] = 0;
                     break;
                 case 0x3:
                     // set Vx to Vx XOR Vy
@@ -299,6 +304,7 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // and then shifting it 4 bits to the right
                     // we can then set Vx to Vx XOR Vy
                     chip8->v[(opcode & 0x0F00) >> 8] ^= chip8->v[(opcode & 0x00F0) >> 4];
+                    chip8->v[0xF] = 0;
                     break;
                 case 0x4:
                     // add Vy to Vx, set VF to 1 if there is a carry
@@ -416,12 +422,15 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             // draw a sprite at position Vx, Vy
             // sprite is 0xN pixels tall
             // on/off based on value in I
-            // wrap around the screen
             // set VF to 1 if any set pixels are changed to unset, 0 otherwise
-            spriteX = chip8->v[(opcode & 0x0F00) >> 8] % (SCREEN_WIDTH / 10);
-            spriteY = chip8->v[(opcode & 0x00F0) >> 4] % (SCREEN_HEIGHT / 10);
-            spriteHeight = opcode & 0x000F;
+            if (chip8->v[(opcode & 0x0F00) >> 8] >= SCREEN_WIDTH / 10)
+                chip8->v[(opcode & 0x0F00) >> 8] %= SCREEN_WIDTH / 10;
+            if (chip8->v[(opcode & 0x00F0) >> 4] >= SCREEN_HEIGHT / 10)
+                chip8->v[(opcode & 0x00F0) >> 4] %= SCREEN_HEIGHT / 10;
             chip8->v[0xF] = 0;
+            spriteX = chip8->v[(opcode & 0x0F00) >> 8];
+            spriteY = chip8->v[(opcode & 0x00F0) >> 4];
+            spriteHeight = opcode & 0x000F;
             for (int yline = 0; yline < spriteHeight; yline++) {
                 uint8_t pixel = chip8->memory[chip8->ix + yline];
                 for (int xline = 0; xline < 8; xline++) {
@@ -527,6 +536,7 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // we can then store V0 to Vx in memory starting at address I
                     for (int i = 0; i <= ((opcode & 0x0F00) >> 8); i++)
                         chip8->memory[chip8->ix + i] = chip8->v[i];
+                    chip8->ix += ((opcode & 0x0F00) >> 8) + 1;
                     break;
                 case 0x65:
                     // fill V0 to Vx with values from memory starting at address I
@@ -535,6 +545,7 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // we can then fill V0 to Vx with values from memory starting at address I
                     for (int i = 0; i <= ((opcode & 0x0F00) >> 8); i++)
                         chip8->v[i] = chip8->memory[chip8->ix + i];
+                    chip8->ix += ((opcode & 0x0F00) >> 8) + 1;
             }
     }
 }
