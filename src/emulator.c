@@ -58,7 +58,8 @@ FILE *getRom(const char *rom)
         strcmp(filename, "beep") == 0 ||
         strcmp(filename, "corax+") == 0 ||
         strcmp(filename, "keypad") == 0 ||
-        strcmp(filename, "flags") == 0
+        strcmp(filename, "flags") == 0 ||
+        strcmp(filename, "quirks") == 0
     ) {
         sprintf(filename, "roms/test/%s.ch8", rom);
         rom_file = fopen(filename, "rb");
@@ -413,9 +414,10 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             // draw a sprite at position Vx, Vy
             // sprite is 0xN pixels tall
             // on/off based on value in I
+            // wrap around the screen
             // set VF to 1 if any set pixels are changed to unset, 0 otherwise
-            spriteX = chip8->v[(opcode & 0x0F00) >> 8];
-            spriteY = chip8->v[(opcode & 0x00F0) >> 4];
+            spriteX = chip8->v[(opcode & 0x0F00) >> 8] % (SCREEN_WIDTH / 10);
+            spriteY = chip8->v[(opcode & 0x00F0) >> 4] % (SCREEN_HEIGHT / 10);
             spriteHeight = opcode & 0x000F;
             chip8->v[0xF] = 0;
             for (int yline = 0; yline < spriteHeight; yline++) {
