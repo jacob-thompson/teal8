@@ -59,7 +59,9 @@ FILE *getRom(const char *rom)
         strcmp(filename, "corax+") == 0 ||
         strcmp(filename, "keypad") == 0 ||
         strcmp(filename, "flags") == 0 ||
-        strcmp(filename, "quirks") == 0
+        strcmp(filename, "quirks") == 0 ||
+        strcmp(filename, "splash") == 0 ||
+        strcmp(filename, "ibm_logo") == 0
     ) {
         sprintf(filename, "roms/test/%s.ch8", rom);
         rom_file = fopen(filename, "rb");
