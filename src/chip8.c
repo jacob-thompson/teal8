@@ -79,7 +79,6 @@ int main(int argc, char **argv)
 
         decodeOpcode(&chip8, opcode);
 
-
         // draw the frame
         if (drawBackground(&chip8.display) != 0) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error drawing background: %s\n", SDL_GetError());

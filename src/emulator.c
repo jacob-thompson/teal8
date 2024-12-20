@@ -3,7 +3,7 @@
 
 uint16_t roundRate(int rate)
 {
-    if (rate <= 0 || rate > 1000)
+    if (rate <= 0 || rate > DEFAULT_INSTRUCTION_RATE)
         return DEFAULT_INSTRUCTION_RATE;
 
     uint8_t significant = 0;
@@ -139,7 +139,6 @@ void printMemory(emulator *chip8)
 
 int randomNumber(int min, int max)
 {
-
     if (min == max)
         return min;
 
