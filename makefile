@@ -17,11 +17,21 @@ endif
 
 IDIR = include
 _DEPS = emulator.h display.h stack.h timers.h
+
+ifeq ($(OS),Windows_NT)
+DEPS = $(patsubst %, $(IDIR)\%, $(_DEPS))
+else
 DEPS = $(patsubst %, $(IDIR)/%, $(_DEPS))
+endif
 
 BDIR = build
 _OBJ = emulator.o display.o stack.o chip8.o
+
+ifeq ($(OS),Windows_NT)
+OBJ = $(patsubst %, $(BDIR)\%, $(_OBJ))
+else
 OBJ = $(patsubst %, $(BDIR)/%, $(_OBJ))
+endif
 
 ifeq ($(OS),Windows_NT)
 OUT = chip8.exe
