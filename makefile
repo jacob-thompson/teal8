@@ -10,6 +10,7 @@ CFLAGS = -I.
 CFLAGS += -Wall
 
 SDLFLAGS = `sdl2-config --libs --cflags`
+
 ifeq ($(shell uname), Darwin)
 CFLAGS += -Wno-unused-command-line-argument
 SDLFLAGS += -I/opt/homebrew/Cellar/sdl2/*/include
@@ -23,11 +24,7 @@ BDIR = build
 _OBJ = emulator.o display.o stack.o chip8.o
 OBJ = $(patsubst %, $(BDIR)/%, $(_OBJ))
 
-ifeq ($(OS),Windows_NT)
-OUT = chip8.exe
-else
 OUT = chip8
-endif
 
 .PHONY: clean run test
 
@@ -44,9 +41,4 @@ test:
 	./$(OUT) corax+
 
 clean:
-ifeq ($(OS), Windows_NT)
-	cd $(BDIR) && del $(_OBJ)
-	cd .. && del $(OUT)
-else
 	rm -f $(OBJ) $(OUT)
-endif
