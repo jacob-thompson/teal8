@@ -7,7 +7,7 @@
     * The sound timer is used for sound effects.
 */
 typedef struct {
-    int8_t delay;
-    int8_t sound;
+    uint8_t delay;
+    uint8_t sound;
     uint32_t lastUpdate;
 } timers;
