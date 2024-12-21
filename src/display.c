@@ -2,9 +2,9 @@
 
 void resetDisplay(display *display)
 {
-    for (int y = 0; y < SCREEN_HEIGHT; y++)
-        for (int x = 0; x < SCREEN_WIDTH; x++)
-            display->pixels[y][x] = false;
+    for (int y = 0; y < CHIP8_HEIGHT; y++)
+        for (int x = 0; x < CHIP8_WIDTH; x++)
+            display->pixelDrawn[y][x] = false;
 }
 
 int initDisplay(display *display)
@@ -26,6 +26,14 @@ int initDisplay(display *display)
     display->renderer = SDL_CreateRenderer(display->window, -1, SDL_RENDERER_ACCELERATED);
     if (display->renderer == NULL)
         return EXIT_FAILURE;
+
+    for (int y = 0; y < CHIP8_HEIGHT; y++)
+        for (int x = 0; x < CHIP8_WIDTH; x++) {
+            display->pixels[y][x].x = x * SCALE;
+            display->pixels[y][x].y = y * SCALE;
+            display->pixels[y][x].w = SCALE;
+            display->pixels[y][x].h = SCALE;
+        }
 
     resetDisplay(display);
 
@@ -189,9 +197,9 @@ int drawPixels(display *display)
     if (SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255) != EXIT_SUCCESS)
         return EXIT_FAILURE;
 
-    for (int y = 0; y < SCREEN_HEIGHT; y++)
-        for (int x = 0; x < SCREEN_WIDTH; x++)
-            if (display->pixels[y / 10][x / 10] && SDL_RenderDrawPoint(display->renderer, x, y) != EXIT_SUCCESS)
+    for (int y = 0; y < CHIP8_HEIGHT; y++)
+        for (int x = 0; x < CHIP8_WIDTH; x++)
+            if (display->pixelDrawn[y][x] && SDL_RenderFillRect(display->renderer, &display->pixels[y][x]) != EXIT_SUCCESS)
                 return EXIT_FAILURE;
 
     return EXIT_SUCCESS;

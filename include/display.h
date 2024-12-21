@@ -3,10 +3,15 @@
 #include <SDL.h>
 
 #define KEY_COUNT 16
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 320
+
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
+
+#define SCALE 10
+#define CHIP8_WIDTH 64
+#define CHIP8_HEIGHT 32
+#define SCREEN_WIDTH CHIP8_WIDTH * SCALE
+#define SCREEN_HEIGHT CHIP8_HEIGHT * SCALE
 
 /**
     * The display struct.
@@ -15,7 +20,8 @@
 typedef struct display {
     SDL_Window *window;
     SDL_Renderer *renderer;
-    bool pixels[SCREEN_HEIGHT][SCREEN_WIDTH];
+    SDL_Rect pixels[CHIP8_HEIGHT][CHIP8_WIDTH];
+    bool pixelDrawn[CHIP8_HEIGHT][CHIP8_WIDTH];
     bool powered_on;
     bool keyDown[KEY_COUNT];
     bool keyUp[KEY_COUNT];
