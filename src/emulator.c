@@ -1,5 +1,4 @@
 #include "../include/emulator.h"
-#include <stdint.h>
 
 uint16_t roundRate(int rate)
 {
@@ -176,10 +175,7 @@ uint16_t fetchOpcode(emulator *chip8)
 
 void decodeOpcode(emulator *chip8, unsigned short opcode)
 {
-    uint16_t poppedAddress;
-    uint8_t spriteX, spriteY, spriteHeight;
-    uint8_t minuend, subtrahend;
-    uint8_t operand, addend;
+    uint8_t minuend, subtrahend, operand, addend;
 
     switch (opcode >> 12) {
         case 0x0:
@@ -192,8 +188,7 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // return from subroutine
                     // we can do this by popping the address from the stack
                     // and then setting the program counter to this address
-                    stackPop(&chip8->stack, &poppedAddress);
-                    chip8->pc = poppedAddress;
+                    stackPop(&chip8->stack, &chip8->pc);
                     break;
                 default:
                     // call RCA 1802 program at address NNN
@@ -423,23 +418,31 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             // sprite is 0xN pixels tall
             // on/off based on value in I
             // set VF to 1 if any set pixels are changed to unset, 0 otherwise
-            if (chip8->v[(opcode & 0x0F00) >> 8] >= SCREEN_WIDTH / 10)
-                chip8->v[(opcode & 0x0F00) >> 8] %= SCREEN_WIDTH / 10;
-            if (chip8->v[(opcode & 0x00F0) >> 4] >= SCREEN_HEIGHT / 10)
-                chip8->v[(opcode & 0x00F0) >> 4] %= SCREEN_HEIGHT / 10;
             chip8->v[0xF] = 0;
-            spriteX = chip8->v[(opcode & 0x0F00) >> 8];
-            spriteY = chip8->v[(opcode & 0x00F0) >> 4];
-            spriteHeight = opcode & 0x000F;
+            uint8_t spriteX = chip8->v[(opcode & 0x0F00) >> 8];
+            uint8_t spriteY = chip8->v[(opcode & 0x00F0) >> 4];
+            uint8_t spriteHeight = opcode & 0x000F;
+            uint8_t wrappedX, wrappedY;
             for (int yline = 0; yline < spriteHeight; yline++) {
+                if (spriteY + yline >= SCREEN_HEIGHT / 10)
+                    wrappedY = (spriteY + yline) % (SCREEN_HEIGHT / 10);
+                else
+                    wrappedY = spriteY + yline;
+
                 uint8_t pixel = chip8->memory[chip8->ix + yline];
                 for (int xline = 0; xline < 8; xline++) {
                     if ((pixel & (0x80 >> xline)) != 0) {
-                        if (chip8->display.pixels[(spriteY + yline) % SCREEN_HEIGHT][(spriteX + xline) % SCREEN_WIDTH])
+                        if (spriteX + xline >= SCREEN_WIDTH / 10)
+                            wrappedX = (spriteX + xline) % (SCREEN_WIDTH / 10);
+                        else
+                            wrappedX = spriteX + xline;
+
+                        if (chip8->display.pixels[(wrappedY) % SCREEN_HEIGHT][(wrappedX) % SCREEN_WIDTH])
                             chip8->v[0xF] = 1;
                         else
                             chip8->v[0xF] = 0;
-                        chip8->display.pixels[(spriteY + yline) % SCREEN_HEIGHT][(spriteX + xline) % SCREEN_WIDTH] ^= true;
+
+                        chip8->display.pixels[(wrappedY) % SCREEN_HEIGHT][(wrappedX) % SCREEN_WIDTH] ^= true;
                     }
                 }
             }
