@@ -23,22 +23,7 @@ FILE *getRom(const char *rom)
     char *filename = malloc(sizeof(char) * 64);
     FILE *rom_file = NULL;
 
-
-    sprintf(filename, "roms/%s.c8", rom);
-    rom_file = fopen(filename, "rb");
-    if (rom_file != NULL) {
-        free(filename);
-        return rom_file;
-    }
-
     sprintf(filename, "roms/%s.ch8", rom);
-    rom_file = fopen(filename, "rb");
-    if (rom_file != NULL) {
-        free(filename);
-        return rom_file;
-    }
-
-    sprintf(filename, "roms/%s.chip8", rom);
     rom_file = fopen(filename, "rb");
     if (rom_file != NULL) {
         free(filename);
@@ -426,12 +411,11 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             uint8_t spriteX = chip8->v[(opcode & 0x0F00) >> 8];
             uint8_t spriteY = chip8->v[(opcode & 0x00F0) >> 4];
             uint8_t spriteHeight = opcode & 0x000F;
-            uint8_t wrappedX, wrappedY;
+            uint8_t wrappedX;
+
             for (int yline = 0; yline < spriteHeight; yline++) {
                 if (spriteY + yline >= CHIP8_HEIGHT)
-                    wrappedY = (spriteY + yline) % CHIP8_HEIGHT;
-                else
-                    wrappedY = spriteY + yline;
+                    continue;
 
                 uint8_t pixel = chip8->memory[chip8->ix + yline];
                 for (int xline = 0; xline < 8; xline++) {
@@ -441,10 +425,10 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                         else
                             wrappedX = spriteX + xline;
 
-                        if (chip8->display.pixelDrawn[(wrappedY) % CHIP8_HEIGHT][(wrappedX) % CHIP8_WIDTH])
+                        if (chip8->display.pixelDrawn[spriteY + yline][wrappedX])
                             chip8->v[0xF] = 1;
 
-                        chip8->display.pixelDrawn[(wrappedY) % CHIP8_HEIGHT][(wrappedX) % CHIP8_WIDTH] ^= true;
+                        chip8->display.pixelDrawn[spriteY + yline][wrappedX] ^= true;
                     }
                 }
             }

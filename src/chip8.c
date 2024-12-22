@@ -73,7 +73,24 @@ int main(int argc, char **argv)
 
         // fetch, decode, and execute opcode
         opcode = fetchOpcode(&chip8);
+
         //printf("opcode: %04x\n", opcode);
+        //printf("v0: %02x\n", chip8.v[0]);
+        //printf("v1: %02x\n", chip8.v[1]);
+        //printf("v2: %02x\n", chip8.v[2]);
+        //printf("v3: %02x\n", chip8.v[3]);
+        //printf("v4: %02x\n", chip8.v[4]);
+        //printf("v5: %02x\n", chip8.v[5]);
+        //printf("v6: %02x\n", chip8.v[6]);
+        //printf("v7: %02x\n", chip8.v[7]);
+        //printf("v8: %02x\n", chip8.v[8]);
+        //printf("v9: %02x\n", chip8.v[9]);
+        //printf("va: %02x\n", chip8.v[10]);
+        //printf("vb: %02x\n", chip8.v[11]);
+        //printf("vc: %02x\n", chip8.v[12]);
+        //printf("vd: %02x\n", chip8.v[13]);
+        //printf("ve: %02x\n", chip8.v[14]);
+        //printf("vf: %02x\n", chip8.v[15]);
 
         chip8.pc += 2;
 
