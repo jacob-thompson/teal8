@@ -407,11 +407,11 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                 if (chip8->display.lastUpdate + (1000 / 60) < SDL_GetTicks())
                     break;
 
-            chip8->v[0xF] = 0;
-            uint8_t spriteX = chip8->v[(opcode & 0x0F00) >> 8];
-            uint8_t spriteY = chip8->v[(opcode & 0x00F0) >> 4];
+            uint8_t spriteX = chip8->v[(opcode & 0x0F00) >> 8] % CHIP8_WIDTH;
+            uint8_t spriteY = chip8->v[(opcode & 0x00F0) >> 4] % CHIP8_HEIGHT;
             uint8_t spriteHeight = opcode & 0x000F;
-            uint8_t wrappedX;
+
+            chip8->v[0xF] = 0;
 
             for (int yline = 0; yline < spriteHeight; yline++) {
                 if (spriteY + yline >= CHIP8_HEIGHT)
@@ -421,14 +421,12 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                 for (int xline = 0; xline < 8; xline++) {
                     if ((pixel & (0x80 >> xline)) != 0) {
                         if (spriteX + xline >= CHIP8_WIDTH)
-                            wrappedX = (spriteX + xline) % CHIP8_WIDTH;
-                        else
-                            wrappedX = spriteX + xline;
+                            continue;
 
-                        if (chip8->display.pixelDrawn[spriteY + yline][wrappedX])
+                        if (chip8->display.pixelDrawn[spriteY + yline][spriteX + xline])
                             chip8->v[0xF] = 1;
 
-                        chip8->display.pixelDrawn[spriteY + yline][wrappedX] ^= true;
+                        chip8->display.pixelDrawn[spriteY + yline][spriteX + xline] ^= true;
                     }
                 }
             }
