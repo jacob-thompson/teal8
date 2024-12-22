@@ -25,6 +25,7 @@ typedef struct display {
     bool powered_on;
     bool keyDown[KEY_COUNT];
     bool keyUp[KEY_COUNT];
+    uint32_t lastUpdate;
 } display;
 
 /**

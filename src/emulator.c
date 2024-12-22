@@ -418,6 +418,10 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             // sprite is 0xN pixels tall
             // on/off based on value in I
             // set VF to 1 if any set pixels are changed to unset, 0 otherwise
+            while (true) // wait for vertical blank interrupt
+                if (chip8->display.lastUpdate + (1000 / 60) < SDL_GetTicks())
+                    break;
+
             chip8->v[0xF] = 0;
             uint8_t spriteX = chip8->v[(opcode & 0x0F00) >> 8];
             uint8_t spriteY = chip8->v[(opcode & 0x00F0) >> 4];
@@ -439,13 +443,12 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
 
                         if (chip8->display.pixelDrawn[(wrappedY) % CHIP8_HEIGHT][(wrappedX) % CHIP8_WIDTH])
                             chip8->v[0xF] = 1;
-                        else
-                            chip8->v[0xF] = 0;
 
                         chip8->display.pixelDrawn[(wrappedY) % CHIP8_HEIGHT][(wrappedX) % CHIP8_WIDTH] ^= true;
                     }
                 }
             }
+            chip8->display.lastUpdate = SDL_GetTicks();
             break;
         case 0xE:
             switch (opcode & 0x00FF) {
