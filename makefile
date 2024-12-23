@@ -38,7 +38,7 @@ run:
 	./$(OUT) $(RUN_ARGS)
 
 test:
-	./$(OUT) corax+
+	./$(OUT) quirks
 
 clean:
 	rm -f $(OBJ) $(OUT)
