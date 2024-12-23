@@ -16,8 +16,8 @@ int initDisplay(display *display)
         "CHIP-8",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        SCREEN_WIDTH,
-        SCREEN_HEIGHT,
+        CHIP8_WIDTH * SCALE,
+        CHIP8_HEIGHT * SCALE,
         0
     );
     if (display->window == NULL)

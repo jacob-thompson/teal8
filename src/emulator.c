@@ -63,6 +63,7 @@ FILE *getRom(const char *rom)
             return rom_file;
         }
     }
+
     rom_file = fopen(filename, "rb");
     if (rom_file != NULL) {
         free(filename);
@@ -171,8 +172,6 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     break;
                 case 0xEE:
                     // return from subroutine
-                    // we can do this by popping the address from the stack
-                    // and then setting the program counter to this address
                     stackPop(&chip8->stack, &chip8->pc);
                     break;
                 default:
@@ -183,119 +182,63 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             break;
         case 0x1:
             // jump to address NNN
-            // we can get address NNN by ANDing the opcode with 0x0FFF
             chip8->pc = opcode & 0x0FFF;
             break;
         case 0x2:
             // call subroutine at address NNN
-            // we can do this by pushing the address of the next instruction onto the stack
-            // and then setting the program counter to NNN
             stackPush(&chip8->stack, &chip8->pc);
             chip8->pc = opcode & 0x0FFF;
             break;
         case 0x3:
             // skip next instruction if Vx == NN
-            // we can get NN by ANDing the opcode with 0x00FF
-            // we can then use this value to compare with Vx
-            // we can get the index of Vx by ANDing the opcode with 0x0F00
-            // and then shifting it 8 bits to the right
-            // we can then compare the value of Vx with the value in the opcode
             if (chip8->v[(opcode & 0x0F00) >> 8] == (opcode & 0x00FF))
                 chip8->pc += 2;
             break;
         case 0x4:
             // skip next instruction if Vx != NN
-            // we can get NN by ANDing the opcode with 0x00FF
-            // we can then use this value to compare with Vx
-            // we can get the index of Vx by ANDing the opcode with 0x0F00
-            // and then shifting it 8 bits to the right
-            // we can then compare the value of Vx with the value in the opcode
             if (chip8->v[(opcode & 0x0F00) >> 8] != (opcode & 0x00FF))
                 chip8->pc += 2;
             break;
         case 0x5:
             // skip next instruction if Vx == Vy
-            // we can do this by getting the index of Vx and Vy
-            // we can get the index of Vx by ANDing the opcode with 0x0F00
-            // and then shifting it 8 bits to the right
-            // we can get the index of Vy by ANDing the opcode with 0x00F0
-            // and then shifting it 4 bits to the right
-            // we can then compare the values of Vx and Vy
             if (chip8->v[(opcode & 0x0F00) >> 8] == chip8->v[(opcode & 0x00F0) >> 4])
                 chip8->pc += 2;
             break;
         case 0x6:
             // set Vx to NN
-            // we can get NN by ANDing the opcode with 0x00FF
-            // we can then use this value to set Vx
-            // we can get the index of Vx by ANDing the opcode with 0x0F00
-            // and then shifting it 8 bits to the right
             chip8->v[(opcode & 0x0F00) >> 8] = opcode & 0x00FF;
             break;
         case 0x7:
             // add NN to Vx
-            // we can get NN by ANDing the opcode with 0x00FF
-            // we can then use this value to add to Vx
-            // we can get the index of Vx by ANDing the opcode with 0x0F00
-            // and then shifting it 8 bits to the right
-            // we can then add the value to Vx
             chip8->v[(opcode & 0x0F00) >> 8] += opcode & 0x00FF;
             break;
         case 0x8:
             switch (opcode & 0x000F) {
                 case 0x0:
                     // set Vx to Vy
-                    // we can get the index of Vx and Vy
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can get the index of Vy by ANDing the opcode with 0x00F0
-                    // and then shifting it 4 bits to the right
-                    // we can then set Vx to Vy
                     chip8->v[(opcode & 0x0F00) >> 8] = chip8->v[(opcode & 0x00F0) >> 4];
                     break;
                 case 0x1:
                     // set Vx to Vx OR Vy
-                    // we can get the index of Vx and Vy
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can get the index of Vy by ANDing the opcode with 0x00F0
-                    // and then shifting it 4 bits to the right
-                    // we can then set Vx to Vx OR Vy
+                    // reset VF to 0
                     chip8->v[(opcode & 0x0F00) >> 8] |= chip8->v[(opcode & 0x00F0) >> 4];
                     chip8->v[0xF] = 0;
                     break;
                 case 0x2:
                     // set Vx to Vx AND Vy
-                    // we can get the index of Vx and Vy
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can get the index of Vy by ANDing the opcode with 0x00F0
-                    // and then shifting it 4 bits to the right
-                    // we can then set Vx to Vx AND Vy
+                    // reset VF to 0
                     chip8->v[(opcode & 0x0F00) >> 8] &= chip8->v[(opcode & 0x00F0) >> 4];
                     chip8->v[0xF] = 0;
                     break;
                 case 0x3:
                     // set Vx to Vx XOR Vy
-                    // we can get the index of Vx and Vy
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can get the index of Vy by ANDing the opcode with 0x00F0
-                    // and then shifting it 4 bits to the right
-                    // we can then set Vx to Vx XOR Vy
+                    // reset VF to 0
                     chip8->v[(opcode & 0x0F00) >> 8] ^= chip8->v[(opcode & 0x00F0) >> 4];
                     chip8->v[0xF] = 0;
                     break;
                 case 0x4:
-                    // add Vy to Vx, set VF to 1 if there is a carry
-                    // we can get the index of Vx and Vy
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can get the index of Vy by ANDing the opcode with 0x00F0
-                    // and then shifting it 4 bits to the right
-                    // we can then add Vy to Vx
-                    // if there is a carry, we can set VF to 1
-                    // if there is no carry, we can set VF to 0
+                    // add Vy to Vx
+                    // set VF to 1 if there is a carry
                     operand = chip8->v[(opcode & 0x0F00) >> 8];
                     addend = chip8->v[(opcode & 0x00F0) >> 4];
                     chip8->v[(opcode & 0x0F00) >> 8] += chip8->v[(opcode & 0x00F0) >> 4];
@@ -305,15 +248,8 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                         chip8->v[0xF] = 0;
                     break;
                 case 0x5:
-                    // subtract Vy from Vx, set VF to 0 if there is a borrow
-                    // we can get the index of Vx and Vy
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can get the index of Vy by ANDing the opcode with 0x00F0
-                    // and then shifting it 4 bits to the right
-                    // we can then subtract Vy from Vx
-                    // if there is a borrow, we can set VF to 0
-                    // if there is no borrow, we can set VF to 1
+                    // subtract Vy from Vx
+                    // set VF to 0 if there is a borrow
                     minuend = chip8->v[(opcode & 0x0F00) >> 8];
                     subtrahend = chip8->v[(opcode & 0x00F0) >> 4];
                     chip8->v[(opcode & 0x0F00) >> 8] -= chip8->v[(opcode & 0x00F0) >> 4];
@@ -323,26 +259,16 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                         chip8->v[0xF] = 1;
                     break;
                 case 0x6:
-                    // shift Vx right by 1, set VF to the least significant bit of Vx before the shift
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can then set Vx to the value of Vy
-                    // we can then shift Vx right by 1
-                    // we can then set VF to the least significant bit of Vx before the shift
+                    // shift Vx right by 1
+                    // set VF to the least significant bit of Vx before the shift
                     operand = chip8->v[(opcode & 0x0F00) >> 8];
                     chip8->v[(opcode & 0x0F00) >> 8] = chip8->v[(opcode & 0x00F0) >> 4];
                     chip8->v[(opcode & 0x0F00) >> 8] >>= 1;
                     chip8->v[0xF] = operand & 0x01;
                     break;
                 case 0x7:
-                    // set Vx to Vy - Vx, set VF to 0 if there is a borrow
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can get the index of Vy by ANDing the opcode with 0x00F0
-                    // and then shifting it 4 bits to the right
-                    // we can then set Vx to Vy - Vx
-                    // if there is a borrow, we can set VF to 0
-                    // if there is no borrow, we can set VF to 1
+                    // set Vx to Vy - Vx
+                    // set VF to 0 if there is a borrow
                     minuend = chip8->v[(opcode & 0x00F0) >> 4];
                     subtrahend = chip8->v[(opcode & 0x0F00) >> 8];
                     chip8->v[(opcode & 0x0F00) >> 8] = minuend - subtrahend;
@@ -352,12 +278,8 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                         chip8->v[0xF] = 1;
                     break;
                 case 0xE:
-                    // shift Vx left by 1, set VF to the least significant bit of Vx before the shift
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can then set Vx to the value of Vy
-                    // we can then shift Vx right by 1
-                    // we can then set VF to the most significant bit of Vx before the shift
+                    // shift Vx left by 1
+                    // set VF to the least significant bit of Vx before the shift
                     operand = chip8->v[(opcode & 0x0F00) >> 8];
                     chip8->v[(opcode & 0x0F00) >> 8] = chip8->v[(opcode & 0x00F0) >> 4];
                     chip8->v[(opcode & 0x0F00) >> 8] <<= 1;
@@ -367,35 +289,19 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             break;
         case 0x9:
             // skip next instruction if Vx != Vy
-            // we can get the index of Vx by ANDing the opcode with 0x0F00
-            // and then shifting it 8 bits to the right
-            // we can get the index of Vy by ANDing the opcode with 0x00F0
-            // and then shifting it 4 bits to the right
-            // we can then compare the values of Vx and Vy
-            // if they are not equal, we can skip the next instruction
             if (chip8->v[(opcode & 0x0F00) >> 8] != chip8->v[(opcode & 0x00F0) >> 4])
                 chip8->pc += 2;
             break;
         case 0xA:
             // set I to address NNN
-            // we can get address NNN by ANDing the opcode with 0x0FFF
             chip8->ix = opcode & 0x0FFF;
             break;
         case 0xB:
             // jump to address NNN + V0
-            // we can do this by adding V0 to the address in the opcode
-            // we can get the address in the opcode by ANDing the opcode with 0x0FFF
-            // we can then add V0 to this value
-            // we can then set the program counter to this value
             chip8->pc = (opcode & 0x0FFF) + chip8->v[0];
             break;
         case 0xC:
             // set Vx to a random number AND NN
-            // we can get the index of Vx by ANDing the opcode with 0x0F00
-            // and then shifting it 8 bits to the right
-            // we can then set Vx to a random number AND NN
-            // we can get the value of NN by ANDing the opcode with 0x00FF
-            // we can then set Vx to a random number AND NN
             chip8->v[(opcode & 0x0F00) >> 8] = randomNumber(0, 255) & (opcode & 0x00FF);
             break;
         case 0xD: // DXYN
@@ -415,13 +321,13 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
 
             for (int yline = 0; yline < spriteHeight; yline++) {
                 if (spriteY + yline >= CHIP8_HEIGHT)
-                    continue;
+                    continue; // clip vertically
 
                 uint8_t pixel = chip8->memory[chip8->ix + yline];
                 for (int xline = 0; xline < 8; xline++) {
                     if ((pixel & (0x80 >> xline)) != 0) {
                         if (spriteX + xline >= CHIP8_WIDTH)
-                            continue;
+                            continue; // clip horizontally
 
                         if (chip8->display.pixelDrawn[spriteY + yline][spriteX + xline])
                             chip8->v[0xF] = 1;
@@ -436,19 +342,11 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             switch (opcode & 0x00FF) {
                 case 0x9E:
                     // skip next instruction if key with the value of Vx is pressed
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can then check if the key with the value of Vx is pressed
-                    // if it is pressed, we can skip the next instruction
                     if (chip8->display.keyDown[chip8->v[(opcode & 0x0F00) >> 8]])
                         chip8->pc += 2;
                     break;
                 case 0xA1:
                     // skip next instruction if key with the value of Vx is not pressed
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can then check if the key with the value of Vx is not pressed
-                    // if it is not pressed, we can skip the next instruction
                     if (!chip8->display.keyDown[chip8->v[(opcode & 0x0F00) >> 8]])
                         chip8->pc += 2;
                     break;
@@ -458,16 +356,11 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             switch (opcode & 0x00FF) {
                 case 0x07:
                     // set Vx to the value of the delay timer
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can then set Vx to the value of the delay timer
                     chip8->v[(opcode & 0x0F00) >> 8] = chip8->timers.delay;
                     break;
                 case 0x0A:
-                    // wait for a key press, store the value of the key in Vx
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // if a key is released, we can store the value of the key in Vx
+                    // wait for a key press
+                    // store the value of the key in Vx
                     chip8->pc -= 2;
                     for (int i = 0x0; i <= 0xF; i++)
                         if (chip8->display.keyUp[i]) {
@@ -479,58 +372,34 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     break;
                 case 0x15:
                     // set the delay timer to Vx
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can then set the delay timer to Vx
                     chip8->timers.delay = chip8->v[(opcode & 0x0F00) >> 8];
                     break;
                 case 0x18:
                     // set the sound timer to Vx
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can then set the sound timer to Vx
                     chip8->timers.sound = chip8->v[(opcode & 0x0F00) >> 8];
                     break;
                 case 0x1E:
                     // add Vx to I
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can then add Vx to I
                     chip8->ix += chip8->v[(opcode & 0x0F00) >> 8];
                     break;
                 case 0x29:
                     // set I to the location of the sprite for the character in Vx
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can then set I to the location of the sprite for the character in Vx
-                    // because each character is 5 bytes long,
-                    // the location of the sprite for the character in Vx is the index of Vx multiplied by 5
-                    // we can get the location of the sprite for the character in Vx by multiplying the index of Vx by 5
                     chip8->ix = chip8->v[(opcode & 0x0F00) >> 8] * 5;
                     break;
                 case 0x33:
                     // store the binary-coded base-10 representation of Vx in memory locations I, I+1, and I+2
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can then store the binary-coded base-10 representation of Vx in memory locations I, I+1, and I+2
                     chip8->memory[chip8->ix] = chip8->v[(opcode & 0x0F00) >> 8] / 100;
                     chip8->memory[chip8->ix + 1] = (chip8->v[(opcode & 0x0F00) >> 8] / 10) % 10;
                     chip8->memory[chip8->ix + 2] = chip8->v[(opcode & 0x0F00) >> 8] % 10;
                     break;
                 case 0x55:
                     // store V0 to Vx in memory starting at address I
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can then store V0 to Vx in memory starting at address I
                     for (int i = 0; i <= ((opcode & 0x0F00) >> 8); i++)
                         chip8->memory[chip8->ix + i] = chip8->v[i];
                     chip8->ix += ((opcode & 0x0F00) >> 8) + 1;
                     break;
                 case 0x65:
                     // fill V0 to Vx with values from memory starting at address I
-                    // we can get the index of Vx by ANDing the opcode with 0x0F00
-                    // and then shifting it 8 bits to the right
-                    // we can then fill V0 to Vx with values from memory starting at address I
                     for (int i = 0; i <= ((opcode & 0x0F00) >> 8); i++)
                         chip8->v[i] = chip8->memory[chip8->ix + i];
                     chip8->ix += ((opcode & 0x0F00) >> 8) + 1;
