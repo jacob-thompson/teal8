@@ -70,6 +70,7 @@ FILE *getRom(const char *rom)
         return rom_file;
     }
 
+    free(filename);
     return NULL;
 }
 
