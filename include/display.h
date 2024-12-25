@@ -10,6 +10,8 @@
 #define SCALE 10
 #define CHIP8_WIDTH 64
 #define CHIP8_HEIGHT 32
+#define SCHIP_WIDTH CHIP8_WIDTH << 1
+#define SCHIP_HEIGHT CHIP8_HEIGHT << 1
 
 /**
     * The display struct.
@@ -20,7 +22,7 @@ typedef struct display {
     SDL_Renderer *renderer;
     SDL_Rect *pixels;
     bool *pixelDrawn;
-    bool powered_on;
+    bool poweredOn;
     bool keyDown[KEY_COUNT];
     bool keyUp[KEY_COUNT];
     uint32_t lastUpdate;

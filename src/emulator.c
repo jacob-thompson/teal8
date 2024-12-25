@@ -117,6 +117,8 @@ void initializeEmulator(emulator *chip8, FILE *rom)
 
     chip8->lastUpdate = 0;
     chip8->timers.lastUpdate = 0;
+
+    chip8->specType = CHIP8;
 }
 
 void printMemory(emulator *chip8)
@@ -175,6 +177,7 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             switch (y) {
                 case 0xC:
                     // scroll the display N lines down
+                    chip8->specType = SCHIP;
                     break;
             }
             switch (opcode & 0x00FF) {
@@ -188,18 +191,23 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     break;
                 case 0xFB:
                     // scroll the display 4 pixels to the right
+                    chip8->specType = SCHIP;
                     break;
                 case 0xFC:
                     // scroll the display 4 pixels to the left
+                    chip8->specType = SCHIP;
                     break;
                 case 0xFD:
                     // exit the interpreter
+                    chip8->display.poweredOn = false;
                     break;
                 case 0xFE:
                     // set the CHIP-8 display mode to 64x32
+                    chip8->specType = SCHIP;
                     break;
                 case 0xFF:
                     // set the CHIP-8 display mode to 128x64
+                    chip8->specType = SCHIP;
                     break;
                 default:
                     // call RCA 1802 program at address NNN

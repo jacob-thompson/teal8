@@ -42,7 +42,7 @@ int initDisplay(display *display)
 
     resetDisplay(display);
 
-    display->powered_on = true;
+    display->poweredOn = true;
 
     return EXIT_SUCCESS;
 }
@@ -54,7 +54,7 @@ void handleEvent(display *display, SDL_Event *event)
         case SDL_KEYUP:
             switch (event->key.keysym.scancode) {
                 case SDL_SCANCODE_ESCAPE:
-                    display->powered_on = false;
+                    display->poweredOn = false;
                     break;
                 case SDL_SCANCODE_1:
                     display->keyDown[0x1] = false;
@@ -182,7 +182,7 @@ void handleEvent(display *display, SDL_Event *event)
 
         // quit gracefully
         case SDL_QUIT:
-            display->powered_on = false;
+            display->poweredOn = false;
     }
 }
 
