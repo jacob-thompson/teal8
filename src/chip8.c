@@ -113,6 +113,8 @@ int main(int argc, char **argv)
     }
 
     // cleanup
+    free(chip8.display.pixels);
+    free(chip8.display.pixelDrawn);
     SDL_DestroyRenderer(chip8.display.renderer);
     SDL_DestroyWindow(chip8.display.window);
     SDL_Quit();
