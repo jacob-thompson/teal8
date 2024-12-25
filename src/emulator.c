@@ -164,8 +164,19 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
 {
     uint8_t minuend, subtrahend, operand, addend;
 
+    uint8_t x = (opcode & 0x0F00) >> 8;
+    uint8_t y = (opcode & 0x00F0) >> 4;
+    uint8_t n = opcode & 0x000F;
+    uint8_t nn = opcode & 0x00FF;
+    uint16_t nnn = opcode & 0x0FFF;
+
     switch (opcode >> 12) {
         case 0x0:
+            switch (y) {
+                case 0xC:
+                    // scroll the display N lines down
+                    break;
+            }
             switch (opcode & 0x00FF) {
                 case 0xE0:
                     // clear the display
@@ -175,6 +186,21 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // return from subroutine
                     stackPop(&chip8->stack, &chip8->pc);
                     break;
+                case 0xFB:
+                    // scroll the display 4 pixels to the right
+                    break;
+                case 0xFC:
+                    // scroll the display 4 pixels to the left
+                    break;
+                case 0xFD:
+                    // exit the interpreter
+                    break;
+                case 0xFE:
+                    // set the CHIP-8 display mode to 64x32
+                    break;
+                case 0xFF:
+                    // set the CHIP-8 display mode to 128x64
+                    break;
                 default:
                     // call RCA 1802 program at address NNN
                     // this is not implemented on modern interpreters
@@ -183,66 +209,66 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             break;
         case 0x1:
             // jump to address NNN
-            chip8->pc = opcode & 0x0FFF;
+            chip8->pc = nnn;
             break;
         case 0x2:
             // call subroutine at address NNN
             stackPush(&chip8->stack, &chip8->pc);
-            chip8->pc = opcode & 0x0FFF;
+            chip8->pc = nnn;
             break;
         case 0x3:
             // skip next instruction if Vx == NN
-            if (chip8->v[(opcode & 0x0F00) >> 8] == (opcode & 0x00FF))
+            if (chip8->v[x] == nn)
                 chip8->pc += 2;
             break;
         case 0x4:
             // skip next instruction if Vx != NN
-            if (chip8->v[(opcode & 0x0F00) >> 8] != (opcode & 0x00FF))
+            if (chip8->v[x] != nn)
                 chip8->pc += 2;
             break;
         case 0x5:
             // skip next instruction if Vx == Vy
-            if (chip8->v[(opcode & 0x0F00) >> 8] == chip8->v[(opcode & 0x00F0) >> 4])
+            if (chip8->v[x] == chip8->v[y])
                 chip8->pc += 2;
             break;
         case 0x6:
             // set Vx to NN
-            chip8->v[(opcode & 0x0F00) >> 8] = opcode & 0x00FF;
+            chip8->v[x] = nn;
             break;
         case 0x7:
             // add NN to Vx
-            chip8->v[(opcode & 0x0F00) >> 8] += opcode & 0x00FF;
+            chip8->v[x] += nn;
             break;
         case 0x8:
             switch (opcode & 0x000F) {
                 case 0x0:
                     // set Vx to Vy
-                    chip8->v[(opcode & 0x0F00) >> 8] = chip8->v[(opcode & 0x00F0) >> 4];
+                    chip8->v[x] = chip8->v[y];
                     break;
                 case 0x1:
                     // set Vx to Vx OR Vy
                     // reset VF to 0
-                    chip8->v[(opcode & 0x0F00) >> 8] |= chip8->v[(opcode & 0x00F0) >> 4];
+                    chip8->v[x] |= chip8->v[y];
                     chip8->v[0xF] = 0;
                     break;
                 case 0x2:
                     // set Vx to Vx AND Vy
                     // reset VF to 0
-                    chip8->v[(opcode & 0x0F00) >> 8] &= chip8->v[(opcode & 0x00F0) >> 4];
+                    chip8->v[x] &= chip8->v[y];
                     chip8->v[0xF] = 0;
                     break;
                 case 0x3:
                     // set Vx to Vx XOR Vy
                     // reset VF to 0
-                    chip8->v[(opcode & 0x0F00) >> 8] ^= chip8->v[(opcode & 0x00F0) >> 4];
+                    chip8->v[x] ^= chip8->v[y];
                     chip8->v[0xF] = 0;
                     break;
                 case 0x4:
                     // add Vy to Vx
                     // set VF to 1 if there is a carry
-                    operand = chip8->v[(opcode & 0x0F00) >> 8];
-                    addend = chip8->v[(opcode & 0x00F0) >> 4];
-                    chip8->v[(opcode & 0x0F00) >> 8] += chip8->v[(opcode & 0x00F0) >> 4];
+                    operand = chip8->v[x];
+                    addend = chip8->v[y];
+                    chip8->v[x] += chip8->v[y];
                     if (operand > 0xFF - addend)
                         chip8->v[0xF] = 1;
                     else
@@ -251,9 +277,9 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                 case 0x5:
                     // subtract Vy from Vx
                     // set VF to 0 if there is a borrow
-                    minuend = chip8->v[(opcode & 0x0F00) >> 8];
-                    subtrahend = chip8->v[(opcode & 0x00F0) >> 4];
-                    chip8->v[(opcode & 0x0F00) >> 8] -= chip8->v[(opcode & 0x00F0) >> 4];
+                    minuend = chip8->v[x];
+                    subtrahend = chip8->v[y];
+                    chip8->v[x] -= chip8->v[y];
                     if (minuend < subtrahend)
                         chip8->v[0xF] = 0;
                     else
@@ -262,17 +288,17 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                 case 0x6:
                     // shift Vx right by 1
                     // set VF to the least significant bit of Vx before the shift
-                    operand = chip8->v[(opcode & 0x0F00) >> 8];
-                    chip8->v[(opcode & 0x0F00) >> 8] = chip8->v[(opcode & 0x00F0) >> 4];
-                    chip8->v[(opcode & 0x0F00) >> 8] >>= 1;
+                    operand = chip8->v[x];
+                    chip8->v[x] = chip8->v[y];
+                    chip8->v[x] >>= 1;
                     chip8->v[0xF] = operand & 0x01;
                     break;
                 case 0x7:
                     // set Vx to Vy - Vx
                     // set VF to 0 if there is a borrow
-                    minuend = chip8->v[(opcode & 0x00F0) >> 4];
-                    subtrahend = chip8->v[(opcode & 0x0F00) >> 8];
-                    chip8->v[(opcode & 0x0F00) >> 8] = minuend - subtrahend;
+                    minuend = chip8->v[y];
+                    subtrahend = chip8->v[x];
+                    chip8->v[x] = minuend - subtrahend;
                     if (minuend < subtrahend)
                         chip8->v[0xF] = 0;
                     else
@@ -281,29 +307,29 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                 case 0xE:
                     // shift Vx left by 1
                     // set VF to the least significant bit of Vx before the shift
-                    operand = chip8->v[(opcode & 0x0F00) >> 8];
-                    chip8->v[(opcode & 0x0F00) >> 8] = chip8->v[(opcode & 0x00F0) >> 4];
-                    chip8->v[(opcode & 0x0F00) >> 8] <<= 1;
+                    operand = chip8->v[x];
+                    chip8->v[x] = chip8->v[y];
+                    chip8->v[x] <<= 1;
                     chip8->v[0xF] = operand >> 7;
                     break;
             }
             break;
         case 0x9:
             // skip next instruction if Vx != Vy
-            if (chip8->v[(opcode & 0x0F00) >> 8] != chip8->v[(opcode & 0x00F0) >> 4])
+            if (chip8->v[x] != chip8->v[y])
                 chip8->pc += 2;
             break;
         case 0xA:
             // set I to address NNN
-            chip8->ix = opcode & 0x0FFF;
+            chip8->ix = nnn;
             break;
         case 0xB:
             // jump to address NNN + V0
-            chip8->pc = (opcode & 0x0FFF) + chip8->v[0];
+            chip8->pc = nnn + chip8->v[0];
             break;
         case 0xC:
             // set Vx to a random number AND NN
-            chip8->v[(opcode & 0x0F00) >> 8] = randomNumber(0, 255) & (opcode & 0x00FF);
+            chip8->v[x] = randomNumber(0, 255) & nn;
             break;
         case 0xD: // DXYN
             // draw a sprite at position Vx, Vy
@@ -314,9 +340,9 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                 if (chip8->display.lastUpdate + (1000 / 60) < SDL_GetTicks())
                     break;
 
-            uint8_t spriteX = chip8->v[(opcode & 0x0F00) >> 8] % CHIP8_WIDTH;
-            uint8_t spriteY = chip8->v[(opcode & 0x00F0) >> 4] % CHIP8_HEIGHT;
-            uint8_t spriteHeight = opcode & 0x000F;
+            uint8_t spriteX = chip8->v[x] % CHIP8_WIDTH;
+            uint8_t spriteY = chip8->v[y] % CHIP8_HEIGHT;
+            uint8_t spriteHeight = n;
 
             chip8->v[0xF] = 0;
 
@@ -343,12 +369,12 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             switch (opcode & 0x00FF) {
                 case 0x9E:
                     // skip next instruction if key with the value of Vx is pressed
-                    if (chip8->display.keyDown[chip8->v[(opcode & 0x0F00) >> 8]])
+                    if (chip8->display.keyDown[chip8->v[x]])
                         chip8->pc += 2;
                     break;
                 case 0xA1:
                     // skip next instruction if key with the value of Vx is not pressed
-                    if (!chip8->display.keyDown[chip8->v[(opcode & 0x0F00) >> 8]])
+                    if (!chip8->display.keyDown[chip8->v[x]])
                         chip8->pc += 2;
                     break;
             }
@@ -357,7 +383,7 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             switch (opcode & 0x00FF) {
                 case 0x07:
                     // set Vx to the value of the delay timer
-                    chip8->v[(opcode & 0x0F00) >> 8] = chip8->timers.delay;
+                    chip8->v[x] = chip8->timers.delay;
                     break;
                 case 0x0A:
                     // wait for a key press
@@ -365,7 +391,7 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     chip8->pc -= 2;
                     for (int i = 0x0; i <= 0xF; i++)
                         if (chip8->display.keyUp[i]) {
-                            chip8->v[(opcode & 0x0F00) >> 8] = i;
+                            chip8->v[x] = i;
                             chip8->pc += 2;
                             break;
                         }
@@ -373,37 +399,37 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     break;
                 case 0x15:
                     // set the delay timer to Vx
-                    chip8->timers.delay = chip8->v[(opcode & 0x0F00) >> 8];
+                    chip8->timers.delay = chip8->v[x];
                     break;
                 case 0x18:
                     // set the sound timer to Vx
-                    chip8->timers.sound = chip8->v[(opcode & 0x0F00) >> 8];
+                    chip8->timers.sound = chip8->v[x];
                     break;
                 case 0x1E:
                     // add Vx to I
-                    chip8->ix += chip8->v[(opcode & 0x0F00) >> 8];
+                    chip8->ix += chip8->v[x];
                     break;
                 case 0x29:
                     // set I to the location of the sprite for the character in Vx
-                    chip8->ix = chip8->v[(opcode & 0x0F00) >> 8] * 5;
+                    chip8->ix = chip8->v[x] * 5;
                     break;
                 case 0x33:
                     // store the binary-coded base-10 representation of Vx in memory locations I, I+1, and I+2
-                    chip8->memory[chip8->ix] = chip8->v[(opcode & 0x0F00) >> 8] / 100;
-                    chip8->memory[chip8->ix + 1] = (chip8->v[(opcode & 0x0F00) >> 8] / 10) % 10;
-                    chip8->memory[chip8->ix + 2] = chip8->v[(opcode & 0x0F00) >> 8] % 10;
+                    chip8->memory[chip8->ix] = chip8->v[x] / 100;
+                    chip8->memory[chip8->ix + 1] = (chip8->v[x] / 10) % 10;
+                    chip8->memory[chip8->ix + 2] = chip8->v[x] % 10;
                     break;
                 case 0x55:
                     // store V0 to Vx in memory starting at address I
-                    for (int i = 0; i <= ((opcode & 0x0F00) >> 8); i++)
+                    for (int i = 0; i <= x; i++)
                         chip8->memory[chip8->ix + i] = chip8->v[i];
-                    chip8->ix += ((opcode & 0x0F00) >> 8) + 1;
+                    chip8->ix += x + 1;
                     break;
                 case 0x65:
                     // fill V0 to Vx with values from memory starting at address I
-                    for (int i = 0; i <= ((opcode & 0x0F00) >> 8); i++)
+                    for (int i = 0; i <= x; i++)
                         chip8->v[i] = chip8->memory[chip8->ix + i];
-                    chip8->ix += ((opcode & 0x0F00) >> 8) + 1;
+                    chip8->ix += x + 1;
             }
     }
 }
