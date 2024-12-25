@@ -330,10 +330,10 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                         if (spriteX + xline >= CHIP8_WIDTH)
                             continue; // clip horizontally
 
-                        if (chip8->display.pixelDrawn[spriteY + yline][spriteX + xline])
+                        if (chip8->display.pixelDrawn[(spriteY + yline) * CHIP8_WIDTH + (spriteX + xline)])
                             chip8->v[0xF] = 1;
 
-                        chip8->display.pixelDrawn[spriteY + yline][spriteX + xline] ^= true;
+                        chip8->display.pixelDrawn[(spriteY + yline) * CHIP8_WIDTH + (spriteX + xline)] ^= true;
                     }
                 }
             }

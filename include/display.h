@@ -18,8 +18,8 @@
 typedef struct display {
     SDL_Window *window;
     SDL_Renderer *renderer;
-    SDL_Rect pixels[CHIP8_HEIGHT][CHIP8_WIDTH];
-    bool pixelDrawn[CHIP8_HEIGHT][CHIP8_WIDTH];
+    SDL_Rect *pixels;
+    bool *pixelDrawn;
     bool powered_on;
     bool reset;
     bool keyDown[KEY_COUNT];
