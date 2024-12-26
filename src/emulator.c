@@ -325,7 +325,8 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // shift Vx right by 1
                     // set VF to the least significant bit of Vx before the shift
                     operand = chip8->v[x];
-                    chip8->v[x] = chip8->v[y];
+                    if (chip8->specType == CHIP8)
+                        chip8->v[x] = chip8->v[y];
                     chip8->v[x] >>= 1;
                     chip8->v[0xF] = operand & 0x01;
                     break;
@@ -344,7 +345,8 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // shift Vx left by 1
                     // set VF to the least significant bit of Vx before the shift
                     operand = chip8->v[x];
-                    chip8->v[x] = chip8->v[y];
+                    if (chip8->specType == CHIP8)
+                        chip8->v[x] = chip8->v[y];
                     chip8->v[x] <<= 1;
                     chip8->v[0xF] = operand >> 7;
                     break;
