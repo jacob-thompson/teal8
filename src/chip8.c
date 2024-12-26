@@ -73,6 +73,7 @@ int main(int argc, char **argv)
 
         if (chip8.display.reset) {
             initializeEmulator(&chip8, getRom(argv[1]));
+            resetDisplay(&chip8.display);
             chip8.display.reset = false;
             continue;
         }
