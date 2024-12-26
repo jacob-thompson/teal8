@@ -460,13 +460,15 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // store V0 to Vx in memory starting at address I
                     for (int i = 0; i <= x; i++)
                         chip8->memory[chip8->ix + i] = chip8->v[i];
-                    chip8->ix += x + 1;
+                    if (chip8->specType == CHIP8)
+                        chip8->ix += x + 1;
                     break;
                 case 0x65:
                     // fill V0 to Vx with values from memory starting at address I
                     for (int i = 0; i <= x; i++)
                         chip8->v[i] = chip8->memory[chip8->ix + i];
-                    chip8->ix += x + 1;
+                    if (chip8->specType == CHIP8)
+                        chip8->ix += x + 1;
                     break;
                 case 0x75:
                     // store V0 to Vx in the RPL user flags
