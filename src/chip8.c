@@ -91,6 +91,7 @@ int main(int argc, char **argv)
         //printf("vd: %02x\n", chip8.v[13]);
         //printf("ve: %02x\n", chip8.v[14]);
         //printf("vf: %02x\n", chip8.v[15]);
+        //printf("stacked values: %d\n", stacked(&chip8.stack));
         //printf(" ------- \n");
 
         chip8.pc += 2;

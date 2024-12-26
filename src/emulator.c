@@ -118,8 +118,10 @@ void initializeEmulator(emulator *chip8, FILE *rom)
     chip8->lastUpdate = 0;
     chip8->timers.lastUpdate = 0;
 
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < 16; i++) {
         chip8->v[i] = 0;
+        chip8->stack.s[i] = '\0';
+    }
 
     chip8->specType = CHIP8;
 }
