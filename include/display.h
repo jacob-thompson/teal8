@@ -21,6 +21,7 @@ typedef struct display {
     SDL_Rect pixels[CHIP8_HEIGHT][CHIP8_WIDTH];
     bool pixelDrawn[CHIP8_HEIGHT][CHIP8_WIDTH];
     bool powered_on;
+    bool reset;
     bool keyDown[KEY_COUNT];
     bool keyUp[KEY_COUNT];
     uint32_t lastUpdate;

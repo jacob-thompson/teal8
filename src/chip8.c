@@ -71,6 +71,12 @@ int main(int argc, char **argv)
         while (SDL_PollEvent(&event))
             handleEvent(&chip8.display, &event);
 
+        if (chip8.display.reset) {
+            initializeEmulator(&chip8, getRom(argv[1]));
+            chip8.display.reset = false;
+            continue;
+        }
+
         // fetch, decode, and execute opcode
         opcode = fetchOpcode(&chip8);
 

@@ -38,6 +38,7 @@ int initDisplay(display *display)
     resetDisplay(display);
 
     display->powered_on = true;
+    display->reset = false;
 
     return EXIT_SUCCESS;
 }
@@ -50,6 +51,9 @@ void handleEvent(display *display, SDL_Event *event)
             switch (event->key.keysym.scancode) {
                 case SDL_SCANCODE_ESCAPE:
                     display->powered_on = false;
+                    break;
+                case SDL_SCANCODE_SPACE: // restart the rom
+                    display->reset = true;
                     break;
                 case SDL_SCANCODE_1:
                     display->keyDown[0x1] = false;
