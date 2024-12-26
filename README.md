@@ -1,6 +1,6 @@
 # chip-8
 
-chip-8 interpreter written in C
+CHIP-8 interpreter written in C using SDL2.
 
 ## prerequisites
 
