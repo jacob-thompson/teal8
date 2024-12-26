@@ -464,6 +464,16 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     for (int i = 0; i <= x; i++)
                         chip8->v[i] = chip8->memory[chip8->ix + i];
                     chip8->ix += x + 1;
+                    break;
+                case 0x75:
+                    // store V0 to Vx in the RPL user flags
+                    // this is not implemented on modern interpreters
+                    chip8->specType = SCHIP;
+                    break;
+                case 0x85:
+                    // fill V0 to Vx with values from the RPL user flags
+                    // this is not implemented on modern interpreters
+                    chip8->specType = SCHIP;
             }
     }
 }
