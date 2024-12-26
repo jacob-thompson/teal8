@@ -282,19 +282,22 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // set Vx to Vx OR Vy
                     // reset VF to 0
                     chip8->v[x] |= chip8->v[y];
-                    chip8->v[0xF] = 0;
+                    if (chip8->specType == CHIP8)
+                        chip8->v[0xF] = 0;
                     break;
                 case 0x2:
                     // set Vx to Vx AND Vy
                     // reset VF to 0
                     chip8->v[x] &= chip8->v[y];
-                    chip8->v[0xF] = 0;
+                    if (chip8->specType == CHIP8)
+                        chip8->v[0xF] = 0;
                     break;
                 case 0x3:
                     // set Vx to Vx XOR Vy
                     // reset VF to 0
                     chip8->v[x] ^= chip8->v[y];
-                    chip8->v[0xF] = 0;
+                    if (chip8->specType == CHIP8)
+                        chip8->v[0xF] = 0;
                     break;
                 case 0x4:
                     // add Vy to Vx
