@@ -363,7 +363,11 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             break;
         case 0xB:
             // jump to address NNN + V0
-            chip8->pc = nnn + chip8->v[0];
+            // on SCHIP, jump to XNN + vX
+            if (chip8->specType == CHIP8)
+                chip8->pc = nnn + chip8->v[0];
+            else
+                chip8->pc = nnn + chip8->v[x];
             break;
         case 0xC:
             // set Vx to a random number AND NN
