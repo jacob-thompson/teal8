@@ -39,12 +39,18 @@ FILE *getRom(const char *rom)
 
     sprintf(filename, "%s", rom);
     if ( // test roms
-        strcmp(filename, "beep") == 0 ||
-        strcmp(filename, "corax+") == 0 ||
-        strcmp(filename, "keypad") == 0 ||
-        strcmp(filename, "flags") == 0 ||
-        strcmp(filename, "quirks") == 0 ||
-        strcmp(filename, "splash") == 0 ||
+        strcmp(filename, "beep") == 0
+        ||
+        strcmp(filename, "corax+") == 0
+        ||
+        strcmp(filename, "keypad") == 0
+        ||
+        strcmp(filename, "flags") == 0
+        ||
+        strcmp(filename, "quirks") == 0
+        ||
+        strcmp(filename, "splash") == 0
+        ||
         strcmp(filename, "ibm_logo") == 0
     ) {
         sprintf(filename, "roms/test/%s.ch8", rom);
@@ -208,10 +214,24 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     break;
                 case 0xFE:
                     // set the CHIP-8 display mode to 64x32
+                    if (chip8->display.width == SCHIP_WIDTH * SCALE && chip8->display.height == SCHIP_HEIGHT * SCALE) {
+                        SDL_SetWindowSize(chip8->display.window, CHIP8_WIDTH * SCALE, CHIP8_HEIGHT * SCALE);
+                        SDL_GetWindowSize(chip8->display.window, &chip8->display.width, &chip8->display.height);
+                        SDL_SetWindowPosition(chip8->display.window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+                        createPixels(&chip8->display);
+                        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "display mode switched to lores\n");
+                    }
                     chip8->specType = SCHIP;
                     break;
                 case 0xFF:
                     // set the CHIP-8 display mode to 128x64
+                    if (chip8->display.width == CHIP8_WIDTH * SCALE && chip8->display.height == CHIP8_HEIGHT * SCALE) {
+                        SDL_SetWindowSize(chip8->display.window, SCHIP_WIDTH * SCALE, SCHIP_HEIGHT * SCALE);
+                        SDL_GetWindowSize(chip8->display.window, &chip8->display.width, &chip8->display.height);
+                        SDL_SetWindowPosition(chip8->display.window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+                        createPixels(&chip8->display);
+                        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "display mode switched to hires\n");
+                    }
                     chip8->specType = SCHIP;
                     break;
                 default:
@@ -353,26 +373,27 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                 if (chip8->display.lastUpdate + (1000 / 60) < SDL_GetTicks())
                     break;
 
-            uint8_t spriteX = chip8->v[x] % CHIP8_WIDTH;
-            uint8_t spriteY = chip8->v[y] % CHIP8_HEIGHT;
-            uint8_t spriteHeight = n;
+            uint8_t sX, sY, sH;
+            sX = chip8->v[x] % (chip8->display.width / SCALE);
+            sY = chip8->v[y] % (chip8->display.height / SCALE);
+            sH = n;
 
             chip8->v[0xF] = 0;
 
-            for (int yline = 0; yline < spriteHeight; yline++) {
-                if (spriteY + yline >= CHIP8_HEIGHT)
+            for (int yline = 0; yline < sH; yline++) {
+                if (sY + yline >= (chip8->display.height / SCALE))
                     continue; // clip vertically
 
                 uint8_t pixel = chip8->memory[chip8->ix + yline];
                 for (int xline = 0; xline < 8; xline++) {
                     if ((pixel & (0x80 >> xline)) != 0) {
-                        if (spriteX + xline >= CHIP8_WIDTH)
+                        if (sX + xline >= (chip8->display.width / SCALE) )
                             continue; // clip horizontally
 
-                        if (chip8->display.pixelDrawn[(spriteY + yline) * CHIP8_WIDTH + (spriteX + xline)])
+                        if (chip8->display.pixelDrawn[(sY + yline) * (chip8->display.width / SCALE) + (sX + xline)])
                             chip8->v[0xF] = 1;
 
-                        chip8->display.pixelDrawn[(spriteY + yline) * CHIP8_WIDTH + (spriteX + xline)] ^= true;
+                        chip8->display.pixelDrawn[(sY + yline) * (chip8->display.width / SCALE) + (sX + xline)] ^= true;
                     }
                 }
             }
