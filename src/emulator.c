@@ -23,6 +23,23 @@ FILE *getRom(const char *rom)
     char *filename = malloc(sizeof(char) * 64);
     FILE *rom_file = NULL;
 
+    if (
+        strcmp(rom, "flightrunner") == 0
+        ||
+        strcmp(rom, "flightrunner.ch8") == 0
+        ||
+        strcmp(rom, "roms/flightrunner.ch8") == 0
+    ) {
+        SDL_LogWarn(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "The 'flightrunner' ROM by @TodPunk is prone to stack overflow-related issues."
+        );
+        SDL_LogWarn(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "If this ROM freezes, you can reset it by pressing 'SPACE'."
+        );
+    }
+
     sprintf(filename, "roms/%s.ch8", rom);
     rom_file = fopen(filename, "rb");
     if (rom_file != NULL) {
@@ -38,6 +55,7 @@ FILE *getRom(const char *rom)
     }
 
     sprintf(filename, "%s", rom);
+
     if ( // test roms
         strcmp(filename, "beep") == 0 ||
         strcmp(filename, "corax+") == 0 ||
@@ -54,6 +72,7 @@ FILE *getRom(const char *rom)
             return rom_file;
         }
     }
+
     if (strcmp(filename, "octojamtitle") == 0) {
         int randomTitleRom = randomNumber(1, 10);
         sprintf(filename, "roms/octojam%dtitle.ch8", randomTitleRom);
