@@ -38,7 +38,7 @@ int main(int argc, char **argv)
     uint16_t opcode;
 
     // main loop
-    while (chip8.display.powered_on) {
+    while (chip8.display.poweredOn) {
 
         // update timers
         ticks = SDL_GetTicks();

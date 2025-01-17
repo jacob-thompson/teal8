@@ -2,9 +2,35 @@
 
 void resetDisplay(display *display)
 {
-    for (int y = 0; y < CHIP8_HEIGHT; y++)
-        for (int x = 0; x < CHIP8_WIDTH; x++)
-            display->pixelDrawn[y * CHIP8_WIDTH + x] = false;
+    for (int y = 0; y < display->height / SCALE; y++)
+        for (int x = 0; x < display->width / SCALE; x++)
+            display->pixelDrawn[y * (display->width / SCALE) + x] = false;
+}
+
+void createPixels(display *display)
+{
+    if (display->pixels != NULL)
+        free(display->pixels);
+
+    if (display->pixelDrawn != NULL)
+        free(display->pixelDrawn);
+
+    display->pixels = calloc(
+        display->height / SCALE * display->width / SCALE,
+        sizeof(SDL_Rect));
+
+    for (int y = 0; y < display->height / SCALE; y++) {
+        for (int x = 0; x < display->width / SCALE; x++) {
+            display->pixels[y * (display->width / SCALE) + x].x = x * SCALE;
+            display->pixels[y * (display->width / SCALE) + x].y = y * SCALE;
+            display->pixels[y * (display->width / SCALE) + x].w = SCALE;
+            display->pixels[y * (display->width / SCALE) + x].h = SCALE;
+        }
+    }
+
+    display->pixelDrawn = calloc(
+        display->height / SCALE * display->width / SCALE,
+        sizeof(bool));
 }
 
 int initDisplay(display *display)
@@ -22,27 +48,24 @@ int initDisplay(display *display)
     );
     if (display->window == NULL)
         return EXIT_FAILURE;
+    else
+        SDL_GetWindowSize(display->window, &display->width, &display->height);
 
     display->renderer = SDL_CreateRenderer(display->window, -1, SDL_RENDERER_ACCELERATED);
     if (display->renderer == NULL)
         return EXIT_FAILURE;
 
-    display->pixels = calloc(CHIP8_HEIGHT * CHIP8_WIDTH, sizeof(SDL_Rect));
+    display->pixels = NULL;
+    display->pixelDrawn = NULL;
 
-    for (int y = 0; y < CHIP8_HEIGHT; y++)
-        for (int x = 0; x < CHIP8_WIDTH; x++) {
-            display->pixels[y * CHIP8_WIDTH + x].x = x * SCALE;
-            display->pixels[y * CHIP8_WIDTH + x].y = y * SCALE;
-            display->pixels[y * CHIP8_WIDTH + x].w = SCALE;
-            display->pixels[y * CHIP8_WIDTH + x].h = SCALE;
-        }
+    createPixels(display);
 
 
     display->pixelDrawn = calloc(CHIP8_HEIGHT * CHIP8_WIDTH, sizeof(bool));
 
     resetDisplay(display);
 
-    display->powered_on = true;
+    display->poweredOn = true;
     display->reset = false;
 
     return EXIT_SUCCESS;
@@ -55,7 +78,7 @@ void handleEvent(display *display, SDL_Event *event)
         case SDL_KEYUP:
             switch (event->key.keysym.scancode) {
                 case SDL_SCANCODE_ESCAPE:
-                    display->powered_on = false;
+                    display->poweredOn = false;
                     break;
                 case SDL_SCANCODE_SPACE: // restart the rom
                     display->reset = true;
@@ -186,7 +209,7 @@ void handleEvent(display *display, SDL_Event *event)
 
         // quit gracefully
         case SDL_QUIT:
-            display->powered_on = false;
+            display->poweredOn = false;
     }
 }
 
@@ -206,11 +229,14 @@ int drawPixels(display *display)
     if (SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255) != EXIT_SUCCESS)
         return EXIT_FAILURE;
 
-    for (int y = 0; y < CHIP8_HEIGHT; y++)
-        for (int x = 0; x < CHIP8_WIDTH; x++)
+    for (int y = 0; y < display->height / SCALE; y++)
+        for (int x = 0; x < display->width / SCALE; x++)
             if (
-                display->pixelDrawn[y * CHIP8_WIDTH + x] &&
-                SDL_RenderFillRect(display->renderer, &display->pixels[y * CHIP8_WIDTH + x]) != EXIT_SUCCESS
+                display->pixelDrawn[y * (display->width / SCALE) + x]
+                &&
+                SDL_RenderFillRect(display->renderer, &display->pixels[y * (display->width / SCALE) + x])
+                !=
+                EXIT_SUCCESS
             )
                 return EXIT_FAILURE;
 

@@ -57,12 +57,18 @@ FILE *getRom(const char *rom)
     sprintf(filename, "%s", rom);
 
     if ( // test roms
-        strcmp(filename, "beep") == 0 ||
-        strcmp(filename, "corax+") == 0 ||
-        strcmp(filename, "keypad") == 0 ||
-        strcmp(filename, "flags") == 0 ||
-        strcmp(filename, "quirks") == 0 ||
-        strcmp(filename, "splash") == 0 ||
+        strcmp(filename, "beep") == 0
+        ||
+        strcmp(filename, "corax+") == 0
+        ||
+        strcmp(filename, "keypad") == 0
+        ||
+        strcmp(filename, "flags") == 0
+        ||
+        strcmp(filename, "quirks") == 0
+        ||
+        strcmp(filename, "splash") == 0
+        ||
         strcmp(filename, "ibm_logo") == 0
     ) {
         sprintf(filename, "roms/test/%s.ch8", rom);
@@ -141,6 +147,8 @@ void initializeEmulator(emulator *chip8, FILE *rom)
         chip8->v[i] = 0;
         chip8->stack.s[i] = '\0';
     }
+
+    chip8->specType = CHIP8;
 }
 
 void printMemory(emulator *chip8)
@@ -199,6 +207,7 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             switch (y) {
                 case 0xC:
                     // scroll the display N lines down
+                    chip8->specType = SCHIP;
                     break;
             }
             switch (opcode & 0x00FF) {
@@ -212,18 +221,37 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     break;
                 case 0xFB:
                     // scroll the display 4 pixels to the right
+                    chip8->specType = SCHIP;
                     break;
                 case 0xFC:
                     // scroll the display 4 pixels to the left
+                    chip8->specType = SCHIP;
                     break;
                 case 0xFD:
                     // exit the interpreter
+                    chip8->display.poweredOn = false;
                     break;
                 case 0xFE:
                     // set the CHIP-8 display mode to 64x32
+                    if (chip8->display.width == SCHIP_WIDTH * SCALE && chip8->display.height == SCHIP_HEIGHT * SCALE) {
+                        SDL_SetWindowSize(chip8->display.window, CHIP8_WIDTH * SCALE, CHIP8_HEIGHT * SCALE);
+                        SDL_GetWindowSize(chip8->display.window, &chip8->display.width, &chip8->display.height);
+                        SDL_SetWindowPosition(chip8->display.window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+                        createPixels(&chip8->display);
+                        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "display mode switched to lores\n");
+                    }
+                    chip8->specType = SCHIP;
                     break;
                 case 0xFF:
                     // set the CHIP-8 display mode to 128x64
+                    if (chip8->display.width == CHIP8_WIDTH * SCALE && chip8->display.height == CHIP8_HEIGHT * SCALE) {
+                        SDL_SetWindowSize(chip8->display.window, SCHIP_WIDTH * SCALE, SCHIP_HEIGHT * SCALE);
+                        SDL_GetWindowSize(chip8->display.window, &chip8->display.width, &chip8->display.height);
+                        SDL_SetWindowPosition(chip8->display.window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+                        createPixels(&chip8->display);
+                        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "display mode switched to hires\n");
+                    }
+                    chip8->specType = SCHIP;
                     break;
                 default:
                     // call RCA 1802 program at address NNN
@@ -273,19 +301,22 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // set Vx to Vx OR Vy
                     // reset VF to 0
                     chip8->v[x] |= chip8->v[y];
-                    chip8->v[0xF] = 0;
+                    if (chip8->specType == CHIP8)
+                        chip8->v[0xF] = 0;
                     break;
                 case 0x2:
                     // set Vx to Vx AND Vy
                     // reset VF to 0
                     chip8->v[x] &= chip8->v[y];
-                    chip8->v[0xF] = 0;
+                    if (chip8->specType == CHIP8)
+                        chip8->v[0xF] = 0;
                     break;
                 case 0x3:
                     // set Vx to Vx XOR Vy
                     // reset VF to 0
                     chip8->v[x] ^= chip8->v[y];
-                    chip8->v[0xF] = 0;
+                    if (chip8->specType == CHIP8)
+                        chip8->v[0xF] = 0;
                     break;
                 case 0x4:
                     // add Vy to Vx
@@ -313,7 +344,8 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // shift Vx right by 1
                     // set VF to the least significant bit of Vx before the shift
                     operand = chip8->v[x];
-                    chip8->v[x] = chip8->v[y];
+                    if (chip8->specType == CHIP8)
+                        chip8->v[x] = chip8->v[y];
                     chip8->v[x] >>= 1;
                     chip8->v[0xF] = operand & 0x01;
                     break;
@@ -332,7 +364,8 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // shift Vx left by 1
                     // set VF to the least significant bit of Vx before the shift
                     operand = chip8->v[x];
-                    chip8->v[x] = chip8->v[y];
+                    if (chip8->specType == CHIP8)
+                        chip8->v[x] = chip8->v[y];
                     chip8->v[x] <<= 1;
                     chip8->v[0xF] = operand >> 7;
                     break;
@@ -349,7 +382,11 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             break;
         case 0xB:
             // jump to address NNN + V0
-            chip8->pc = nnn + chip8->v[0];
+            // on SCHIP, jump to XNN + vX
+            if (chip8->specType == CHIP8)
+                chip8->pc = nnn + chip8->v[0];
+            else
+                chip8->pc = nnn + chip8->v[x];
             break;
         case 0xC:
             // set Vx to a random number AND NN
@@ -364,26 +401,27 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                 if (chip8->display.lastUpdate + (1000 / 60) < SDL_GetTicks())
                     break;
 
-            uint8_t spriteX = chip8->v[x] % CHIP8_WIDTH;
-            uint8_t spriteY = chip8->v[y] % CHIP8_HEIGHT;
-            uint8_t spriteHeight = n;
+            uint8_t sX, sY, sH;
+            sX = chip8->v[x] % (chip8->display.width / SCALE);
+            sY = chip8->v[y] % (chip8->display.height / SCALE);
+            sH = n;
 
             chip8->v[0xF] = 0;
 
-            for (int yline = 0; yline < spriteHeight; yline++) {
-                if (spriteY + yline >= CHIP8_HEIGHT)
+            for (int yline = 0; yline < sH; yline++) {
+                if (sY + yline >= (chip8->display.height / SCALE))
                     continue; // clip vertically
 
                 uint8_t pixel = chip8->memory[chip8->ix + yline];
                 for (int xline = 0; xline < 8; xline++) {
                     if ((pixel & (0x80 >> xline)) != 0) {
-                        if (spriteX + xline >= CHIP8_WIDTH)
+                        if (sX + xline >= (chip8->display.width / SCALE) )
                             continue; // clip horizontally
 
-                        if (chip8->display.pixelDrawn[(spriteY + yline) * CHIP8_WIDTH + (spriteX + xline)])
+                        if (chip8->display.pixelDrawn[(sY + yline) * (chip8->display.width / SCALE) + (sX + xline)])
                             chip8->v[0xF] = 1;
 
-                        chip8->display.pixelDrawn[(spriteY + yline) * CHIP8_WIDTH + (spriteX + xline)] ^= true;
+                        chip8->display.pixelDrawn[(sY + yline) * (chip8->display.width / SCALE) + (sX + xline)] ^= true;
                     }
                 }
             }
@@ -447,13 +485,25 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                     // store V0 to Vx in memory starting at address I
                     for (int i = 0; i <= x; i++)
                         chip8->memory[chip8->ix + i] = chip8->v[i];
-                    chip8->ix += x + 1;
+                    if (chip8->specType == CHIP8)
+                        chip8->ix += x + 1;
                     break;
                 case 0x65:
                     // fill V0 to Vx with values from memory starting at address I
                     for (int i = 0; i <= x; i++)
                         chip8->v[i] = chip8->memory[chip8->ix + i];
-                    chip8->ix += x + 1;
+                    if (chip8->specType == CHIP8)
+                        chip8->ix += x + 1;
+                    break;
+                case 0x75:
+                    // store V0 to Vx in the RPL user flags
+                    // this is not implemented on modern interpreters
+                    chip8->specType = SCHIP;
+                    break;
+                case 0x85:
+                    // fill V0 to Vx with values from the RPL user flags
+                    // this is not implemented on modern interpreters
+                    chip8->specType = SCHIP;
             }
     }
 }

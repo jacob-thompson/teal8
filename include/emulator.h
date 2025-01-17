@@ -17,6 +17,9 @@
 
 #define REGISTERS 16
 
+#define CHIP8 100
+#define SCHIP 101
+
 /**
     * The emulator struct.
     * This struct contains the memory, registers, index register, program counter, timers, stack, and display.
@@ -24,6 +27,7 @@
 typedef struct {
     uint8_t memory[MEMORY_IN_BYTES]; // 4KB memory
     uint8_t v[REGISTERS]; // 16 8-bit registers
+    uint8_t specType; // chip8 or schip
     uint16_t ix; // 16-bit index register
     uint16_t pc; // program counter
     uint32_t lastUpdate; // last update tick
