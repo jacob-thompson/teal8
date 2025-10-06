@@ -9,7 +9,7 @@
 */
 typedef struct {
     uint16_t s[STACK_SIZE]; // 16 16-bit registers
-    uint16_t *sp; // stack pointer
+    uint8_t sp; // stack pointer index (0-15)
 } stack;
 
 /**

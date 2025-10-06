@@ -2,9 +2,10 @@
 
 void resetDisplay(display *display)
 {
-    for (int y = 0; y < display->height / SCALE; y++)
-        for (int x = 0; x < display->width / SCALE; x++)
-            display->pixelDrawn[y * (display->width / SCALE) + x] = false;
+    for (int y = 0; y < display->pixelHeight; y++)
+        for (int x = 0; x < display->pixelWidth; x++)
+            display->pixelDrawn[y * display->pixelWidth + x] = false;
+    display->dirty = true;
 }
 
 void createPixels(display *display)
@@ -15,21 +16,24 @@ void createPixels(display *display)
     if (display->pixelDrawn != NULL)
         free(display->pixelDrawn);
 
+    display->pixelWidth = display->width / SCALE;
+    display->pixelHeight = display->height / SCALE;
+
     display->pixels = calloc(
-        display->height / SCALE * display->width / SCALE,
+        display->pixelHeight * display->pixelWidth,
         sizeof(SDL_Rect));
 
-    for (int y = 0; y < display->height / SCALE; y++) {
-        for (int x = 0; x < display->width / SCALE; x++) {
-            display->pixels[y * (display->width / SCALE) + x].x = x * SCALE;
-            display->pixels[y * (display->width / SCALE) + x].y = y * SCALE;
-            display->pixels[y * (display->width / SCALE) + x].w = SCALE;
-            display->pixels[y * (display->width / SCALE) + x].h = SCALE;
+    for (int y = 0; y < display->pixelHeight; y++) {
+        for (int x = 0; x < display->pixelWidth; x++) {
+            display->pixels[y * display->pixelWidth + x].x = x * SCALE;
+            display->pixels[y * display->pixelWidth + x].y = y * SCALE;
+            display->pixels[y * display->pixelWidth + x].w = SCALE;
+            display->pixels[y * display->pixelWidth + x].h = SCALE;
         }
     }
 
     display->pixelDrawn = calloc(
-        display->height / SCALE * display->width / SCALE,
+        display->pixelHeight * display->pixelWidth,
         sizeof(bool));
 }
 
@@ -67,6 +71,7 @@ int initDisplay(display *display)
 
     display->poweredOn = true;
     display->reset = false;
+    display->dirty = true;
 
     return EXIT_SUCCESS;
 }
@@ -229,12 +234,12 @@ int drawPixels(display *display)
     if (SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255) != EXIT_SUCCESS)
         return EXIT_FAILURE;
 
-    for (int y = 0; y < display->height / SCALE; y++)
-        for (int x = 0; x < display->width / SCALE; x++)
+    for (int y = 0; y < display->pixelHeight; y++)
+        for (int x = 0; x < display->pixelWidth; x++)
             if (
-                display->pixelDrawn[y * (display->width / SCALE) + x]
+                display->pixelDrawn[y * display->pixelWidth + x]
                 &&
-                SDL_RenderFillRect(display->renderer, &display->pixels[y * (display->width / SCALE) + x])
+                SDL_RenderFillRect(display->renderer, &display->pixels[y * display->pixelWidth + x])
                 !=
                 EXIT_SUCCESS
             )

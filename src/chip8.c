@@ -110,18 +110,21 @@ int main(int argc, char **argv)
 
         decodeOpcode(&chip8, opcode);
 
-        // draw the frame
-        if (drawBackground(&chip8.display) != 0) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error drawing background: %s\n", SDL_GetError());
-            return EXIT_FAILURE;
-        }
+        // draw the frame only if display has changed
+        if (chip8.display.dirty) {
+            if (drawBackground(&chip8.display) != 0) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error drawing background: %s\n", SDL_GetError());
+                return EXIT_FAILURE;
+            }
 
-        if (drawPixels(&chip8.display) != 0) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error drawing pixels: %s\n", SDL_GetError());
-            return EXIT_FAILURE;
-        }
+            if (drawPixels(&chip8.display) != 0) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error drawing pixels: %s\n", SDL_GetError());
+                return EXIT_FAILURE;
+            }
 
-        SDL_RenderPresent(chip8.display.renderer);
+            SDL_RenderPresent(chip8.display.renderer);
+            chip8.display.dirty = false;
+        }
 
     }
 

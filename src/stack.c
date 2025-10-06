@@ -4,16 +4,13 @@
 
 int stacked(stack *stack)
 {
-    int count = 0;
-    for (int i = 0; stack->s[i] != '\0'; i++)
-        count++;
-    return count;
+    return stack->sp;
 }
 
 void stackPush(stack *stack, unsigned short *value)
 {
-    if (stacked(stack) < STACK_SIZE) {
-        stack->s[stacked(stack)] = *value;
+    if (stack->sp < STACK_SIZE) {
+        stack->s[stack->sp] = *value;
         stack->sp++;
         //printf("Pushed %d\n", *value);
     }
@@ -21,10 +18,9 @@ void stackPush(stack *stack, unsigned short *value)
 
 void stackPop(stack *stack, unsigned short *poppedValue)
 {
-    if (stacked(stack) > 0) {
+    if (stack->sp > 0) {
         stack->sp--;
-        *poppedValue = stack->s[stacked(stack) - 1];
-        stack->s[stacked(stack) - 1] = '\0';
+        *poppedValue = stack->s[stack->sp];
         //printf("Popped %d\n", *poppedValue);
     }
 }
