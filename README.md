@@ -6,10 +6,27 @@ CHIP-8 interpreter written in C using SDL2.
 
 ### SDL2
 
-[SDL2](https://www.libsdl.org/) is used to render the graphics and handle the input. This library can be installed by:
-- using a package manager (e.g. `brew`, `apt`, `pacman`, `dnf`)
-- downloading one of the [precompiled binaries](https://github.com/libsdl-org/SDL/releases/latest)
-- downloading the [source code](https://github.com/libsdl-org/SDL) and [compiling it](https://wiki.libsdl.org/Installation)
+[SDL2](https://www.libsdl.org/) is used to render the graphics and handle the input.
+
+### curl
+[curl](https://curl.se/) is used to pull data about ROMs from the [chip-8-database](https://github.com/chip-8/chip-8-database).
+
+### installation
+
+#### macOS
+```bash
+brew install sdl2 curl
+```
+
+#### Ubuntu
+```bash
+sudo apt-get install libsdl2-dev libcurl4-openssl-dev
+```
+
+#### Arch Linux
+```bash
+sudo pacman -S sdl2 curl
+```
 
 ## compile
 
@@ -22,7 +39,7 @@ make
 ## run
 
 ```bash
-./chip8 <rom> <rate>
+./chip8 <rom> <rate=1000>
 ```
 
 For roms in the `roms/` directory, you can omit the rom's file path and extension:
