@@ -8,8 +8,6 @@ CHIP-8 interpreter written in C using SDL2.
 * [curl](https://curl.se/) is used to pull data about ROMs from the [chip-8-database](https://github.com/chip-8/chip-8-database).
 * [openSSL](https://www.openssl.org/) is used to get SHA1 hashes of ROMs.
 
-### installation
-
 #### macOS
 ```bash
 brew install sdl2 curl openssl
