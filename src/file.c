@@ -112,7 +112,12 @@ void printProgramInfo(cJSON *program_info, cJSON *romHash)
             SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Author: %s\n", romHash->valuestring);
         }
     }
-    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Description: %s\n", cJSON_GetObjectItemCaseSensitive(program_info, "description")->valuestring);
+    cJSON *description = cJSON_GetObjectItemCaseSensitive(program_info, "description");
+    SDL_LogInfo(
+        SDL_LOG_CATEGORY_APPLICATION,
+        "Description: %s\n",
+        description ? description->valuestring : "No Description Available"
+    );
 }
 
 bool isRomInDatabase(FILE *fp)
@@ -178,6 +183,11 @@ bool isRomInDatabase(FILE *fp)
 
     cJSON *romHash = cJSON_GetObjectItemCaseSensitive(hashJson, hashString);
     if (cJSON_IsNull(romHash) || romHash == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "rom hash not found in database: %s\n",
+            hashString
+        );
         free(hashString);
         free(hashChunk.memory);
         cJSON_Delete(hashJson);
@@ -197,6 +207,7 @@ bool isRomInDatabase(FILE *fp)
         &infoChunk,
         "https://raw.githubusercontent.com/chip-8/chip-8-database/refs/heads/master/database/programs.json"
     ) != 0) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "failed to pull program info database\n");
         free(hashString);
         free(hashChunk.memory);
         cJSON_Delete(hashJson);
