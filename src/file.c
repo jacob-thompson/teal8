@@ -99,13 +99,13 @@ void printProgramInfo(cJSON *program_info, cJSON *romHash)
         cJSON_Print(program_info)
     );
 
-    const char *title = cJSON_GetObjectItemCaseSensitive(program_info, "title")->valuestring;
-    const char *release = cJSON_GetObjectItemCaseSensitive(program_info, "release")->valuestring;
+    cJSON *title = cJSON_GetObjectItemCaseSensitive(program_info, "title");
+    cJSON *release = cJSON_GetObjectItemCaseSensitive(program_info, "release");
     SDL_LogInfo(
         SDL_LOG_CATEGORY_APPLICATION,
         "Title: %s (%s)\n",
-        title ? title : "Title Unknown",
-        release ? release : "Release Date Unknown"
+        title ? title->valuestring : "Title Unknown",
+        release ? release->valuestring : "Release Date Unknown"
     );
     cJSON_ArrayForEach(romHash, cJSON_GetObjectItemCaseSensitive(program_info, "authors")) {
         if (cJSON_IsString(romHash) && (romHash->valuestring != NULL)) {
