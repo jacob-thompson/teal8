@@ -1,8 +1,14 @@
 #include "../include/emulator.h"
+#include "../include/file.h"
+
+#include <sys/stat.h>
+#include <unistd.h>
 
 int main(int argc, char **argv)
 {
     srand(time(NULL));
+
+    //SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
 
     uint16_t rate = DEFAULT_INSTRUCTION_RATE;
     if (argc < 2 || argc > 3) {
@@ -13,14 +19,13 @@ int main(int argc, char **argv)
         rate = roundRate(rate);
     }
 
-    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "opening rom: %s\n", argv[1]);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "opening %s\n", argv[1]);
 
     FILE *rom = getRom(argv[1]);
-    if (rom == NULL) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error opening rom: %s\n", argv[1]);
-        return EXIT_FAILURE;
-    } else {
-        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "rom opened successfully\n");
+    struct stat st;
+
+    if (!isFileValid(argv[1], rom, &st)) {
+        return EXIT_FAILURE; // error has already been logged
     }
 
     emulator chip8;
@@ -30,7 +35,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "running %s at %d Hz\n", argv[1], rate);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "running %s at %d Hz\n", argv[1], rate);
 
     fclose(rom); // the rom is written to memory, so we can close it now
 
