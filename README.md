@@ -1,6 +1,6 @@
 # chip-8
 
-CHIP-8 interpreter written in C using SDL2.
+CHIP-8 interpreter written in pure C.
 
 ## prerequisites
 
@@ -9,16 +9,19 @@ CHIP-8 interpreter written in C using SDL2.
 * [openSSL](https://www.openssl.org/) is used to get SHA1 hashes of ROMs.
 
 #### macOS
+
 ```bash
 brew install sdl2 curl openssl
 ```
 
 #### Ubuntu
+
 ```bash
 sudo apt-get install libsdl2-dev libcurl4-openssl-dev libssl-dev
 ```
 
 #### Arch Linux
+
 ```bash
 sudo pacman -S sdl2 curl openssl
 ```
