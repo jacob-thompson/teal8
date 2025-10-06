@@ -4,15 +4,9 @@ CHIP-8 interpreter written in C using SDL2.
 
 ## prerequisites
 
-### SDL2
-
-[SDL2](https://www.libsdl.org/) is used to render the graphics and handle the input.
-
-### curl
-[curl](https://curl.se/) is used to pull data about ROMs from the [chip-8-database](https://github.com/chip-8/chip-8-database).
-
-### openSSL
-[openSSL](https://www.openssl.org/) is used to get SHA1 hashes of ROMs.
+* [SDL2](https://www.libsdl.org/) is used to render the graphics and handle the input.
+* [curl](https://curl.se/) is used to pull data about ROMs from the [chip-8-database](https://github.com/chip-8/chip-8-database).
+* [openSSL](https://www.openssl.org/) is used to get SHA1 hashes of ROMs.
 
 ### installation
 
