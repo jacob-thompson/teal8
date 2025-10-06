@@ -399,7 +399,7 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             // on/off based on value in I
             // set VF to 1 if any set pixels are changed to unset, 0 otherwise
             while (true) // wait for vertical blank interrupt
-                if (chip8->display.lastUpdate + (1000 / 60) < SDL_GetTicks())
+                if (chip8->display.lastUpdate + VBLANK_INTERVAL < SDL_GetTicks())
                     break;
 
             uint8_t sX, sY, sH;

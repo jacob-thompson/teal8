@@ -64,9 +64,6 @@ int initDisplay(display *display)
 
     createPixels(display);
 
-
-    display->pixelDrawn = calloc(CHIP8_HEIGHT * CHIP8_WIDTH, sizeof(bool));
-
     resetDisplay(display);
 
     display->poweredOn = true;

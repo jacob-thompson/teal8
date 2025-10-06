@@ -14,6 +14,7 @@
 
 #define DEFAULT_INSTRUCTION_RATE 1000
 #define TIMER_RATE 60
+#define VBLANK_INTERVAL (1000 / 60)  // ~16.67ms for 60Hz vertical blank
 
 #define REGISTERS 16
 
