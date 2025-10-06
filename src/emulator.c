@@ -145,8 +145,9 @@ void initializeEmulator(emulator *chip8, FILE *rom)
 
     for (int i = 0; i < 16; i++) {
         chip8->v[i] = 0;
-        chip8->stack.s[i] = '\0';
+        chip8->stack.s[i] = 0;
     }
+    chip8->stack.sp = 0;
 
     chip8->specType = CHIP8;
 }
@@ -398,30 +399,31 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
             // on/off based on value in I
             // set VF to 1 if any set pixels are changed to unset, 0 otherwise
             while (true) // wait for vertical blank interrupt
-                if (chip8->display.lastUpdate + (1000 / 60) < SDL_GetTicks())
+                if (chip8->display.lastUpdate + VBLANK_INTERVAL < SDL_GetTicks())
                     break;
 
             uint8_t sX, sY, sH;
-            sX = chip8->v[x] % (chip8->display.width / SCALE);
-            sY = chip8->v[y] % (chip8->display.height / SCALE);
+            sX = chip8->v[x] % chip8->display.pixelWidth;
+            sY = chip8->v[y] % chip8->display.pixelHeight;
             sH = n;
 
             chip8->v[0xF] = 0;
 
             for (int yline = 0; yline < sH; yline++) {
-                if (sY + yline >= (chip8->display.height / SCALE))
+                if (sY + yline >= chip8->display.pixelHeight)
                     continue; // clip vertically
 
                 uint8_t pixel = chip8->memory[chip8->ix + yline];
                 for (int xline = 0; xline < 8; xline++) {
                     if ((pixel & (0x80 >> xline)) != 0) {
-                        if (sX + xline >= (chip8->display.width / SCALE) )
+                        if (sX + xline >= chip8->display.pixelWidth)
                             continue; // clip horizontally
 
-                        if (chip8->display.pixelDrawn[(sY + yline) * (chip8->display.width / SCALE) + (sX + xline)])
+                        if (chip8->display.pixelDrawn[(sY + yline) * chip8->display.pixelWidth + (sX + xline)])
                             chip8->v[0xF] = 1;
 
-                        chip8->display.pixelDrawn[(sY + yline) * (chip8->display.width / SCALE) + (sX + xline)] ^= true;
+                        chip8->display.pixelDrawn[(sY + yline) * chip8->display.pixelWidth + (sX + xline)] ^= true;
+                        chip8->display.dirty = true;
                     }
                 }
             }

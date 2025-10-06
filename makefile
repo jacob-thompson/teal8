@@ -39,7 +39,7 @@ $(BDIR)/%.o: src/%.c $(DEPS) clean
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(OUT): $(OBJ)
-	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 run:
 	./$(OUT) $(RUN_ARGS)

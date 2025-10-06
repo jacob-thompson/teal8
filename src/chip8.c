@@ -41,6 +41,8 @@ int main(int argc, char **argv)
 
     uint32_t ticks;
     uint16_t opcode;
+    uint16_t instructionDelay = 1000 / rate;  // Cache division
+    uint16_t timerDelay = 1000 / TIMER_RATE;  // Cache division
 
     // main loop
     while (chip8.display.poweredOn) {
@@ -48,7 +50,7 @@ int main(int argc, char **argv)
         // update timers
         ticks = SDL_GetTicks();
 
-        if (ticks - chip8.lastUpdate >= 1000 / rate) {
+        if (ticks - chip8.lastUpdate >= instructionDelay) {
             chip8.lastUpdate = ticks;
         } else if (ticks < chip8.lastUpdate) {
             chip8.lastUpdate = ticks;
@@ -56,7 +58,7 @@ int main(int argc, char **argv)
             continue;
         }
 
-        if (ticks - chip8.timers.lastUpdate >= 1000 / TIMER_RATE) {
+        if (ticks - chip8.timers.lastUpdate >= timerDelay) {
             if (chip8.timers.delay > 0) {
                 chip8.timers.delay--;
             }
@@ -110,18 +112,21 @@ int main(int argc, char **argv)
 
         decodeOpcode(&chip8, opcode);
 
-        // draw the frame
-        if (drawBackground(&chip8.display) != 0) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error drawing background: %s\n", SDL_GetError());
-            return EXIT_FAILURE;
-        }
+        // draw the frame only if display has changed
+        if (chip8.display.dirty) {
+            if (drawBackground(&chip8.display) != 0) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error drawing background: %s\n", SDL_GetError());
+                return EXIT_FAILURE;
+            }
 
-        if (drawPixels(&chip8.display) != 0) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error drawing pixels: %s\n", SDL_GetError());
-            return EXIT_FAILURE;
-        }
+            if (drawPixels(&chip8.display) != 0) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error drawing pixels: %s\n", SDL_GetError());
+                return EXIT_FAILURE;
+            }
 
-        SDL_RenderPresent(chip8.display.renderer);
+            SDL_RenderPresent(chip8.display.renderer);
+            chip8.display.dirty = false;
+        }
 
     }
 

@@ -29,6 +29,9 @@ typedef struct display {
     uint32_t lastUpdate;
     int width;
     int height;
+    int pixelWidth;  // cached width / SCALE
+    int pixelHeight; // cached height / SCALE
+    bool dirty;      // track if display needs redraw
 } display;
 
 /**
