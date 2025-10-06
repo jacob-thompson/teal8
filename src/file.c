@@ -263,6 +263,10 @@ bool isFileValid(const char *filename, FILE *fp, struct stat *st)
         return false;
     }
 
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "rom opened successfully\n");
+    SDL_LogDebug(
+        SDL_LOG_CATEGORY_APPLICATION,
+        "%s opened successfully\n",
+        filename
+    );
     return true;
 }
