@@ -4,9 +4,12 @@
 
 #include <SDL.h>
 #include <curl/curl.h>
-#include <openssl/sha.h>
+#include <openssl/evp.h>
 
 #include "../include/cJSON.h"
+
+#define SHA1_BLOCK_SIZE 20
+#define SHA1_HASH_SIZE 41
 
 /** Struct to hold data for curl callback
 */

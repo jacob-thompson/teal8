@@ -57,8 +57,17 @@ int pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url)
 
 char *getHash(FILE *fp)
 {
-    SHA_CTX shaContext;
-    SHA1_Init(&shaContext);
+    EVP_MD_CTX *shaContext = EVP_MD_CTX_new();
+    if (shaContext == NULL) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "failed to create SHA1 context\n");
+        return NULL;
+    }
+
+    if (EVP_DigestInit_ex(shaContext, EVP_sha1(), NULL) != 1) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "failed to initialize SHA1 context\n");
+        EVP_MD_CTX_free(shaContext);
+        return NULL;
+    }
 
     // compute SHA1 hash of the ROM
     unsigned char buffer[20]; // SHA1 produces a 20-byte hash
@@ -66,27 +75,28 @@ char *getHash(FILE *fp)
 
     // read the ROM file in chunks and update the SHA1 context
     while ((bytesRead = fread(buffer, 1, sizeof(buffer), fp)) > 0) {
-        SHA1_Update(&shaContext, buffer, bytesRead);
+        EVP_DigestUpdate(shaContext, buffer, bytesRead);
     }
 
-    unsigned char hash[SHA_DIGEST_LENGTH];
-    SHA1_Final(hash, &shaContext);
+    unsigned char hash[SHA1_BLOCK_SIZE];
+    EVP_DigestFinal_ex(shaContext, hash, NULL);
+    EVP_MD_CTX_free(shaContext);
     rewind(fp); // reset file pointer to the beginning of the file
 
     /*
     printf("SHA1 hash: ");
-    for (int i = 0; i < SHA_DIGEST_LENGTH; i++) {
+    for (int i = 0; i < SHA1_BLOCK_SIZE; i++) {
         printf("%02x", hash[i]);
     }
     printf("\n");
     */
 
     // convert hash to hex string
-    char *hashString = malloc((SHA_DIGEST_LENGTH * 2 + 1) * sizeof(char));
-    for (int i = 0; i < SHA_DIGEST_LENGTH; i++) {
-        sprintf(&hashString[i * 2], "%02x", hash[i]);
+    char *hashString = malloc(SHA1_HASH_SIZE * sizeof(char));
+    for (int i = 0; i < SHA1_BLOCK_SIZE; i++) {
+        sprintf(&hashString[i << 1], "%02x", hash[i]);
     }
-    hashString[SHA_DIGEST_LENGTH * 2] = '\0';
+    hashString[SHA1_HASH_SIZE - 1] = '\0';
 
     return hashString;
 }
