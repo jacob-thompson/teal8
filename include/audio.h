@@ -10,6 +10,7 @@
 typedef struct audio {
     SDL_AudioDeviceID deviceId;
     SDL_AudioSpec spec;
+    bool playing;
     bool poweredOn;
 } audio;
 

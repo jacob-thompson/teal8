@@ -39,5 +39,6 @@ int initAudio(audio *audio) {
     }
 
     audio->poweredOn = true;
+    audio->playing = false;
     return 0;
 }

@@ -76,11 +76,15 @@ int main(int argc, char **argv)
             }
             if (chip8.timers.sound > 0) {
                 SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "beep\n");
-                if (!chip8.muted) { // start audio playback
+                if (!chip8.muted) {
+                    // start audio playback
+                    chip8.sound.playing = true;
                     SDL_PauseAudioDevice(chip8.sound.deviceId, 0);
                 }
                 chip8.timers.sound--;
-            } else if (!chip8.muted) { // stop audio playback
+            } else if (chip8.sound.playing && !chip8.muted) {
+                // stop audio playback
+                chip8.sound.playing = false;
                 SDL_PauseAudioDevice(chip8.sound.deviceId, 1);
             }
             chip8.timers.lastUpdate = ticks;
@@ -152,7 +156,10 @@ int main(int argc, char **argv)
 
     if (chip8.sound.poweredOn) {
         SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "shutting down audio\n");
-        SDL_PauseAudioDevice(chip8.sound.deviceId, 1); // stop audio playback
+        if (chip8.sound.playing) {
+            // stop audio playback
+            SDL_PauseAudioDevice(chip8.sound.deviceId, 1);
+        }
         SDL_CloseAudioDevice(chip8.sound.deviceId);
     }
 
