@@ -4,6 +4,8 @@
 
 #define TONE_FREQ 440 // A4 tone
 #define AMPLITUDE 1000 // volume of the tone
+#define SAMPLE_RATE 44100
+#define BUFFER_SIZE 4096
 
 typedef struct audio {
     SDL_AudioDeviceID deviceId;
