@@ -1,6 +1,3 @@
-#include <stdlib.h>
-#include <time.h>
-
 #include "../include/audio.h"
 #include "../include/display.h"
 #include "../include/stack.h"

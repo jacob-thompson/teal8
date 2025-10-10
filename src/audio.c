@@ -1,3 +1,6 @@
+#include <time.h>
+#include <math.h>
+
 #include "../include/audio.h"
 
 void my_audio_callback(void *userdata, Uint8 *stream, int len) {

@@ -1,3 +1,5 @@
+#include <SDL.h>
+
 #include "../include/display.h"
 
 void resetDisplay(display *display)

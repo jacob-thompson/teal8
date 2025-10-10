@@ -1,7 +1,5 @@
 #include <stdbool.h>
 
-#include <SDL.h>
-
 #define KEY_COUNT 16
 
 #define EXIT_SUCCESS 0

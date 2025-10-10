@@ -1,10 +1,7 @@
 #include <stdbool.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
-#include <SDL.h>
 #include <curl/curl.h>
-#include <openssl/evp.h>
 
 #include "../include/cJSON.h"
 

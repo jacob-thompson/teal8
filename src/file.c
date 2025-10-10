@@ -1,3 +1,8 @@
+#include <unistd.h>
+
+#include <SDL.h>
+#include <openssl/evp.h>
+
 #include "../include/file.h"
 
 static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)

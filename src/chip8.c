@@ -1,9 +1,6 @@
 #include "../include/emulator.h"
 #include "../include/file.h"
 
-#include <sys/stat.h>
-#include <unistd.h>
-
 int main(int argc, char **argv)
 {
     srand(time(NULL));

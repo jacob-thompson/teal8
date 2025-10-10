@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <time.h>
+
 #include "../include/emulator.h"
 
 bool isNumber(const char num[])
