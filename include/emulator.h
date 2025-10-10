@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "../include/audio.h"
 #include "../include/display.h"
 #include "../include/stack.h"
 #include "../include/timers.h"
@@ -35,7 +36,11 @@ typedef struct {
     timers timers; // delay and sound timers
     stack stack; // stack
     display display; // display
+    audio sound; // sound
+    bool muted; // is the audio muted?
 } emulator;
+
+bool isNumber(const char num[]);
 
 /**
     * Round the rate to the nearest divisor of 1000 Hz.

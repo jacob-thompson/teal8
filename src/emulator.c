@@ -1,5 +1,14 @@
 #include "../include/emulator.h"
 
+bool isNumber(const char num[])
+{
+    for (int i = 0; num[i] != 0; ++i) {
+        if (!isdigit(num[i]))
+            return false;
+    }
+    return true;
+}
+
 uint16_t roundRate(int rate)
 {
     if (rate <= 0 || rate > DEFAULT_INSTRUCTION_RATE)

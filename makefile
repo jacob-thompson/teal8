@@ -24,11 +24,11 @@ LDFLAGS += $(SDL_LDFLAGS) $(OPENSSL_LDFLAGS)
 LDLIBS += $(CURL_LIBS)
 
 IDIR = include
-_DEPS = emulator.h cJSON.h file.h display.h stack.h timers.h
+_DEPS = emulator.h cJSON.h file.h display.h audio.h stack.h timers.h
 DEPS = $(patsubst %, $(IDIR)/%, $(_DEPS))
 
 BDIR = build
-_OBJ = emulator.o cJSON.o file.o display.o stack.o chip8.o
+_OBJ = emulator.o cJSON.o file.o display.o audio.o stack.o chip8.o
 OBJ = $(patsubst %, $(BDIR)/%, $(_OBJ))
 
 OUT = chip8

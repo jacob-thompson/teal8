@@ -39,8 +39,16 @@ void createPixels(display *display)
 
 int initDisplay(display *display)
 {
-    if(SDL_Init(SDL_INIT_EVERYTHING) != EXIT_SUCCESS)
+    if (
+        SDL_InitSubSystem(
+            SDL_INIT_TIMER
+            |
+            SDL_INIT_VIDEO
+            |
+            SDL_INIT_EVENTS
+        ) != EXIT_SUCCESS) {
         return EXIT_FAILURE;
+    }
 
     display->window = SDL_CreateWindow(
         "CHIP-8",

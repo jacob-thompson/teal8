@@ -11,12 +11,21 @@ int main(int argc, char **argv)
     //SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
 
     uint16_t rate = DEFAULT_INSTRUCTION_RATE;
-    if (argc < 2 || argc > 3) {
+    bool mute = false;
+    if (argc < 2 || argc > 4) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "usage: %s <rom> <rate>\n", argv[0]);
         return EXIT_FAILURE;
-    } else if (argc == 3) {
+    } else if (argc == 3 && isNumber(argv[2])) {
         rate = atoi(argv[2]);
         rate = roundRate(rate);
+    } else if (argc == 3 && !isNumber(argv[2])) {
+        if (strcmp("-m", argv[2]) == 0 || strcmp("--mute", argv[2]) == 0) {
+            mute = true;
+        }
+    } else if (argc == 4) {
+        if (strcmp("-m", argv[3]) == 0 || strcmp("--mute", argv[3]) == 0) {
+            mute = true;
+        }
     }
 
     SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "opening %s\n", argv[1]);
@@ -30,8 +39,14 @@ int main(int argc, char **argv)
 
     emulator chip8;
     initializeEmulator(&chip8, rom);
+    chip8.muted = mute;
     if (initDisplay(&chip8.display) != 0) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error creating SDL display: %s\n", SDL_GetError());
+        return EXIT_FAILURE;
+    }
+
+    if (!chip8.muted && initAudio(&chip8.sound) != 0) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error creating SDL audio: %s\n", SDL_GetError());
         return EXIT_FAILURE;
     }
 
@@ -63,8 +78,13 @@ int main(int argc, char **argv)
                 chip8.timers.delay--;
             }
             if (chip8.timers.sound > 0) {
-                SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "beep\n");
+                SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "beep\n");
+                if (!chip8.muted) { // start audio playback
+                    SDL_PauseAudioDevice(chip8.sound.deviceId, 0);
+                }
                 chip8.timers.sound--;
+            } else if (!chip8.muted) { // stop audio playback
+                SDL_PauseAudioDevice(chip8.sound.deviceId, 1);
             }
             chip8.timers.lastUpdate = ticks;
         } else if (ticks < chip8.timers.lastUpdate) {
@@ -131,10 +151,21 @@ int main(int argc, char **argv)
     }
 
     // cleanup
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "cleaning up\n");
+
+    if (chip8.sound.poweredOn) {
+        SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "shutting down audio\n");
+        SDL_PauseAudioDevice(chip8.sound.deviceId, 1); // stop audio playback
+        SDL_CloseAudioDevice(chip8.sound.deviceId);
+    }
+
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "shutting down display\n");
     free(chip8.display.pixels);
     free(chip8.display.pixelDrawn);
     SDL_DestroyRenderer(chip8.display.renderer);
     SDL_DestroyWindow(chip8.display.window);
+
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "quitting SDL\n");
     SDL_Quit();
 
     return EXIT_SUCCESS;
