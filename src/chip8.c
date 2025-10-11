@@ -53,8 +53,8 @@ int main(int argc, char **argv)
     uint32_t ticks;
     uint16_t opcode;
     uint16_t timerDelay = 1000 / TIMER_RATE;  // Cache division
-    double instructionsPerMs = rate / 1000.0;  // Instructions to execute per millisecond
-    uint32_t lastInstructionTime = SDL_GetTicks();
+    double msPerInstruction = 1000.0 / rate;  // Milliseconds per instruction
+    double nextInstructionTime = SDL_GetTicks();
 
     // main loop
     while (chip8.display.poweredOn) {
@@ -62,21 +62,9 @@ int main(int argc, char **argv)
         // update timers
         ticks = SDL_GetTicks();
 
-        // Calculate how many instructions to execute based on elapsed time
-        uint32_t elapsedMs;
-        if (ticks >= lastInstructionTime) {
-            elapsedMs = ticks - lastInstructionTime;
-        } else {
-            // Handle timer wrap-around
-            elapsedMs = 0;
-            lastInstructionTime = ticks;
-        }
-
-        uint32_t instructionsToExecute = (uint32_t)(elapsedMs * instructionsPerMs);
-        
-        // Skip this iteration if no instructions are due yet
-        if (instructionsToExecute == 0) {
-            // Update timers even when not executing instructions
+        // Check if it's time to execute the next instruction
+        if ((double)ticks < nextInstructionTime) {
+            // Not time yet, but still update timers and handle events
             if (ticks - chip8.timers.lastUpdate >= timerDelay) {
                 if (chip8.timers.delay > 0) {
                     chip8.timers.delay--;
@@ -111,19 +99,14 @@ int main(int argc, char **argv)
                 initializeEmulator(&chip8, getRom(argv[1]));
                 resetDisplay(&chip8.display);
                 chip8.display.reset = false;
-                lastInstructionTime = SDL_GetTicks();
+                nextInstructionTime = SDL_GetTicks();
             }
 
             continue;
         }
 
-        // Cap instructions per frame to prevent lag spikes
-        if (instructionsToExecute > rate / 10) {
-            instructionsToExecute = rate / 10;  // Max 100ms worth of instructions
-        }
-
-        // Update the time for the next iteration
-        lastInstructionTime = ticks;
+        // Schedule next instruction (accumulate fractional time for accuracy)
+        nextInstructionTime += msPerInstruction;
 
         // Update timers
         if (ticks - chip8.timers.lastUpdate >= timerDelay) {
@@ -160,39 +143,36 @@ int main(int argc, char **argv)
             initializeEmulator(&chip8, getRom(argv[1]));
             resetDisplay(&chip8.display);
             chip8.display.reset = false;
-            lastInstructionTime = SDL_GetTicks();
+            nextInstructionTime = SDL_GetTicks();
             continue;
         }
 
-        // Execute the calculated number of instructions
-        for (uint32_t i = 0; i < instructionsToExecute; i++) {
-            // fetch, decode, and execute opcode
-            opcode = fetchOpcode(&chip8);
+        // fetch, decode, and execute opcode
+        opcode = fetchOpcode(&chip8);
 
-            //printf("opcode: %04x\n", opcode);
-            //printf("v0: %02x\n", chip8.v[0]);
-            //printf("v1: %02x\n", chip8.v[1]);
-            //printf("v2: %02x\n", chip8.v[2]);
-            //printf("v3: %02x\n", chip8.v[3]);
-            //printf("v4: %02x\n", chip8.v[4]);
-            //printf("v5: %02x\n", chip8.v[5]);
-            //printf("v6: %02x\n", chip8.v[6]);
-            //printf("v7: %02x\n", chip8.v[7]);
-            //printf("v8: %02x\n", chip8.v[8]);
-            //printf("v9: %02x\n", chip8.v[9]);
-            //printf("va: %02x\n", chip8.v[10]);
-            //printf("vb: %02x\n", chip8.v[11]);
-            //printf("vc: %02x\n", chip8.v[12]);
-            //printf("vd: %02x\n", chip8.v[13]);
-            //printf("ve: %02x\n", chip8.v[14]);
-            //printf("vf: %02x\n", chip8.v[15]);
-            //printf("stacked values: %d\n", stacked(&chip8.stack));
-            //printf(" ------- \n");
+        //printf("opcode: %04x\n", opcode);
+        //printf("v0: %02x\n", chip8.v[0]);
+        //printf("v1: %02x\n", chip8.v[1]);
+        //printf("v2: %02x\n", chip8.v[2]);
+        //printf("v3: %02x\n", chip8.v[3]);
+        //printf("v4: %02x\n", chip8.v[4]);
+        //printf("v5: %02x\n", chip8.v[5]);
+        //printf("v6: %02x\n", chip8.v[6]);
+        //printf("v7: %02x\n", chip8.v[7]);
+        //printf("v8: %02x\n", chip8.v[8]);
+        //printf("v9: %02x\n", chip8.v[9]);
+        //printf("va: %02x\n", chip8.v[10]);
+        //printf("vb: %02x\n", chip8.v[11]);
+        //printf("vc: %02x\n", chip8.v[12]);
+        //printf("vd: %02x\n", chip8.v[13]);
+        //printf("ve: %02x\n", chip8.v[14]);
+        //printf("vf: %02x\n", chip8.v[15]);
+        //printf("stacked values: %d\n", stacked(&chip8.stack));
+        //printf(" ------- \n");
 
-            chip8.pc += 2;
+        chip8.pc += 2;
 
-            decodeOpcode(&chip8, opcode);
-        }
+        decodeOpcode(&chip8, opcode);
 
         // draw the frame only if display has changed
         if (chip8.display.dirty) {
