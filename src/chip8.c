@@ -46,14 +46,14 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "running %s at %d Hz\n", argv[1], rate);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "running %s at %d IPS\n", argv[1], rate);
 
     fclose(rom); // the rom is written to memory, so we can close it now
 
     uint32_t ticks;
     uint16_t opcode;
-    uint16_t timerDelay = 1000 / TIMER_RATE;  // Cache division
-    double msPerInstruction = 1000.0 / rate;  // Milliseconds per instruction
+    uint16_t timerDelay = 1000 / TIMER_RATE;
+    double msPerInstruction = 1000.0 / rate;  // milliseconds per instruction
     double nextInstructionTime = SDL_GetTicks();
 
     // main loop
@@ -62,9 +62,9 @@ int main(int argc, char **argv)
         // update timers
         ticks = SDL_GetTicks();
 
-        // Check if it's time to execute the next instruction
+        // check if it is time to execute the next instruction
         if ((double)ticks < nextInstructionTime) {
-            // Not time yet, but still update timers and handle events
+            // not time yet, but still update timers and handle events
             if (ticks - chip8.timers.lastUpdate >= timerDelay) {
                 if (chip8.timers.delay > 0) {
                     chip8.timers.delay--;
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
                 chip8.timers.lastUpdate = ticks;
             }
 
-            // Handle events even when not executing instructions
+            // handle events even when not executing instructions
             clearKeys(chip8.display.keyUp);
 
             SDL_Event event;
@@ -105,10 +105,10 @@ int main(int argc, char **argv)
             continue;
         }
 
-        // Schedule next instruction (accumulate fractional time for accuracy)
+        // schedule next instruction (accumulate fractional time for accuracy)
         nextInstructionTime += msPerInstruction;
 
-        // Update timers
+        // update timers
         if (ticks - chip8.timers.lastUpdate >= timerDelay) {
             if (chip8.timers.delay > 0) {
                 chip8.timers.delay--;
@@ -132,7 +132,7 @@ int main(int argc, char **argv)
             chip8.timers.lastUpdate = ticks;
         }
 
-        // Handle events
+        // handle events
         clearKeys(chip8.display.keyUp);
 
         SDL_Event event;
