@@ -462,14 +462,6 @@ void decodeOpcode(emulator *chip8, unsigned short opcode)
                 case 0x18:
                     // set the sound timer to Vx
                     chip8->timers.sound = chip8->v[x];
-                    // Start audio immediately when sound timer is set
-                    if (chip8->v[x] > 0 && !chip8->muted) {
-                        chip8->sound.phase = 0.0;  // Reset phase for clean beep
-                        if (!chip8->sound.playing) {
-                            chip8->sound.playing = true;
-                            SDL_PauseAudioDevice(chip8->sound.deviceId, 0);
-                        }
-                    }
                     break;
                 case 0x1E:
                     // add Vx to I

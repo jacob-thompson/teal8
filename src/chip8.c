@@ -73,19 +73,17 @@ int main(int argc, char **argv)
             if (chip8.timers.delay > 0) {
                 chip8.timers.delay--;
             }
-            
-            // Handle sound timer and audio playback
             if (chip8.timers.sound > 0) {
                 SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "beep\n");
+                if (!chip8.muted) {
+                    // Enable audio playback by setting playing flag
+                    chip8.sound.playing = true;
+                }
                 chip8.timers.sound--;
-            }
-            
-            // Stop audio when timer reaches 0
-            if (chip8.timers.sound == 0 && chip8.sound.playing && !chip8.muted) {
+            } else if (chip8.sound.playing && !chip8.muted) {
+                // Disable audio playback when timer reaches 0
                 chip8.sound.playing = false;
-                SDL_PauseAudioDevice(chip8.sound.deviceId, 1);
             }
-            
             chip8.timers.lastUpdate = ticks;
         } else if (ticks < chip8.timers.lastUpdate) {
             chip8.timers.lastUpdate = ticks;
@@ -155,10 +153,7 @@ int main(int argc, char **argv)
 
     if (chip8.sound.poweredOn) {
         SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "shutting down audio\n");
-        if (chip8.sound.playing) {
-            // stop audio playback
-            SDL_PauseAudioDevice(chip8.sound.deviceId, 1);
-        }
+        // Just close the device (no need to pause since callback handles silence)
         SDL_CloseAudioDevice(chip8.sound.deviceId);
     }
 

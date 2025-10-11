@@ -1,21 +1,28 @@
 #include <time.h>
 #include <math.h>
+#include <string.h>
 
 #include "../include/audio.h"
 
 void my_audio_callback(void *userdata, Uint8 *stream, int len) {
     audio *aud = (audio *)userdata;
-    double phase_inc = 2.0 * M_PI * TONE_FREQ / SAMPLE_RATE;
     Sint16 *samples = (Sint16 *) stream;
     int sample_count = len / sizeof(Sint16);
 
-    for (int i = 0; i < sample_count; ++i) {
-        // square wave for beep tone
-        samples[i] = sin(aud->phase) > 0 ? AMPLITUDE : -AMPLITUDE;
-        aud->phase += phase_inc;
-        if (aud->phase >= 2.0 * M_PI) {
-            aud->phase -= 2.0 * M_PI;
+    if (aud->playing) {
+        // Generate square wave when playing
+        double phase_inc = 2.0 * M_PI * TONE_FREQ / SAMPLE_RATE;
+        for (int i = 0; i < sample_count; ++i) {
+            samples[i] = sin(aud->phase) > 0 ? AMPLITUDE : -AMPLITUDE;
+            aud->phase += phase_inc;
+            if (aud->phase >= 2.0 * M_PI) {
+                aud->phase -= 2.0 * M_PI;
+            }
         }
+    } else {
+        // Output silence when not playing
+        memset(stream, 0, len);
+        aud->phase = 0.0;  // Reset phase when silent
     }
 }
 
@@ -42,5 +49,9 @@ int initAudio(audio *audio) {
     audio->poweredOn = true;
     audio->playing = false;
     audio->phase = 0.0;
+    
+    // Start audio device immediately (it will output silence until playing is true)
+    SDL_PauseAudioDevice(audio->deviceId, 0);
+    
     return 0;
 }
