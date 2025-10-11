@@ -64,31 +64,7 @@ int main(int argc, char **argv)
 
         // check if it is time to execute the next instruction
         if ((double)ticks < nextInstructionTime) {
-            // not time yet, but still update timers and handle events
-            if (ticks - chip8.timers.lastUpdate >= timerDelay) {
-                if (chip8.timers.delay > 0) {
-                    chip8.timers.delay--;
-                }
-                if (chip8.timers.sound > 0) {
-                    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "beep\n");
-                    if (!chip8.muted) {
-                        // start audio playback
-                        chip8.sound.playing = true;
-                        SDL_PauseAudioDevice(chip8.sound.deviceId, 0);
-                    }
-                    chip8.timers.sound--;
-                } else if (chip8.sound.playing && !chip8.muted) {
-                    // stop audio playback and reset phase
-                    chip8.sound.playing = false;
-                    chip8.sound.phase = 0.0;
-                    SDL_PauseAudioDevice(chip8.sound.deviceId, 1);
-                }
-                chip8.timers.lastUpdate = ticks;
-            } else if (ticks < chip8.timers.lastUpdate) {
-                chip8.timers.lastUpdate = ticks;
-            }
-
-            // handle events even when not executing instructions
+            // not time yet, but still handle events
             clearKeys(chip8.display.keyUp);
 
             SDL_Event event;
