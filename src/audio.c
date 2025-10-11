@@ -3,7 +3,7 @@
 
 #include "../include/audio.h"
 
-void my_audio_callback(void *userdata, Uint8 *stream, int len) {
+void audioCallback(void *userdata, Uint8 *stream, int len) {
     audio *aud = (audio *)userdata;
     double phase_inc = 2.0 * M_PI * TONE_FREQ / SAMPLE_RATE;
     Sint16 *samples = (Sint16 *) stream;
@@ -30,7 +30,7 @@ int initAudio(audio *audio) {
     audio->spec.format = AUDIO_S16SYS;
     audio->spec.channels = 1;
     audio->spec.samples = BUFFER_SIZE;
-    audio->spec.callback = my_audio_callback;
+    audio->spec.callback = audioCallback;
     audio->spec.userdata = audio;
     audio->deviceId = SDL_OpenAudioDevice(NULL, 0, &audio->spec, NULL, 0);
 

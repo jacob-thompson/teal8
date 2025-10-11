@@ -15,6 +15,6 @@ typedef struct audio {
     double phase;
 } audio;
 
-void my_audio_callback(void *userdata, Uint8 *stream, int len);
+void audioCallback(void *userdata, Uint8 *stream, int len);
 
 int initAudio(audio *audio);
