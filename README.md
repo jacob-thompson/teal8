@@ -35,16 +35,26 @@ cd chip-8
 make
 ```
 
-## run
+The `chip8` binary will be in `bin/`.
+
+## usage
+
+You can add the program to your PATH:
 
 ```bash
-./chip8 <rom> <rate=1000>
+export PATH="path/to/chip-8/bin:$PATH"
 ```
 
-For roms in the `roms/` directory, you can omit the rom's file path and extension:
+Run the program:
 
 ```bash
-./chip8 spockpaperscissors
+chip8 <rom> <rate=1000>
+```
+
+You can omit the rom's file extension:
+
+```bash
+chip8 roms/spockpaperscissors
 ```
 
 > [!NOTE]
