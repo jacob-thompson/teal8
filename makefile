@@ -45,7 +45,7 @@ run:
 	./$(OUT) $(RUN_ARGS)
 
 test:
-	./$(OUT) quirks
+	./$(OUT) roms/test/quirks
 
 clean:
 	rm -f $(OBJ) $(OUT)

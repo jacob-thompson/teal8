@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include "../include/emulator.h"
@@ -14,83 +15,36 @@ bool isNumber(const char num[])
 
 FILE *getRom(const char *rom)
 {
-    char *filename = malloc(sizeof(char) * 64);
-    FILE *rom_file = NULL;
+    /*
+     * allocate memory for the filename
+     * and 4 additional bytes for appending
+     * the file extension if necessary
+     */
+    char *filename = malloc(sizeof(char) * strlen(rom) + 4);
 
-    if (
-        strcmp(rom, "flightrunner") == 0
-        ||
-        strcmp(rom, "flightrunner.ch8") == 0
-        ||
-        strcmp(rom, "roms/flightrunner.ch8") == 0
-    ) {
-        SDL_LogWarn(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "The 'flightrunner' ROM by @TodPunk is prone to stack overflow-related issues."
-        );
-        SDL_LogWarn(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "If this ROM freezes, you can reset it by pressing 'SPACE'."
-        );
-    }
-
-    sprintf(filename, "roms/%s.ch8", rom);
-    rom_file = fopen(filename, "rb");
-    if (rom_file != NULL) {
-        free(filename);
-        return rom_file;
-    }
-
-    sprintf(filename, "roms/%s", rom);
-    rom_file = fopen(filename, "rb");
-    if (rom_file != NULL) {
-        free(filename);
-        return rom_file;
-    }
+    FILE *rom_file = NULL; // file to be returned
 
     sprintf(filename, "%s", rom);
-
-    if ( // test roms
-        strcmp(filename, "beep") == 0
-        ||
-        strcmp(filename, "corax+") == 0
-        ||
-        strcmp(filename, "keypad") == 0
-        ||
-        strcmp(filename, "flags") == 0
-        ||
-        strcmp(filename, "quirks") == 0
-        ||
-        strcmp(filename, "splash") == 0
-        ||
-        strcmp(filename, "ibm_logo") == 0
-    ) {
-        sprintf(filename, "roms/test/%s.ch8", rom);
-        rom_file = fopen(filename, "rb");
-        if (rom_file != NULL) {
-            free(filename);
-            return rom_file;
-        }
-    }
-
-    if (strcmp(filename, "octojamtitle") == 0) {
-        int randomTitleRom = randomNumber(1, 10);
-        sprintf(filename, "roms/octojam%dtitle.ch8", randomTitleRom);
-        rom_file = fopen(filename, "rb");
-        if (rom_file != NULL) {
-            free(filename);
-            return rom_file;
-        }
-    }
-
     rom_file = fopen(filename, "rb");
     if (rom_file != NULL) {
         free(filename);
         return rom_file;
     }
 
+    /*
+     * opening the file as given did not work,
+     * so try appending the file extension
+     */
+    sprintf(filename, "%s.ch8", rom);
+    rom_file = fopen(filename, "rb");
+    if (rom_file != NULL) {
+        free(filename);
+        return rom_file;
+    }
+
+    // nothing worked
     free(filename);
-    return NULL;
+    return rom_file; // null
 }
 
 void writeFontToMemory(unsigned char *memory)
