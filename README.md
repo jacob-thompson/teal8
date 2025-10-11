@@ -49,8 +49,6 @@ For roms in the `roms/` directory, you can omit the rom's file path and extensio
 > [!NOTE]
 > - `<rom>` is the path to the ROM file
 > - `<rate>` is the rate at which instructions should be executed (in Hz)
->   * The default and maximum instruction rate is 1000 Hz
->   * The instruction rate is rounded to the nearest divisor of 1000 Hz (e.g. 500 Hz, 250 Hz, 125 Hz, ...)
 
 ## controls
 

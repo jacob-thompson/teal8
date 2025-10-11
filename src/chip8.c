@@ -14,7 +14,6 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     } else if (argc == 3 && isNumber(argv[2])) {
         rate = atoi(argv[2]);
-        rate = roundRate(rate);
     } else if (argc == 3 && !isNumber(argv[2])) {
         if (strcmp("-m", argv[2]) == 0 || strcmp("--mute", argv[2]) == 0) {
             mute = true;

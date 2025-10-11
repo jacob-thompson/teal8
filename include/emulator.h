@@ -40,13 +40,6 @@ typedef struct {
 bool isNumber(const char num[]);
 
 /**
-    * Round the rate to the nearest divisor of 1000 Hz.
-    * @param rate the rate
-    * @return the rounded rate
-*/
-uint16_t roundRate(int rate);
-
-/**
     * Get the rom file.
     * @param rom the rom file
     * @return the rom file
