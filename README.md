@@ -59,7 +59,7 @@ chip8 roms/spockpaperscissors
 
 > [!NOTE]
 > - `<rom>` is the path to the ROM file
-> - `<rate>` is the rate at which instructions should be executed (in Hz)
+> - `<rate>` is the amount of instructions to execute per second (default: 1000)
 
 ## controls
 
