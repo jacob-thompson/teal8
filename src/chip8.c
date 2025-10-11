@@ -77,15 +77,11 @@ int main(int argc, char **argv)
             // Handle sound timer and audio playback
             if (chip8.timers.sound > 0) {
                 SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "beep\n");
-                if (!chip8.muted && !chip8.sound.playing) {
-                    // Reset phase and start audio playback
-                    chip8.sound.phase = 0.0;
-                    chip8.sound.playing = true;
-                    SDL_PauseAudioDevice(chip8.sound.deviceId, 0);
-                }
                 chip8.timers.sound--;
-            } else if (chip8.sound.playing && !chip8.muted) {
-                // Stop audio when timer reaches 0
+            }
+            
+            // Stop audio when timer reaches 0
+            if (chip8.timers.sound == 0 && chip8.sound.playing && !chip8.muted) {
                 chip8.sound.playing = false;
                 SDL_PauseAudioDevice(chip8.sound.deviceId, 1);
             }
