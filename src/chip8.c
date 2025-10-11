@@ -82,8 +82,9 @@ int main(int argc, char **argv)
                 }
                 chip8.timers.sound--;
             } else if (chip8.sound.playing && !chip8.muted) {
-                // stop audio playback
+                // stop audio playback and reset phase
                 chip8.sound.playing = false;
+                chip8.sound.phase = 0.0;
                 SDL_PauseAudioDevice(chip8.sound.deviceId, 1);
             }
             chip8.timers.lastUpdate = ticks;
@@ -156,7 +157,8 @@ int main(int argc, char **argv)
     if (chip8.sound.poweredOn) {
         SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "shutting down audio\n");
         if (chip8.sound.playing) {
-            // stop audio playback
+            // stop audio playback and reset phase
+            chip8.sound.phase = 0.0;
             SDL_PauseAudioDevice(chip8.sound.deviceId, 1);
         }
         SDL_CloseAudioDevice(chip8.sound.deviceId);

@@ -12,6 +12,7 @@ typedef struct audio {
     SDL_AudioSpec spec;
     bool playing;
     bool poweredOn;
+    double phase;
 } audio;
 
 void my_audio_callback(void *userdata, Uint8 *stream, int len);

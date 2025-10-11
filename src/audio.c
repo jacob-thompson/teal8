@@ -4,17 +4,17 @@
 #include "../include/audio.h"
 
 void my_audio_callback(void *userdata, Uint8 *stream, int len) {
-    static double phase = 0.0;
+    audio *aud = (audio *)userdata;
     double phase_inc = 2.0 * M_PI * TONE_FREQ / SAMPLE_RATE;
     Sint16 *samples = (Sint16 *) stream;
     int sample_count = len / sizeof(Sint16);
 
     for (int i = 0; i < sample_count; ++i) {
         // square wave for beep tone
-        samples[i] = sin(phase) > 0 ? AMPLITUDE : -AMPLITUDE;
-        phase += phase_inc;
-        if (phase >= 2.0 * M_PI) {
-            phase -= 2.0 * M_PI;
+        samples[i] = sin(aud->phase) > 0 ? AMPLITUDE : -AMPLITUDE;
+        aud->phase += phase_inc;
+        if (aud->phase >= 2.0 * M_PI) {
+            aud->phase -= 2.0 * M_PI;
         }
     }
 }
@@ -31,6 +31,7 @@ int initAudio(audio *audio) {
     audio->spec.channels = 1;
     audio->spec.samples = BUFFER_SIZE;
     audio->spec.callback = my_audio_callback;
+    audio->spec.userdata = audio;
     audio->deviceId = SDL_OpenAudioDevice(NULL, 0, &audio->spec, NULL, 0);
 
     if (audio->deviceId == 0) {
@@ -40,5 +41,6 @@ int initAudio(audio *audio) {
 
     audio->poweredOn = true;
     audio->playing = false;
+    audio->phase = 0.0;
     return 0;
 }
