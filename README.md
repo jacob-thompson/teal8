@@ -5,7 +5,7 @@
 <img src="resources/logo.png" alt="Logo" width="160" height="80">
 </a>
 
-<h3 align="center">teal8</h3>
+<h1 align="center">teal8</h3>
 
 <p align="center">
 CHIP-8 interpreter written in pure C.
