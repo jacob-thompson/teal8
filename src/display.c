@@ -4,6 +4,9 @@
 
 void resetDisplay(display *display)
 {
+    if (display->pixelDrawn == NULL)
+        return;
+    
     for (int y = 0; y < display->pixelHeight; y++)
         for (int x = 0; x < display->pixelWidth; x++)
             display->pixelDrawn[y * display->pixelWidth + x] = false;
@@ -260,6 +263,9 @@ int drawBackground(display *display)
 
 int drawPixels(display *display)
 {
+    if (display->pixelDrawn == NULL || display->pixels == NULL)
+        return EXIT_FAILURE;
+    
     if (SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255) != EXIT_SUCCESS)
         return EXIT_FAILURE;
 

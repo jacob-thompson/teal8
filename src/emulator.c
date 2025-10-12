@@ -182,6 +182,14 @@ int randomNumber(int min, int max)
 
 uint16_t fetchOpcode(emulator *chip8)
 {
+    if (chip8->pc >= MEMORY_IN_BYTES - 1) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "program counter out of bounds: 0x%04X\n",
+            chip8->pc
+        );
+        return 0;
+    }
     return (chip8->memory[chip8->pc] << 8) | chip8->memory[chip8->pc + 1];
 }
 
@@ -430,6 +438,9 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                 if (sY + yline >= chip8->display.pixelHeight)
                     continue; // clip vertically
 
+                if (chip8->ix + yline >= MEMORY_IN_BYTES)
+                    break; // prevent buffer overflow
+
                 uint8_t pixel = chip8->memory[chip8->ix + yline];
                 for (int xline = 0; xline < 8; xline++) {
                     if ((pixel & (0x80 >> xline)) != 0) {
@@ -494,7 +505,7 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                     break;
                 case 0x29:
                     /* set I to the location of the sprite for the character in Vx */
-                    chip8->ix = chip8->v[x] * 5;
+                    chip8->ix = (chip8->v[x] & 0x0F) * 5;
                     break;
                 case 0x33:
                     /*

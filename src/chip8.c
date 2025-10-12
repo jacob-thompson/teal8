@@ -96,8 +96,17 @@ int main(int argc, char **argv)
     struct stat st;
 
     if (!force && !isFileValid(argv[1], rom, &st)) {
+        if (rom != NULL) fclose(rom);
         return EXIT_FAILURE; // error has already been logged
     } else if (force) {
+        if (rom == NULL) {
+            SDL_LogError(
+                SDL_LOG_CATEGORY_APPLICATION,
+                "failed to open ROM file: %s\n",
+                argv[1]
+            );
+            return EXIT_FAILURE;
+        }
         SDL_LogDebug(
             SDL_LOG_CATEGORY_APPLICATION,
             "force loading %s\n",
