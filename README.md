@@ -3,8 +3,8 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![Pull Requests][pulls-shield]][pulls-url]
-[![GitHub Commit Activity][activity-shield]][activity-url]
-[![GitHub code size in bytes][size-shield]][size-url]
+[![GitHub Created At][created-shield]][created-url]
+[![GitHub Code Size][size-shield]][size-url]
 [![MIT License][license-shield]][license-url]
 
 
@@ -124,8 +124,8 @@ teal8 --help
 [issues-url]: https://github.com/jacob-thompson/teal8/issues
 [pulls-shield]: https://img.shields.io/github/issues-pr/jacob-thompson/teal8
 [pulls-url]: https://github.com/jacob-thompson/teal8/pulls
-[activity-shield]: https://img.shields.io/github/commit-activity/y/jacob-thompson/teal8
-[activity-url]: https://github.com/jacob-thompson/teal8/pulse
+[created-shield]: https://img.shields.io/github/created-at/jacob-thompson/teal8
+[created-url]: https://github.com/jacob-thompson/teal8
 [size-shield]: https://img.shields.io/github/languages/code-size/jacob-thompson/teal8
 [size-url]: https://github.com/jacob-thompson/teal8
 [license-shield]: https://img.shields.io/github/license/jacob-thompson/teal8.svg?style=flat
