@@ -1,3 +1,6 @@
+#ifndef EMULATOR_H
+#define EMULATOR_H
+
 #include "../include/audio.h"
 #include "../include/display.h"
 #include "../include/stack.h"
@@ -116,3 +119,5 @@ uint16_t fetchOpcode(emulator *chip8);
  * @param opcode the opcode
  */
 void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode);
+
+#endif /* EMULATOR_H */

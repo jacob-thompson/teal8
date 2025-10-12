@@ -37,6 +37,10 @@ void printUsage(const char *programName, SDL_LogPriority priority)
 
 bool isNumber(const char num[])
 {
+    /* check if string is empty */
+    if (num == NULL || num[0] == '\0')
+        return false;
+    
     /* check if each character is a numeral */
     for (int i = 0; num[i] != 0; ++i) {
         if (!isdigit(num[i]))
@@ -52,7 +56,7 @@ FILE *getRom(const char *rom)
      * and 4 additional bytes for appending
      * the file extension if necessary
      */
-    char *filename = malloc(sizeof(char) * strlen(rom) + 4);
+    char *filename = malloc(sizeof(char) * (strlen(rom) + 5));
     if (filename == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -63,7 +67,7 @@ FILE *getRom(const char *rom)
 
     FILE *romFile = NULL; // file to be returned
 
-    sprintf(filename, "%s", rom);
+    snprintf(filename, strlen(rom) + 1, "%s", rom);
     romFile = fopen(filename, "rb");
     if (romFile != NULL) {
         free(filename);
@@ -74,7 +78,7 @@ FILE *getRom(const char *rom)
      * opening the file as given did not work,
      * so try appending the file extension
      */
-    sprintf(filename, "%s.ch8", rom);
+    snprintf(filename, strlen(rom) + 5, "%s.ch8", rom);
     romFile = fopen(filename, "rb");
     if (romFile != NULL) {
         free(filename);

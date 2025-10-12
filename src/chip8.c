@@ -29,6 +29,14 @@ int main(int argc, char **argv)
         /* check for valid flags and rate */
         if (isNumber(argv[2])) {
             rate = atoi(argv[2]);
+            if (rate <= 0) {
+                SDL_LogError(
+                    SDL_LOG_CATEGORY_APPLICATION,
+                    "invalid instruction rate: %d (must be > 0)\n",
+                    rate
+                );
+                return EXIT_FAILURE;
+            }
         } else if (strcmp("-m", argv[2]) == 0 || strcmp("--mute", argv[2]) == 0) {
             mute = true;
         } else if (strcmp("-f", argv[2]) == 0 || strcmp("--force", argv[2]) == 0) {
@@ -46,10 +54,26 @@ int main(int argc, char **argv)
         if (isNumber(argv[2]) &&
             (strcmp("-m", argv[3]) == 0 || strcmp("--mute", argv[3]) == 0)) {
             rate = atoi(argv[2]);
+            if (rate <= 0) {
+                SDL_LogError(
+                    SDL_LOG_CATEGORY_APPLICATION,
+                    "invalid instruction rate: %d (must be > 0)\n",
+                    rate
+                );
+                return EXIT_FAILURE;
+            }
             mute = true;
         } else if (isNumber(argv[2]) &&
                   (strcmp("-f", argv[3]) == 0 || strcmp("--force", argv[3]) == 0)) {
             rate = atoi(argv[2]);
+            if (rate <= 0) {
+                SDL_LogError(
+                    SDL_LOG_CATEGORY_APPLICATION,
+                    "invalid instruction rate: %d (must be > 0)\n",
+                    rate
+                );
+                return EXIT_FAILURE;
+            }
             force = true;
         } else if ((strcmp("-m", argv[2]) == 0 || strcmp("--mute", argv[2]) == 0) &&
                    (strcmp("-f", argv[3]) == 0 || strcmp("--force", argv[3]) == 0)) {
@@ -73,12 +97,28 @@ int main(int argc, char **argv)
           ((strcmp("-m", argv[3]) == 0 || strcmp("--mute", argv[3]) == 0) &&
            (strcmp("-f", argv[4]) == 0 || strcmp("--force", argv[4]) == 0))) {
             rate = atoi(argv[2]);
+            if (rate <= 0) {
+                SDL_LogError(
+                    SDL_LOG_CATEGORY_APPLICATION,
+                    "invalid instruction rate: %d (must be > 0)\n",
+                    rate
+                );
+                return EXIT_FAILURE;
+            }
             mute = true;
             force = true;
         } else if (isNumber(argv[2]) &&
                  ((strcmp("-f", argv[3]) == 0 || strcmp("--force", argv[3]) == 0) &&
                   (strcmp("-m", argv[4]) == 0 || strcmp("--mute", argv[4]) == 0))) {
             rate = atoi(argv[2]);
+            if (rate <= 0) {
+                SDL_LogError(
+                    SDL_LOG_CATEGORY_APPLICATION,
+                    "invalid instruction rate: %d (must be > 0)\n",
+                    rate
+                );
+                return EXIT_FAILURE;
+            }
             mute = true;
             force = true;
         } else {
