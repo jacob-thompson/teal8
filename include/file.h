@@ -8,8 +8,8 @@
 
 #include "../include/cJSON.h"
 
-#define SHA1_BLOCK_SIZE 20
-#define SHA1_HASH_SIZE 41
+#define SHA1_BLOCK_SIZE 20 // SHA1 outputs a 20 byte digest
+#define SHA1_HASH_SIZE 41 // SHA1 hash string is 40 chars + null terminator
 
 /* MemoryStruct holds data for curl callback */
 struct MemoryStruct {

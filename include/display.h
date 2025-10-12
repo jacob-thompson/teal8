@@ -3,16 +3,16 @@
 
 #include <stdbool.h>
 
-#define KEY_COUNT 16
+#define KEY_COUNT 16 // 16 keys (0x0 to 0xF)
 
-#define EXIT_SUCCESS 0
-#define EXIT_FAILURE 1
+#define EXIT_SUCCESS 0 // for consistency with stdlib.h
+#define EXIT_FAILURE 1 // for consistency with stdlib.h
 
-#define SCALE 10
-#define CHIP8_WIDTH 64
-#define CHIP8_HEIGHT 32
-#define SCHIP_WIDTH 128
-#define SCHIP_HEIGHT 64
+#define SCALE 10 // scale factor for the display
+#define CHIP8_WIDTH 64 // width of the CHIP8 display in pixels
+#define CHIP8_HEIGHT 32 // height of the CHIP8 display in pixels
+#define SCHIP_WIDTH 128 // width of the SCHIP display in pixels
+#define SCHIP_HEIGHT 64 // height of the SCHIP display in pixels
 
 typedef struct display {
     SDL_Window *window;
