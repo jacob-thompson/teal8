@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#include <SDL.h>
+#include <SDL_audio.h>
 
 #define TONE_FREQ 440 // A440 tone
 #define AMPLITUDE 1000 // volume of the tone

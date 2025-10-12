@@ -3,6 +3,8 @@
 
 #include <getopt.h>
 
+#include <SDL_log.h>
+
 #include "../include/audio.h"
 #include "../include/display.h"
 #include "../include/stack.h"

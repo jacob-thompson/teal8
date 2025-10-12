@@ -3,6 +3,11 @@
 
 #include <stdbool.h>
 
+#include <SDL_video.h>
+#include <SDL_render.h>
+#include <SDL_rect.h>
+#include <SDL_events.h>
+
 #define KEY_COUNT 16 // 16 keys (0x0 to 0xF)
 
 #define EXIT_SUCCESS 0 // for consistency with stdlib.h

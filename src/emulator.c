@@ -1,6 +1,8 @@
-#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
-#include <time.h>
+
+#include <SDL_log.h>
+#include <SDL_timer.h>
 
 #include "../include/emulator.h"
 

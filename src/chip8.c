@@ -1,3 +1,5 @@
+#include <SDL.h>
+
 #include "../include/emulator.h"
 #include "../include/file.h"
 
