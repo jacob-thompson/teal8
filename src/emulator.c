@@ -111,15 +111,24 @@ void writeFontToMemory(unsigned char *memory)
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
     };
 
-    for (int loc = FONT_START_ADDRESS; loc <= FONT_END_ADDRESS; loc++)
-        memory[loc] = font[loc - FONT_START_ADDRESS];
+    for (int i = 0; i < FONT_IN_BYTES; i++)
+        memory[FONT_START_ADDRESS + i] = font[i];
 }
 
 void writeRomToMemory(emulator *chip8, FILE *rom)
 {
     chip8->pc = PROGRAM_START_ADDRESS;
-    while (fread(&chip8->memory[chip8->pc], 1, 1, rom) == 1)
+    while (chip8->pc < MEMORY_IN_BYTES && fread(&chip8->memory[chip8->pc], 1, 1, rom) == 1)
         chip8->pc++;
+    
+    if (chip8->pc >= MEMORY_IN_BYTES) {
+        SDL_LogWarn(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "ROM too large, truncated at %d bytes\n",
+            MEMORY_IN_BYTES - PROGRAM_START_ADDRESS
+        );
+    }
+    
     chip8->pc = PROGRAM_START_ADDRESS; // 0x200
 }
 

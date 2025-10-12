@@ -12,7 +12,7 @@
 #define FONT_IN_BYTES 80
 
 #define FONT_START_ADDRESS 0x000
-#define FONT_END_ADDRESS 0x1FF
+#define FONT_END_ADDRESS 0x1FF  // Reserved area for system, font ends at 0x04F
 #define PROGRAM_START_ADDRESS 0x200
 
 #define DEFAULT_INSTRUCTION_RATE 1000
