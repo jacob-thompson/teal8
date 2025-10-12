@@ -40,7 +40,7 @@ bool isNumber(const char num[])
     /* check if string is empty */
     if (num == NULL || num[0] == '\0')
         return false;
-    
+
     /* check if each character is a numeral */
     for (int i = 0; num[i] != 0; ++i) {
         if (!isdigit(num[i]))
@@ -92,7 +92,7 @@ FILE *getRom(const char *rom)
 
 void writeFontToMemory(unsigned char *memory)
 {
-    uint8_t font[FONT_IN_BYTES] = {
+    uint8_t font[FONT_BYTES] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
         0x20, 0x60, 0x20, 0x20, 0x70, // 1
         0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -111,7 +111,7 @@ void writeFontToMemory(unsigned char *memory)
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
     };
 
-    for (int i = 0; i < FONT_IN_BYTES; i++)
+    for (int i = 0x0; i < FONT_BYTES; i++)
         memory[FONT_START_ADDRESS + i] = font[i];
 }
 
@@ -120,7 +120,7 @@ void writeRomToMemory(emulator *chip8, FILE *rom)
     chip8->pc = PROGRAM_START_ADDRESS;
     while (chip8->pc < MEMORY_IN_BYTES && fread(&chip8->memory[chip8->pc], 1, 1, rom) == 1)
         chip8->pc++;
-    
+
     if (chip8->pc >= MEMORY_IN_BYTES) {
         SDL_LogWarn(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -128,7 +128,7 @@ void writeRomToMemory(emulator *chip8, FILE *rom)
             MEMORY_IN_BYTES - PROGRAM_START_ADDRESS
         );
     }
-    
+
     chip8->pc = PROGRAM_START_ADDRESS; // 0x200
 }
 

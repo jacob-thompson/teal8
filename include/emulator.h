@@ -9,10 +9,10 @@
 #define VERSION "1.0.0"
 
 #define MEMORY_IN_BYTES 4096
-#define FONT_IN_BYTES 80
 
 #define FONT_START_ADDRESS 0x000
-#define FONT_END_ADDRESS 0x1FF  // Reserved area for system, font ends at 0x04F
+#define FONT_BYTES 0x50
+
 #define PROGRAM_START_ADDRESS 0x200
 
 #define DEFAULT_INSTRUCTION_RATE 1000

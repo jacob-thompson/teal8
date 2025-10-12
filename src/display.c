@@ -6,7 +6,7 @@ void resetDisplay(display *display)
 {
     if (display->pixelDrawn == NULL)
         return;
-    
+
     for (int y = 0; y < display->pixelHeight; y++)
         for (int x = 0; x < display->pixelWidth; x++)
             display->pixelDrawn[y * display->pixelWidth + x] = false;
@@ -27,7 +27,7 @@ void createPixels(display *display)
     display->pixels = calloc(
         display->pixelHeight * display->pixelWidth,
         sizeof(SDL_Rect));
-    
+
     if (display->pixels == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -48,7 +48,7 @@ void createPixels(display *display)
     display->pixelDrawn = calloc(
         display->pixelHeight * display->pixelWidth,
         sizeof(bool));
-    
+
     if (display->pixelDrawn == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -265,7 +265,7 @@ int drawPixels(display *display)
 {
     if (display->pixelDrawn == NULL || display->pixels == NULL)
         return EXIT_FAILURE;
-    
+
     if (SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255) != EXIT_SUCCESS)
         return EXIT_FAILURE;
 
