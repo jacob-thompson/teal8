@@ -129,4 +129,4 @@ teal8 --help
 [size-shield]: https://img.shields.io/github/languages/code-size/jacob-thompson/teal8
 [size-url]: https://github.com/jacob-thompson/teal8
 [license-shield]: https://img.shields.io/github/license/jacob-thompson/teal8.svg?style=flat
-[license-url]: https://github.com/jacob-thompson/teal8/blob/main/LICENSE
+[license-url]: LICENSE
