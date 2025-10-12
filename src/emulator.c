@@ -20,11 +20,11 @@ void printUsage(const char *programName, SDL_LogPriority priority)
     SDL_LogMessage(
         SDL_LOG_CATEGORY_APPLICATION,
         priority,
-        "\nusage: %s <rom> [rate] [-m|--mute] [-f|--force]\n"
-        "\t<rom>   the chip8 rom to load\n"
-        "\t[rate]  the instruction rate in instructions per second (default: %d)\n"
-        "\t-m, --mute   mute audio\n"
-        "\t-f, --force  force load rom regardless of validity\n"
+        "\nusage:\t%s <rom> [rate] [-m|--mute] [-f|--force]\n"
+        "\t<rom>\t\tthe chip8 rom to load\n"
+        "\t[rate]\t\tthe instruction rate in instructions per second (default: %d)\n"
+        "\t-m (--mute)\tmute audio\n"
+        "\t-f (--force)\tforce load rom regardless of validity\n"
         "controls:\n"
         "\t1 2 3 4\n"
         "\tQ W E R\n"
