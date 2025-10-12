@@ -37,6 +37,11 @@ typedef struct {
     bool muted; // is the audio muted?
 } emulator;
 
+/**
+    * Check if a string is a number.
+    * @param num the string to check
+    * @return true if the string is a number, false otherwise
+*/
 bool isNumber(const char num[]);
 
 /**
