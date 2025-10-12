@@ -2,6 +2,7 @@
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
+![GitHub commit activity](https://img.shields.io/github/commit-activity/y/jacob-thompson/teal8)
 ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues-pr/jacob-thompson/teal8)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/jacob-thompson/teal8)
 [![MIT License][license-shield]][license-url]
