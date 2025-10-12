@@ -124,8 +124,10 @@ int randomNumber(int min, int max)
 
     int range = max - min + 1;
 
-    // chop off the high end of rand()
-    // so that the entire range is evenly divided by range
+    /*
+     * chop off the high end of rand()
+     * so that the entire range is evenly divided by range
+     */
     int x;
     while (1) {
         x = rand();

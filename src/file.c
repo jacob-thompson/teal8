@@ -1,11 +1,11 @@
 #include <unistd.h>
 
-#include <SDL.h>
+#include <SDL_log.h>
 #include <openssl/evp.h>
 
 #include "../include/file.h"
 
-static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
+static size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
     size_t realsize = size * nmemb;
     struct MemoryStruct *mem = (struct MemoryStruct *)userp;
@@ -36,7 +36,7 @@ int pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url)
     curl_easy_setopt(handle, CURLOPT_URL, url);
 
     // send all data to this function
-    curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+    curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, writeMemoryCallback);
 
     // we pass our 'chunk' struct to the callback function
     curl_easy_setopt(handle, CURLOPT_WRITEDATA, (void *)chunk);

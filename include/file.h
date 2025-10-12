@@ -22,7 +22,7 @@ struct MemoryStruct {
  * @param userp pointer to the MemoryStruct
  * @return number of bytes written
  */
-static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
+static size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
 
 /** Pull data from a URL into a MemoryStruct using curl
  * @param handle CURL handle
