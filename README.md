@@ -1,15 +1,17 @@
 <br />
 <div align="center">
-    <a href="https://github.com/jacob-thompson/teal8">
-        <img src="resources/logo.png" alt="Logo" width="160" height = "80">
-    </a>
 
-    <h3 align="center">teal8</h3>
+<a href="https://github.com/jacob-thompson/teal8">
+<img src="resources/logo.png" alt="Logo" width="160" height="80">
+</a>
 
-    <p align="center">
-        CHIP-8 interpreter written in pure C.
-        <br />
-    </p>
+<h3 align="center">teal8</h3>
+
+<p align="center">
+CHIP-8 interpreter written in pure C.
+<br />
+</p>
+
 </div>
 
 ## about 
