@@ -1,7 +1,7 @@
 <br />
 <div align="center">
     <a href="https://github.com/jacob-thompson/teal8">
-        <img src="https://raw.githubusercontent.com/jacob-thompson/teal8/main/resources/logo.png" alt="Logo" width="160" height = "80">
+        <img src="resources/logo.png" alt="Logo" width="160" height = "80">
     </a>
 
     <h3 align="center">teal8</h3>
@@ -14,7 +14,7 @@
 
 ## about 
 
-![screenshot](https://raw.githubusercontent.com/jacob-thompson/teal8/main/resources/screenshot.png)
+![screenshot](resources/screenshot.png)
 
 ## prerequisites
 
