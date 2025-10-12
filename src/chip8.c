@@ -138,7 +138,6 @@ int main(int argc, char **argv)
 
     uint32_t ticks;
     uint16_t opcode;
-    uint16_t timerDelay = 1000 / TIMER_RATE;
     double msPerInstruction = 1000.0 / rate;
     double nextInstructionTime = SDL_GetTicks();
 
@@ -156,8 +155,11 @@ int main(int argc, char **argv)
         /* schedule next instruction */
         nextInstructionTime += msPerInstruction;
 
-        /* update timers */
-        if (ticks - chip8.timers.lastUpdate >= timerDelay) {
+        /*
+         * handle timer updates at 60Hz
+         * timers are decremented if they are greater than zero
+         */
+        if (ticks - chip8.timers.lastUpdate >= TIMER_INTERVAL) {
             if (chip8.timers.delay > 0) {
                 chip8.timers.delay--;
             }

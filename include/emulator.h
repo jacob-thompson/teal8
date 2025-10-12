@@ -10,19 +10,20 @@
 
 #define VERSION "1.0.0"
 
-#define MEMORY_IN_BYTES 4096
+#define MEMORY_IN_BYTES 4096 // 4KB memory
 
-#define FONT_START_ADDRESS 0x000
-#define FONT_BYTES 0x50
+#define FONT_START_ADDRESS 0x000 // 0 decimal
+#define FONT_BYTES 0x50 // 80 decimal
 
-#define PROGRAM_START_ADDRESS 0x200
+#define PROGRAM_START_ADDRESS 0x200 // 512 decimal
 
-#define DEFAULT_INSTRUCTION_RATE 1000
-#define TIMER_RATE 60
+#define DEFAULT_INSTRUCTION_RATE 1000 // 1000 instructions per second
+
+#define TIMER_INTERVAL (1000 / 60) // ~16.67ms for 60Hz timer update
 #define VBLANK_INTERVAL (1000 / 60)  // ~16.67ms for 60Hz vertical blank
 
-#define REGISTERS 16
-#define LAST_REGISTER 0xF
+#define REGISTERS 16 // 16 8-bit registers (V0 to VF)
+#define LAST_REGISTER 0xF // index of the last register (VF)
 
 #define CHIP8 100
 #define SCHIP 101
