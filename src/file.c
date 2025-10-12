@@ -98,6 +98,13 @@ char *getHash(FILE *fp)
 
     /* convert hash to hex string */
     char *hashString = malloc(SHA1_HASH_SIZE * sizeof(char));
+    if (hashString == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to allocate memory for hash string\n"
+        );
+        return NULL;
+    }
     for (int i = 0; i < SHA1_BLOCK_SIZE; i++) {
         sprintf(&hashString[i << 1], "%02x", hash[i]);
     }
@@ -147,6 +154,16 @@ bool isRomInDatabase(FILE *fp)
     hashChunk.memory = malloc(1);
     infoChunk.memory = malloc(1);
 
+    if (hashChunk.memory == NULL || infoChunk.memory == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to allocate memory for database chunks\n"
+        );
+        if (hashChunk.memory != NULL) free(hashChunk.memory);
+        if (infoChunk.memory != NULL) free(infoChunk.memory);
+        return false;
+    }
+
     /* initial size is 0 */
     hashChunk.size = 0;
     infoChunk.size = 0;
@@ -169,6 +186,8 @@ bool isRomInDatabase(FILE *fp)
         &hashChunk,
         "https://raw.githubusercontent.com/chip-8/chip-8-database/refs/heads/master/database/sha1-hashes.json"
     ) != 0) {
+        free(hashChunk.memory);
+        free(infoChunk.memory);
         curl_easy_cleanup(curlHandle);
         return false;
     }
@@ -184,6 +203,8 @@ bool isRomInDatabase(FILE *fp)
                 error_ptr
             );
         }
+        free(hashChunk.memory);
+        free(infoChunk.memory);
         curl_easy_cleanup(curlHandle);
         return false;
     }
@@ -213,6 +234,17 @@ bool isRomInDatabase(FILE *fp)
     );
 
     char *hashString = getHash(fp);
+    if (hashString == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to compute ROM hash\n"
+        );
+        free(hashChunk.memory);
+        free(infoChunk.memory);
+        cJSON_Delete(hashJson);
+        curl_easy_cleanup(curlHandle);
+        return false;
+    }
 
     /* check if the hash is in the database */
     cJSON *romHash = cJSON_GetObjectItemCaseSensitive(hashJson, hashString);

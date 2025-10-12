@@ -24,6 +24,14 @@ void createPixels(display *display)
     display->pixels = calloc(
         display->pixelHeight * display->pixelWidth,
         sizeof(SDL_Rect));
+    
+    if (display->pixels == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to allocate memory for pixels\n"
+        );
+        return;
+    }
 
     for (int y = 0; y < display->pixelHeight; y++) {
         for (int x = 0; x < display->pixelWidth; x++) {
@@ -37,6 +45,16 @@ void createPixels(display *display)
     display->pixelDrawn = calloc(
         display->pixelHeight * display->pixelWidth,
         sizeof(bool));
+    
+    if (display->pixelDrawn == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to allocate memory for pixelDrawn\n"
+        );
+        free(display->pixels);
+        display->pixels = NULL;
+        return;
+    }
 }
 
 int initDisplay(display *display)

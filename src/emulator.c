@@ -53,6 +53,13 @@ FILE *getRom(const char *rom)
      * the file extension if necessary
      */
     char *filename = malloc(sizeof(char) * strlen(rom) + 4);
+    if (filename == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to allocate memory for filename\n"
+        );
+        return NULL;
+    }
 
     FILE *romFile = NULL; // file to be returned
 
@@ -494,21 +501,28 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                      * store the binary-coded base-10 representation of Vx
                      * in memory locations I, I+1, and I+2
                      */
-                    chip8->memory[chip8->ix] = chip8->v[x] / 100;
-                    chip8->memory[chip8->ix + 1] = (chip8->v[x] / 10) % 10;
-                    chip8->memory[chip8->ix + 2] = chip8->v[x] % 10;
+                    if (chip8->ix < MEMORY_IN_BYTES)
+                        chip8->memory[chip8->ix] = chip8->v[x] / 100;
+                    if (chip8->ix + 1 < MEMORY_IN_BYTES)
+                        chip8->memory[chip8->ix + 1] = (chip8->v[x] / 10) % 10;
+                    if (chip8->ix + 2 < MEMORY_IN_BYTES)
+                        chip8->memory[chip8->ix + 2] = chip8->v[x] % 10;
                     break;
                 case 0x55:
                     /* store V0 to Vx in memory starting at address I */
-                    for (int i = 0; i <= x; i++)
-                        chip8->memory[chip8->ix + i] = chip8->v[i];
+                    for (int i = 0; i <= x; i++) {
+                        if (chip8->ix + i < MEMORY_IN_BYTES)
+                            chip8->memory[chip8->ix + i] = chip8->v[i];
+                    }
                     if (chip8->specType == CHIP8)
                         chip8->ix += x + 1;
                     break;
                 case 0x65:
                     /* fill V0 to Vx with values from memory starting at address I */
-                    for (int i = 0; i <= x; i++)
-                        chip8->v[i] = chip8->memory[chip8->ix + i];
+                    for (int i = 0; i <= x; i++) {
+                        if (chip8->ix + i < MEMORY_IN_BYTES)
+                            chip8->v[i] = chip8->memory[chip8->ix + i];
+                    }
                     if (chip8->specType == CHIP8)
                         chip8->ix += x + 1;
                     break;
@@ -519,6 +533,7 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                 case 0x85:
                     /* fill V0 to Vx with values from the RPL user flags */
                     chip8->specType = SCHIP;
+                    break;
             }
     }
 }

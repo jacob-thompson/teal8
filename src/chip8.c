@@ -172,7 +172,11 @@ int main(int argc, char **argv)
                 handleEvent(&chip8.display, &event);
 
             if (chip8.display.reset) {
-                initializeEmulator(&chip8, getRom(argv[1]));
+                FILE *resetRom = getRom(argv[1]);
+                if (resetRom != NULL) {
+                    initializeEmulator(&chip8, resetRom);
+                    fclose(resetRom);
+                }
                 resetDisplay(&chip8.display);
                 chip8.display.reset = false;
                 nextInstructionTime = SDL_GetTicks();
@@ -219,7 +223,11 @@ int main(int argc, char **argv)
             handleEvent(&chip8.display, &event);
 
         if (chip8.display.reset) {
-            initializeEmulator(&chip8, getRom(argv[1]));
+            FILE *resetRom = getRom(argv[1]);
+            if (resetRom != NULL) {
+                initializeEmulator(&chip8, resetRom);
+                fclose(resetRom);
+            }
             resetDisplay(&chip8.display);
             chip8.display.reset = false;
             nextInstructionTime = SDL_GetTicks();
