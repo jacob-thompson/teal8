@@ -150,25 +150,7 @@ int main(int argc, char **argv)
 
         /* check if it is time to execute the next instruction */
         if ((double)ticks < nextInstructionTime) {
-            /* not time yet, but still handle events */
-            clearKeys(chip8.display.keyUp);
-
-            SDL_Event event;
-            while (SDL_PollEvent(&event))
-                handleEvent(&chip8.display, &event);
-
-            if (chip8.display.reset) {
-                FILE *resetRom = getRom(inputFile);
-                if (resetRom != NULL) {
-                    initializeEmulator(&chip8, resetRom);
-                    fclose(resetRom);
-                }
-                resetDisplay(&chip8.display);
-                chip8.display.reset = false;
-                nextInstructionTime = SDL_GetTicks();
-            }
-
-            continue;
+            continue; // not time yet
         }
 
         /* schedule next instruction */
