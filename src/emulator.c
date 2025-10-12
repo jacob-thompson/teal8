@@ -6,13 +6,24 @@
 
 #include "../include/emulator.h"
 
+#define FONT_START_ADDRESS 0x000 // 0 decimal
+#define FONT_BYTES 0x50 // 80 decimal
+
+#define PROGRAM_START_ADDRESS 0x200 // 512 decimal
+
+#define VBLANK_INTERVAL (1000 / 60)  // ~16.67ms for 60Hz vertical blank
+
+#define LAST_REGISTER 0xF // index of the last register (VF)
+
 void printVersion(const char *programName)
 {
     SDL_LogInfo(
         SDL_LOG_CATEGORY_APPLICATION,
-        "%s version %s\n",
+        "%s version %d.%d.%d\n",
         programName,
-        VERSION
+        TEAL_VERSION_MAJOR,
+        TEAL_VERSION_MINOR,
+        TEAL_VERSION_PATCH
     );
 }
 
@@ -21,7 +32,7 @@ void printUsage(const char *programName, SDL_LogPriority priority)
     SDL_LogMessage(
         SDL_LOG_CATEGORY_APPLICATION,
         priority,
-        "%s version %s\nusage:\t%s [-m|--mute] [-f|--force] [-i|--ips <number>] <rom>\n"
+        "%s version %d.%d.%d\nusage:\t%s [-m|--mute] [-f|--force] [-i|--ips <number>] <rom>\n"
         "\t-m (--mute)\tmute audio\n"
         "\t-f (--force)\tforce load rom regardless of validity\n"
         "\t-i (--ips)\tinstructions per second (default: %d)\n"
@@ -32,7 +43,9 @@ void printUsage(const char *programName, SDL_LogPriority priority)
         "\tA S D F\n"
         "\tZ X C V\n",
         programName,
-        VERSION,
+        TEAL_VERSION_MAJOR,
+        TEAL_VERSION_MINOR,
+        TEAL_VERSION_PATCH,
         programName,
         DEFAULT_INSTRUCTION_RATE
     );

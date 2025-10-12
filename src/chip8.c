@@ -3,6 +3,8 @@
 #include "../include/emulator.h"
 #include "../include/file.h"
 
+#define TIMER_INTERVAL (1000 / 60) // ~16.67ms for 60Hz timer update
+
 int main(int argc, char **argv)
 {
     srand(time(NULL));
