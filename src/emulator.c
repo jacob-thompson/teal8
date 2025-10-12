@@ -37,6 +37,7 @@ void printUsage(const char *programName, SDL_LogPriority priority)
 
 bool isNumber(const char num[])
 {
+    /* check if each character is a numeral */
     for (int i = 0; num[i] != 0; ++i) {
         if (!isdigit(num[i]))
             return false;
@@ -108,7 +109,7 @@ void writeRomToMemory(emulator *chip8, FILE *rom)
     chip8->pc = PROGRAM_START_ADDRESS;
     while (fread(&chip8->memory[chip8->pc], 1, 1, rom) == 1)
         chip8->pc++;
-    chip8->pc = PROGRAM_START_ADDRESS;
+    chip8->pc = PROGRAM_START_ADDRESS; // 0x200
 }
 
 void initializeEmulator(emulator *chip8, FILE *rom)
@@ -122,7 +123,8 @@ void initializeEmulator(emulator *chip8, FILE *rom)
     chip8->lastUpdate = 0;
     chip8->timers.lastUpdate = 0;
 
-    for (int i = 0; i < 16; i++) {
+    /* ensure registers and stack are cleared */
+    for (int i = 0x0; i <= LAST_REGISTER; i++) {
         chip8->v[i] = 0;
         chip8->stack.s[i] = 0;
     }
@@ -131,6 +133,7 @@ void initializeEmulator(emulator *chip8, FILE *rom)
     chip8->specType = CHIP8;
 }
 
+/*
 void printMemory(emulator *chip8)
 {
     for (int i = 0; i < MEMORY_IN_BYTES; i++) {
@@ -140,6 +143,7 @@ void printMemory(emulator *chip8)
     }
     fprintf(stdout, "\n");
 }
+*/
 
 int randomNumber(int min, int max)
 {
@@ -461,7 +465,7 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                      * and store the value of the key in Vx
                      */
                     chip8->pc -= 2;
-                    for (int i = 0x0; i <= 0xF; i++)
+                    for (int i = 0x0; i <= LAST_REGISTER; i++)
                         if (chip8->display.keyUp[i]) {
                             chip8->v[x] = i;
                             chip8->pc += 2;

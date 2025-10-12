@@ -17,6 +17,7 @@
 #define VBLANK_INTERVAL (1000 / 60)  // ~16.67ms for 60Hz vertical blank
 
 #define REGISTERS 16
+#define LAST_REGISTER 0xF
 
 #define CHIP8 100
 #define SCHIP 101
@@ -28,11 +29,11 @@ typedef struct emulator {
     uint16_t ix; // 16-bit index register
     uint16_t pc; // program counter
     uint32_t lastUpdate; // last update tick
-    timers timers; // delay and sound timers
-    stack stack; // stack
-    display display; // display
-    audio sound; // sound
-    bool muted; // is the audio muted?
+    timers timers; // delay & sound timers
+    stack stack; // stack & stack pointer
+    display display; // display structure
+    audio sound; // sound structure
+    bool muted; // is the sound muted?
 } emulator;
 
 /*
@@ -91,7 +92,7 @@ void initializeEmulator(emulator *chip8, FILE *rom);
  * For debugging purposes.
  * @param chip8 the emulator
  */
-void printMemory(emulator *chip8);
+//void printMemory(emulator *chip8);
 
 /*
  * Generate a random number between min and max.

@@ -71,6 +71,7 @@ char *getHash(FILE *fp)
         return NULL;
     }
 
+    /* initialize SHA1 context */
     if (EVP_DigestInit_ex(shaContext, EVP_sha1(), NULL) != 1) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -89,6 +90,7 @@ char *getHash(FILE *fp)
         EVP_DigestUpdate(shaContext, buffer, bytesRead);
     }
 
+    /* finalize the SHA1 hash */
     unsigned char hash[SHA1_BLOCK_SIZE];
     EVP_DigestFinal_ex(shaContext, hash, NULL);
     EVP_MD_CTX_free(shaContext);
@@ -171,6 +173,7 @@ bool isRomInDatabase(FILE *fp)
         return false;
     }
 
+    /* parse the JSON data */
     cJSON *hashJson = cJSON_Parse(hashChunk.memory);
     if (hashJson == NULL) {
         const char *error_ptr = cJSON_GetErrorPtr();
@@ -211,6 +214,7 @@ bool isRomInDatabase(FILE *fp)
 
     char *hashString = getHash(fp);
 
+    /* check if the hash is in the database */
     cJSON *romHash = cJSON_GetObjectItemCaseSensitive(hashJson, hashString);
     if (cJSON_IsNull(romHash) || romHash == NULL) {
         SDL_LogError(
@@ -248,6 +252,7 @@ bool isRomInDatabase(FILE *fp)
         return false;
     }
 
+    /* parse the JSON data */
     cJSON *infoJson = cJSON_Parse(infoChunk.memory);
     if (infoJson == NULL) {
         const char *error_ptr = cJSON_GetErrorPtr();
@@ -296,6 +301,7 @@ bool isRomInDatabase(FILE *fp)
 
 bool isFileValid(const char *filename, FILE *fp, struct stat *st)
 {
+    /* check if file exists and is readable */
     if (fp == NULL || fstat(fileno(fp), st) == -1) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
