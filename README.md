@@ -1,6 +1,20 @@
-# teal8
+<br />
+<div align="center">
+    <a href="https://github.com/jacob-thompson/teal8">
+        <img src="https://raw.githubusercontent.com/jacob-thompson/teal8/main/resources/logo.png" alt="Logo" width="160" height = "80">
+    </a>
 
-CHIP-8 interpreter written in pure C.
+    <h3 align="center">teal8</h3>
+
+    <p align="center">
+        CHIP-8 interpreter written in pure C.
+        <br />
+    </p>
+</div>
+
+## about 
+
+![screenshot](https://raw.githubusercontent.com/jacob-thompson/teal8/main/resources/screenshot.png)
 
 ## prerequisites
 
