@@ -7,135 +7,72 @@ int main(int argc, char **argv)
 
     //SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
 
-    uint16_t rate = DEFAULT_INSTRUCTION_RATE;
-    bool mute = false; // mute audio (-m or --mute)
-    bool force = false; // force load rom regardless of validity (-f or --force)
+    /* data that may be configured by args */
+    uint16_t rate;
+    int opt, longIndex;
+    bool mute, force;
 
-    /* args */
-    if (argc < 2 || argc > 5) {
-        printUsage(argv[0], SDL_LOG_PRIORITY_ERROR);
-        return EXIT_FAILURE;
-    } else if (argc == 2 &&
-              (strcmp("-h", argv[1]) == 0 ||
-               strcmp("--help", argv[1]) == 0)) {
-        printUsage(argv[0], SDL_LOG_PRIORITY_INFO);
-        return EXIT_SUCCESS;
-    } else if (argc == 2 &&
-              (strcmp("-v", argv[1]) == 0 ||
-               strcmp("--version", argv[1]) == 0)) {
-        printVersion(argv[0]);
-        return EXIT_SUCCESS;
-    } else if (argc == 3) {
-        /* check for valid flags and rate */
-        if (isNumber(argv[2])) {
-            rate = atoi(argv[2]);
-            if (rate <= 0) {
-                SDL_LogError(
-                    SDL_LOG_CATEGORY_APPLICATION,
-                    "invalid instruction rate: %d (must be > 0)\n",
-                    rate
-                );
+    /* defaults */
+    rate = DEFAULT_INSTRUCTION_RATE; // 1000 instructions per second
+    longIndex = 0; // used as the index for longOptions
+    mute = false; // mute audio (-m or --mute)
+    force = false; // force load rom regardless of validity (-f or --force)
+
+    /* parsing args */
+    while (argc > 1 &&
+          (opt = getopt_long(argc, argv,  "fmi:hv", longOptions, &longIndex)) != -1) {
+        switch (opt) {
+            case 'f': // force
+                force = true;
+                break;
+            case 'm': // mute
+                mute = true;
+                break;
+            case 'i': // ips
+                if (isNumber(optarg)) {
+                    rate = atoi(optarg);
+                } else {
+                    SDL_LogError(
+                        SDL_LOG_CATEGORY_APPLICATION,
+                        "invalid IPS input\n"
+                    );
+                    return EXIT_FAILURE;
+                }
+
+                /* validate the input before we start using it */
+                if (rate <= 0) {
+                    rate = DEFAULT_INSTRUCTION_RATE;
+                }
+                break;
+            case 'h': // help
+                printUsage(argv[0], SDL_LOG_PRIORITY_INFO);
+                return EXIT_SUCCESS;
+                break;
+            case 'v': // version
+                printVersion(argv[0]);
+                return EXIT_SUCCESS;
+                break;
+            default: // '?'
+                printUsage(argv[0], SDL_LOG_PRIORITY_ERROR);
                 return EXIT_FAILURE;
-            }
-        } else if (strcmp("-m", argv[2]) == 0 || strcmp("--mute", argv[2]) == 0) {
-            mute = true;
-        } else if (strcmp("-f", argv[2]) == 0 || strcmp("--force", argv[2]) == 0) {
-            force = true;
-        } else {
-            SDL_LogError(
-                SDL_LOG_CATEGORY_APPLICATION,
-                "invalid argument: %s\n",
-                argv[2]
-            );
-            return EXIT_FAILURE;
-        }
-    } else if (argc == 4) {
-        /* check for valid flags and rate */
-        if (isNumber(argv[2]) &&
-            (strcmp("-m", argv[3]) == 0 || strcmp("--mute", argv[3]) == 0)) {
-            rate = atoi(argv[2]);
-            if (rate <= 0) {
-                SDL_LogError(
-                    SDL_LOG_CATEGORY_APPLICATION,
-                    "invalid instruction rate: %d (must be > 0)\n",
-                    rate
-                );
-                return EXIT_FAILURE;
-            }
-            mute = true;
-        } else if (isNumber(argv[2]) &&
-                  (strcmp("-f", argv[3]) == 0 || strcmp("--force", argv[3]) == 0)) {
-            rate = atoi(argv[2]);
-            if (rate <= 0) {
-                SDL_LogError(
-                    SDL_LOG_CATEGORY_APPLICATION,
-                    "invalid instruction rate: %d (must be > 0)\n",
-                    rate
-                );
-                return EXIT_FAILURE;
-            }
-            force = true;
-        } else if ((strcmp("-m", argv[2]) == 0 || strcmp("--mute", argv[2]) == 0) &&
-                   (strcmp("-f", argv[3]) == 0 || strcmp("--force", argv[3]) == 0)) {
-            mute = true;
-            force = true;
-        } else if ((strcmp("-f", argv[2]) == 0 || strcmp("--force", argv[2]) == 0) &&
-                   (strcmp("-m", argv[3]) == 0 || strcmp("--mute", argv[3]) == 0)) {
-            mute = true;
-            force = true;
-        } else {
-            SDL_LogError(
-                SDL_LOG_CATEGORY_APPLICATION,
-                "invalid arguments: %s %s\n",
-                argv[2],
-                argv[3]
-            );
-            return EXIT_FAILURE;
-        }
-    } else if (argc == 5) {
-        if (isNumber(argv[2]) &&
-          ((strcmp("-m", argv[3]) == 0 || strcmp("--mute", argv[3]) == 0) &&
-           (strcmp("-f", argv[4]) == 0 || strcmp("--force", argv[4]) == 0))) {
-            rate = atoi(argv[2]);
-            if (rate <= 0) {
-                SDL_LogError(
-                    SDL_LOG_CATEGORY_APPLICATION,
-                    "invalid instruction rate: %d (must be > 0)\n",
-                    rate
-                );
-                return EXIT_FAILURE;
-            }
-            mute = true;
-            force = true;
-        } else if (isNumber(argv[2]) &&
-                 ((strcmp("-f", argv[3]) == 0 || strcmp("--force", argv[3]) == 0) &&
-                  (strcmp("-m", argv[4]) == 0 || strcmp("--mute", argv[4]) == 0))) {
-            rate = atoi(argv[2]);
-            if (rate <= 0) {
-                SDL_LogError(
-                    SDL_LOG_CATEGORY_APPLICATION,
-                    "invalid instruction rate: %d (must be > 0)\n",
-                    rate
-                );
-                return EXIT_FAILURE;
-            }
-            mute = true;
-            force = true;
-        } else {
-            SDL_LogError(
-                SDL_LOG_CATEGORY_APPLICATION,
-                "invalid arguments: %s %s\n",
-                argv[3],
-                argv[4]
-            );
-            return EXIT_FAILURE;
+                break;
         }
     }
 
-    FILE *rom = getRom(argv[1]);
+    /* ensure that a ROM argument was given */
+    if (optind >= argc) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "expected ROM argument after options\n"
+        );
+        return EXIT_FAILURE;
+    }
+
+    const char *inputFile = argv[optind];
+    FILE *rom = getRom(inputFile);
     struct stat st;
 
-    if (!force && !isFileValid(argv[1], rom, &st)) {
+    if (!force && !isFileValid(inputFile, rom, &st)) {
         if (rom != NULL) fclose(rom);
         return EXIT_FAILURE; // error has already been logged
     } else if (force) {
@@ -143,20 +80,20 @@ int main(int argc, char **argv)
             SDL_LogError(
                 SDL_LOG_CATEGORY_APPLICATION,
                 "failed to open ROM file: %s\n",
-                argv[1]
+                inputFile
             );
             return EXIT_FAILURE;
         }
         SDL_LogDebug(
             SDL_LOG_CATEGORY_APPLICATION,
             "force loading %s\n",
-            argv[1]
+            inputFile
         );
     } else {
         SDL_LogDebug(
             SDL_LOG_CATEGORY_APPLICATION,
             "loading %s\n",
-            argv[1]
+            inputFile
         );
     }
 
@@ -193,7 +130,7 @@ int main(int argc, char **argv)
     SDL_LogDebug(
         SDL_LOG_CATEGORY_APPLICATION,
         "running %s at %d IPS\n",
-        argv[1],
+        inputFile,
         rate
     );
 
@@ -221,7 +158,7 @@ int main(int argc, char **argv)
                 handleEvent(&chip8.display, &event);
 
             if (chip8.display.reset) {
-                FILE *resetRom = getRom(argv[1]);
+                FILE *resetRom = getRom(inputFile);
                 if (resetRom != NULL) {
                     initializeEmulator(&chip8, resetRom);
                     fclose(resetRom);
@@ -272,7 +209,7 @@ int main(int argc, char **argv)
             handleEvent(&chip8.display, &event);
 
         if (chip8.display.reset) {
-            FILE *resetRom = getRom(argv[1]);
+            FILE *resetRom = getRom(inputFile);
             if (resetRom != NULL) {
                 initializeEmulator(&chip8, resetRom);
                 fclose(resetRom);

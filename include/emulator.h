@@ -1,6 +1,8 @@
 #ifndef EMULATOR_H
 #define EMULATOR_H
 
+#include <getopt.h>
+
 #include "../include/audio.h"
 #include "../include/display.h"
 #include "../include/stack.h"
@@ -24,6 +26,17 @@
 
 #define CHIP8 100
 #define SCHIP 101
+
+/* long options for getopt_long */
+static struct option longOptions[] =
+{
+    {"force", no_argument, NULL, 'f'},
+    {"mute", no_argument, NULL, 'm'},
+    {"ips", required_argument, NULL, 'i'},
+    {"help", no_argument, NULL, 'h'},
+    {"version", no_argument, NULL, 'v'},
+    {0, 0, 0, 0} // end of array
+};
 
 typedef struct emulator {
     uint8_t memory[MEMORY_IN_BYTES]; // 4KB memory

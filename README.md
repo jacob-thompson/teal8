@@ -48,7 +48,7 @@ export PATH="path/to/teal8/bin:$PATH"
 Run the program:
 
 ```bash
-teal8 <rom> [rate] [flags]
+teal8 [-m|--mute] [-f|--force] [-i|--ips <number>] <rom>
 ```
 
 You can omit the rom's file extension:
@@ -57,16 +57,12 @@ You can omit the rom's file extension:
 teal8 roms/spockpaperscissors
 ```
 
-> [!NOTE]
-> - `rom` is the path to the ROM file
-> - `rate` is the amount of instructions to execute per second (default: 1000)
-> - `flags` are optional flags (see below)
-
 The following flags are available:
 
 ```
---mute (-m)        Mute sound
---force (-f)       Force run ROM even if not recognized
+--mute (-m)             Mute sound
+--force (-f)            Force run ROM even if not recognized
+--ips <number> (-i)     Set instructions per second (default: 1000)
 ```
 
 ## controls

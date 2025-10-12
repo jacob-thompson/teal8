@@ -16,20 +16,21 @@ void printVersion(const char *programName)
 
 void printUsage(const char *programName, SDL_LogPriority priority)
 {
-    printVersion(programName);
     SDL_LogMessage(
         SDL_LOG_CATEGORY_APPLICATION,
         priority,
-        "\nusage:\t%s <rom> [rate] [-m|--mute] [-f|--force]\n"
-        "\t<rom>\t\tthe chip8 rom to load\n"
-        "\t[rate]\t\tthe instruction rate in instructions per second (default: %d)\n"
+        "%s version %s\nusage:\t%s [-m|--mute] [-f|--force] [-i|--ips <number>] <rom>\n"
         "\t-m (--mute)\tmute audio\n"
         "\t-f (--force)\tforce load rom regardless of validity\n"
+        "\t-i (--ips)\tinstructions per second (default: %d)\n"
+        "\t<rom>\t\tchip8 rom path\n"
         "controls:\n"
         "\t1 2 3 4\n"
         "\tQ W E R\n"
         "\tA S D F\n"
         "\tZ X C V\n",
+        programName,
+        VERSION,
         programName,
         DEFAULT_INSTRUCTION_RATE
     );
