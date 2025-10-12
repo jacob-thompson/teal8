@@ -3,6 +3,8 @@
 #include "../include/stack.h"
 #include "../include/timers.h"
 
+#define VERSION "1.0.0"
+
 #define MEMORY_IN_BYTES 4096
 #define FONT_IN_BYTES 80
 
@@ -38,10 +40,17 @@ typedef struct {
 } emulator;
 
 /*
- * Print the usage of the program.
+ * Print the version of the program.
  * @param programName the name of the program
  */
-void usage(const char *programName, SDL_LogPriority priority);
+void printVersion(const char *programName);
+
+/*
+ * Print the usage of the program.
+ * @param programName the name of the program
+ * @param priority the log priority to use
+ */
+void printUsage(const char *programName, SDL_LogPriority priority);
 
 /*
  * Check if a string is a number.

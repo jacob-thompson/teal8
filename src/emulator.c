@@ -4,8 +4,19 @@
 
 #include "../include/emulator.h"
 
-void usage(const char *programName, SDL_LogPriority priority)
+void printVersion(const char *programName)
 {
+    SDL_LogInfo(
+        SDL_LOG_CATEGORY_APPLICATION,
+        "%s version %s\n",
+        programName,
+        VERSION
+    );
+}
+
+void printUsage(const char *programName, SDL_LogPriority priority)
+{
+    printVersion(programName);
     SDL_LogMessage(
         SDL_LOG_CATEGORY_APPLICATION,
         priority,
@@ -13,7 +24,12 @@ void usage(const char *programName, SDL_LogPriority priority)
         "\t<rom>   the chip8 rom to load\n"
         "\t[rate]  the instruction rate in instructions per second (default: %d)\n"
         "\t-m, --mute   mute audio\n"
-        "\t-f, --force  force load rom regardless of validity\n",
+        "\t-f, --force  force load rom regardless of validity\n"
+        "controls:\n"
+        "\t1 2 3 4\n"
+        "\tQ W E R\n"
+        "\tA S D F\n"
+        "\tZ X C V\n",
         programName,
         DEFAULT_INSTRUCTION_RATE
     );

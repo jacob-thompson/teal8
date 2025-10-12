@@ -1,8 +1,6 @@
 #include "../include/emulator.h"
 #include "../include/file.h"
 
-#define VERSION "1.0.0"
-
 int main(int argc, char **argv)
 {
     srand(time(NULL));
@@ -15,22 +13,17 @@ int main(int argc, char **argv)
 
     /* args */
     if (argc < 2 || argc > 5) {
-        usage(argv[0], SDL_LOG_PRIORITY_ERROR);
+        printUsage(argv[0], SDL_LOG_PRIORITY_ERROR);
         return EXIT_FAILURE;
     } else if (argc == 2 &&
               (strcmp("-h", argv[1]) == 0 ||
                strcmp("--help", argv[1]) == 0)) {
-        usage(argv[0], SDL_LOG_PRIORITY_INFO);
+        printUsage(argv[0], SDL_LOG_PRIORITY_INFO);
         return EXIT_SUCCESS;
     } else if (argc == 2 &&
               (strcmp("-v", argv[1]) == 0 ||
                strcmp("--version", argv[1]) == 0)) {
-        SDL_LogInfo(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "%s version %s\n",
-            argv[0],
-            VERSION
-        );
+        printVersion(argv[0]);
         return EXIT_SUCCESS;
     } else if (argc == 3) {
         /* check for valid flags and rate */
