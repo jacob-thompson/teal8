@@ -2,8 +2,10 @@
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
+![GitHub Issues or Pull Requests](https://img.shields.io/github/issues-pr/jacob-thompson/teal8)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/jacob-thompson/teal8)
 [![MIT License][license-shield]][license-url]
-![CII Best Practices](https://img.shields.io/cii/summary/jacob-thompson/teal8.svg?style=flat)
+
 
 <br />
 <div align="center">
