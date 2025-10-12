@@ -1,13 +1,8 @@
-[contributors-shield]: https://img.shields.io/github/contributors/jacob-thompson/teal8.svg?style=flat
-[contributors-url]: https://github.com/jacob-thompson/teal8/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/jacob-thompson/teal8.svg?style=flat
-[forks-url]: https://github.com/jacob-thompson/teal8/network/members
-[stars-shield]: https://img.shields.io/github/stars/jacob-thompson/teal8.svg?style=flat
-[stars-url]: https://github.com/jacob-thompson/teal8/stargazers
-[issues-shield]: https://img.shields.io/github/issues/jacob-thompson/teal8.svg?style=flat
-[issues-url]: https://github.com/jacob-thompson/teal8/issues
-[license-shield]: https://img.shields.io/github/license/jacob-thompson/teal8.svg?style=flat
-[license-url]: https://github.com/jacob-thompson/teal8/blob/main/LICENSE
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
 
 <br />
 <div align="center">
