@@ -1,3 +1,6 @@
+#ifndef FILE_H
+#define FILE_H
+
 #include <stdbool.h>
 #include <sys/stat.h>
 
@@ -66,3 +69,5 @@ bool isRomInDatabase(FILE *fp);
  * @return 0 if the file is valid, 1 otherwise
  */
 bool isFileValid(const char *filename, FILE *fp, struct stat *st);
+
+#endif /* FILE_H */

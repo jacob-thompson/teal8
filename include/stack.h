@@ -1,3 +1,6 @@
+#ifndef STACK_H
+#define STACK_H
+
 #include <stdint.h>
 
 #define STACK_SIZE 16
@@ -27,3 +30,5 @@ void stackPush(stack *stack, unsigned short *value);
  * @param poppedValue value to store popped address
  */
 void stackPop(stack *stack, unsigned short *poppedValue);
+
+#endif /* STACK_H */

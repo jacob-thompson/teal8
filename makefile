@@ -29,7 +29,7 @@ OUT = bin/teal8
 
 .PHONY: clean test
 
-$(BDIR)/%.o: src/%.c $(DEPS) clean
+$(BDIR)/%.o: src/%.c $(DEPS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(OUT): $(OBJ)

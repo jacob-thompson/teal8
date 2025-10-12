@@ -1,3 +1,6 @@
+#ifndef DISPLAY_H
+#define DISPLAY_H
+
 #include <stdbool.h>
 
 #define KEY_COUNT 16
@@ -73,3 +76,5 @@ int drawPixels(display *display);
  * @param keys the keys to be cleared
 */
 void clearKeys(bool *keys);
+
+#endif /* DISPLAY_H */

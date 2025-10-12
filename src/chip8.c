@@ -29,6 +29,14 @@ int main(int argc, char **argv)
         /* check for valid flags and rate */
         if (isNumber(argv[2])) {
             rate = atoi(argv[2]);
+            if (rate <= 0) {
+                SDL_LogError(
+                    SDL_LOG_CATEGORY_APPLICATION,
+                    "invalid instruction rate: %d (must be > 0)\n",
+                    rate
+                );
+                return EXIT_FAILURE;
+            }
         } else if (strcmp("-m", argv[2]) == 0 || strcmp("--mute", argv[2]) == 0) {
             mute = true;
         } else if (strcmp("-f", argv[2]) == 0 || strcmp("--force", argv[2]) == 0) {
@@ -46,10 +54,26 @@ int main(int argc, char **argv)
         if (isNumber(argv[2]) &&
             (strcmp("-m", argv[3]) == 0 || strcmp("--mute", argv[3]) == 0)) {
             rate = atoi(argv[2]);
+            if (rate <= 0) {
+                SDL_LogError(
+                    SDL_LOG_CATEGORY_APPLICATION,
+                    "invalid instruction rate: %d (must be > 0)\n",
+                    rate
+                );
+                return EXIT_FAILURE;
+            }
             mute = true;
         } else if (isNumber(argv[2]) &&
                   (strcmp("-f", argv[3]) == 0 || strcmp("--force", argv[3]) == 0)) {
             rate = atoi(argv[2]);
+            if (rate <= 0) {
+                SDL_LogError(
+                    SDL_LOG_CATEGORY_APPLICATION,
+                    "invalid instruction rate: %d (must be > 0)\n",
+                    rate
+                );
+                return EXIT_FAILURE;
+            }
             force = true;
         } else if ((strcmp("-m", argv[2]) == 0 || strcmp("--mute", argv[2]) == 0) &&
                    (strcmp("-f", argv[3]) == 0 || strcmp("--force", argv[3]) == 0)) {
@@ -73,12 +97,28 @@ int main(int argc, char **argv)
           ((strcmp("-m", argv[3]) == 0 || strcmp("--mute", argv[3]) == 0) &&
            (strcmp("-f", argv[4]) == 0 || strcmp("--force", argv[4]) == 0))) {
             rate = atoi(argv[2]);
+            if (rate <= 0) {
+                SDL_LogError(
+                    SDL_LOG_CATEGORY_APPLICATION,
+                    "invalid instruction rate: %d (must be > 0)\n",
+                    rate
+                );
+                return EXIT_FAILURE;
+            }
             mute = true;
             force = true;
         } else if (isNumber(argv[2]) &&
                  ((strcmp("-f", argv[3]) == 0 || strcmp("--force", argv[3]) == 0) &&
                   (strcmp("-m", argv[4]) == 0 || strcmp("--mute", argv[4]) == 0))) {
             rate = atoi(argv[2]);
+            if (rate <= 0) {
+                SDL_LogError(
+                    SDL_LOG_CATEGORY_APPLICATION,
+                    "invalid instruction rate: %d (must be > 0)\n",
+                    rate
+                );
+                return EXIT_FAILURE;
+            }
             mute = true;
             force = true;
         } else {
@@ -96,8 +136,17 @@ int main(int argc, char **argv)
     struct stat st;
 
     if (!force && !isFileValid(argv[1], rom, &st)) {
+        if (rom != NULL) fclose(rom);
         return EXIT_FAILURE; // error has already been logged
     } else if (force) {
+        if (rom == NULL) {
+            SDL_LogError(
+                SDL_LOG_CATEGORY_APPLICATION,
+                "failed to open ROM file: %s\n",
+                argv[1]
+            );
+            return EXIT_FAILURE;
+        }
         SDL_LogDebug(
             SDL_LOG_CATEGORY_APPLICATION,
             "force loading %s\n",
@@ -172,7 +221,11 @@ int main(int argc, char **argv)
                 handleEvent(&chip8.display, &event);
 
             if (chip8.display.reset) {
-                initializeEmulator(&chip8, getRom(argv[1]));
+                FILE *resetRom = getRom(argv[1]);
+                if (resetRom != NULL) {
+                    initializeEmulator(&chip8, resetRom);
+                    fclose(resetRom);
+                }
                 resetDisplay(&chip8.display);
                 chip8.display.reset = false;
                 nextInstructionTime = SDL_GetTicks();
@@ -219,7 +272,11 @@ int main(int argc, char **argv)
             handleEvent(&chip8.display, &event);
 
         if (chip8.display.reset) {
-            initializeEmulator(&chip8, getRom(argv[1]));
+            FILE *resetRom = getRom(argv[1]);
+            if (resetRom != NULL) {
+                initializeEmulator(&chip8, resetRom);
+                fclose(resetRom);
+            }
             resetDisplay(&chip8.display);
             chip8.display.reset = false;
             nextInstructionTime = SDL_GetTicks();

@@ -1,3 +1,6 @@
+#ifndef AUDIO_H
+#define AUDIO_H
+
 #include <stdbool.h>
 
 #include <SDL.h>
@@ -29,3 +32,5 @@ void audioCallback(void *userdata, Uint8 *stream, int len);
  * @return 0 on success, -1 on failure
  */
 int initAudio(audio *audio);
+
+#endif /* AUDIO_H */

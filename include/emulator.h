@@ -1,3 +1,6 @@
+#ifndef EMULATOR_H
+#define EMULATOR_H
+
 #include "../include/audio.h"
 #include "../include/display.h"
 #include "../include/stack.h"
@@ -6,10 +9,10 @@
 #define VERSION "1.0.0"
 
 #define MEMORY_IN_BYTES 4096
-#define FONT_IN_BYTES 80
 
 #define FONT_START_ADDRESS 0x000
-#define FONT_END_ADDRESS 0x1FF
+#define FONT_BYTES 0x50
+
 #define PROGRAM_START_ADDRESS 0x200
 
 #define DEFAULT_INSTRUCTION_RATE 1000
@@ -116,3 +119,5 @@ uint16_t fetchOpcode(emulator *chip8);
  * @param opcode the opcode
  */
 void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode);
+
+#endif /* EMULATOR_H */
