@@ -7,7 +7,6 @@
 #define SAMPLE_RATE 44100 // samples per second
 #define BUFFER_SIZE 512 // audio buffer size
 
-/* Audio structure to hold audio state */
 typedef struct audio {
     SDL_AudioDeviceID deviceId;
     SDL_AudioSpec spec;

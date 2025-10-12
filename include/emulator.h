@@ -21,11 +21,7 @@
 #define CHIP8 100
 #define SCHIP 101
 
-/*
- * The emulator struct.
- * This struct contains the memory, registers, index register, program counter, timers, stack, and display.
- */
-typedef struct {
+typedef struct emulator {
     uint8_t memory[MEMORY_IN_BYTES]; // 4KB memory
     uint8_t v[REGISTERS]; // 16 8-bit registers
     uint8_t specType; // chip8 or schip
@@ -55,7 +51,8 @@ void printUsage(const char *programName, SDL_LogPriority priority);
 /*
  * Check if a string is a number.
  * @param num the string to check
- * @return true if the string is a number, false otherwise
+ * @return true if the string is a number
+ * @return false if the string is not a number
  */
 bool isNumber(const char num[]);
 
@@ -64,8 +61,6 @@ bool isNumber(const char num[]);
  * @param rom the rom file
  * @return the rom file
  * @return NULL if the rom file could not be opened
- * @return NULL if the rom file is NULL
- * @return NULL if the rom file is not a valid chip8 rom
  */
 FILE *getRom(const char *rom);
 
@@ -87,6 +82,7 @@ void writeRomToMemory(emulator *chip8, FILE *rom);
 /*
  * Initialize the emulator.
  * @param chip8 the emulator
+ * @param rom the rom file
  */
 void initializeEmulator(emulator *chip8, FILE *rom);
 

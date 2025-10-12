@@ -11,10 +11,6 @@
 #define SCHIP_WIDTH 128
 #define SCHIP_HEIGHT 64
 
-/*
- * The display struct.
- * Contains the SDL window, renderer, and the pixels to be drawn.
- */
 typedef struct display {
     SDL_Window *window;
     SDL_Renderer *renderer;

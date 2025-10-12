@@ -8,7 +8,7 @@
 #define SHA1_BLOCK_SIZE 20
 #define SHA1_HASH_SIZE 41
 
-/* Struct to hold data for curl callback */
+/* MemoryStruct holds data for curl callback */
 struct MemoryStruct {
     char *memory;
     size_t size;
@@ -29,6 +29,8 @@ static size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, voi
  * @param handle CURL handle
  * @param chunk pointer to MemoryStruct to hold the data
  * @param url URL to fetch data from
+ * @return 0 on success
+ * @return 1 on failure
  */
 int pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url);
 
@@ -49,14 +51,16 @@ void printRomInfo(cJSON *romInfo, cJSON *romHash);
 /*
  * Check if a ROM file is in the database
  * @param fp file pointer to the ROM file
- * @return true if the ROM is in the database, false otherwise
+ * @return true if the ROM is in the database
+ * @return false if the ROM is not in the database
  */
 bool isRomInDatabase(FILE *fp);
 
 /*
  * Check if a file is valid.
- * A file is valid if it exists and is not a directory.
+ * A file is valid if it exists and is in the database.
  * Handles logging of errors.
+ * @param filename the name of the file
  * @param fp the file pointer
  * @param st the stat struct
  * @return 0 if the file is valid, 1 otherwise
