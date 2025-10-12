@@ -1,6 +1,32 @@
-# teal8
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![Pull Requests][pulls-shield]][pulls-url]
+[![GitHub Created At][created-shield]][created-url]
+[![GitHub Code Size][size-shield]][size-url]
+[![MIT License][license-shield]][license-url]
 
+
+<br />
+<div align="center">
+
+<a href="https://github.com/jacob-thompson/teal8">
+<img src="resources/logo.png" alt="Logo">
+</a>
+
+<h1 align="center">teal8</h3>
+
+<p align="center">
 CHIP-8 interpreter written in pure C.
+<br />
+</p>
+
+</div>
+
+## about 
+
+![screenshot](resources/screenshot.png)
 
 ## prerequisites
 
@@ -87,3 +113,20 @@ teal8 --help
 - [tobiasvl](https://tobiasvl.github.io/blog/write-a-chip-8-emulator/)
 - [Timendus](https://github.com/Timendus/chip8-test-suite)
 - [johnearnest](https://johnearnest.github.io/chip8Archive/)
+
+[contributors-shield]: https://img.shields.io/github/contributors/jacob-thompson/teal8.svg?style=flat
+[contributors-url]: https://github.com/jacob-thompson/teal8/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/jacob-thompson/teal8.svg?style=flat
+[forks-url]: https://github.com/jacob-thompson/teal8/network/members
+[stars-shield]: https://img.shields.io/github/stars/jacob-thompson/teal8.svg?style=flat
+[stars-url]: https://github.com/jacob-thompson/teal8/stargazers
+[issues-shield]: https://img.shields.io/github/issues/jacob-thompson/teal8.svg?style=flat
+[issues-url]: https://github.com/jacob-thompson/teal8/issues
+[pulls-shield]: https://img.shields.io/github/issues-pr/jacob-thompson/teal8
+[pulls-url]: https://github.com/jacob-thompson/teal8/pulls
+[created-shield]: https://img.shields.io/github/created-at/jacob-thompson/teal8
+[created-url]: https://github.com/jacob-thompson/teal8
+[size-shield]: https://img.shields.io/github/languages/code-size/jacob-thompson/teal8
+[size-url]: https://github.com/jacob-thompson/teal8
+[license-shield]: https://img.shields.io/github/license/jacob-thompson/teal8.svg?style=flat
+[license-url]: LICENSE
