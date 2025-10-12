@@ -39,7 +39,7 @@ The `teal8` binary will be in `bin/`.
 
 ## usage
 
-You can add the program to your PATH:
+You can add the program binary to your PATH:
 
 ```bash
 export PATH="path/to/teal8/bin:$PATH"
@@ -48,7 +48,7 @@ export PATH="path/to/teal8/bin:$PATH"
 Run the program:
 
 ```bash
-teal8 <rom> <rate=1000> <flags>
+teal8 <rom> [rate] [flags]
 ```
 
 You can omit the rom's file extension:
@@ -58,17 +58,15 @@ teal8 roms/spockpaperscissors
 ```
 
 > [!NOTE]
-> - `<rom>` is the path to the ROM file
-> - `<rate>` is the amount of instructions to execute per second (default: 1000)
-> - `<flags>` are optional flags (see below)
+> - `rom` is the path to the ROM file
+> - `rate` is the amount of instructions to execute per second (default: 1000)
+> - `flags` are optional flags (see below)
 
 The following flags are available:
 
 ```
 --mute (-m)        Mute sound
 --force (-f)       Force run ROM even if not recognized
---help (-h)        Show help message
---version (-v)     Show version
 ```
 
 ## controls
@@ -80,6 +78,12 @@ The controls are mapped to the following keys:
 Q W E R
 A S D F
 Z X C V
+```
+
+## help
+
+```bash
+teal8 --help
 ```
 
 ## special thanks
