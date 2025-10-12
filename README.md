@@ -1,4 +1,4 @@
-# chip-8
+# teal8
 
 CHIP-8 interpreter written in pure C.
 

@@ -31,7 +31,7 @@ BDIR = build
 _OBJ = emulator.o cJSON.o file.o display.o audio.o stack.o chip8.o
 OBJ = $(patsubst %, $(BDIR)/%, $(_OBJ))
 
-OUT = bin/chip8
+OUT = bin/teal8
 
 .PHONY: clean run test
 
