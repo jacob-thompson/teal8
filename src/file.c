@@ -311,6 +311,10 @@ bool isFileValid(const char *filename, FILE *fp, struct stat *st)
             "%s not found in database\n",
             filename
         );
+        SDL_LogInfo(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "pass -f to force load ROM\n"
+        );
         return false;
     }
 
