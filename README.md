@@ -12,7 +12,7 @@
 <div align="center">
 
 <a href="https://github.com/jacob-thompson/teal8">
-<img src="resources/logo.png" alt="Logo">
+<img src="resources/logo.png" alt="Logo" width=460 height=80>
 </a>
 
 <h1 align="center">teal8</h3>
