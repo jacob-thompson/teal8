@@ -3,7 +3,7 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
-![CII Best Practices](https://img.shields.io/cii/summary/jacob-thompson%2Fteal8)
+![CII Best Practices](https://img.shields.io/cii/summary/jacob-thompson/teal8.svg?style=flat)
 
 <br />
 <div align="center">
