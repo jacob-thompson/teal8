@@ -74,7 +74,7 @@ int initDisplay(display *display)
     }
 
     display->window = SDL_CreateWindow(
-        "CHIP-8",
+        "teal8",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         CHIP8_WIDTH * SCALE,
