@@ -53,13 +53,13 @@ FILE *getRom(const char *rom)
      */
     char *filename = malloc(sizeof(char) * strlen(rom) + 4);
 
-    FILE *rom_file = NULL; // file to be returned
+    FILE *romFile = NULL; // file to be returned
 
     sprintf(filename, "%s", rom);
-    rom_file = fopen(filename, "rb");
-    if (rom_file != NULL) {
+    romFile = fopen(filename, "rb");
+    if (romFile != NULL) {
         free(filename);
-        return rom_file;
+        return romFile;
     }
 
     /*
@@ -67,15 +67,15 @@ FILE *getRom(const char *rom)
      * so try appending the file extension
      */
     sprintf(filename, "%s.ch8", rom);
-    rom_file = fopen(filename, "rb");
-    if (rom_file != NULL) {
+    romFile = fopen(filename, "rb");
+    if (romFile != NULL) {
         free(filename);
-        return rom_file;
+        return romFile;
     }
 
     /* nothing worked */
     free(filename);
-    return rom_file; // null
+    return romFile; // null
 }
 
 void writeFontToMemory(unsigned char *memory)

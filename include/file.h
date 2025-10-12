@@ -40,11 +40,11 @@ int pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url);
 char *getHash(FILE *fp);
 
 /*
- * Print program information from a cJSON object
- * @param program_info cJSON object containing program information
+ * Print ROM information from a cJSON object
+ * @param romInfo cJSON object containing program information
  * @param romHash cJSON object containing ROM hash information
  */
-void printProgramInfo(cJSON *program_info, cJSON *romHash);
+void printRomInfo(cJSON *romInfo, cJSON *romHash);
 
 /*
  * Check if a ROM file is in the database

@@ -104,23 +104,23 @@ char *getHash(FILE *fp)
     return hashString;
 }
 
-void printProgramInfo(cJSON *program_info, cJSON *romHash)
+void printRomInfo(cJSON *romInfo, cJSON *romHash)
 {
     SDL_LogDebug(
         SDL_LOG_CATEGORY_APPLICATION,
         "Program info: %s\n",
-        cJSON_Print(program_info)
+        cJSON_Print(romInfo)
     );
 
-    cJSON *title = cJSON_GetObjectItemCaseSensitive(program_info, "title");
-    cJSON *release = cJSON_GetObjectItemCaseSensitive(program_info, "release");
+    cJSON *title = cJSON_GetObjectItemCaseSensitive(romInfo, "title");
+    cJSON *release = cJSON_GetObjectItemCaseSensitive(romInfo, "release");
     SDL_LogInfo(
         SDL_LOG_CATEGORY_APPLICATION,
         "Title: %s (%s)\n",
         title ? title->valuestring : "Title Unknown",
         release ? release->valuestring : "Release Date Unknown"
     );
-    cJSON_ArrayForEach(romHash, cJSON_GetObjectItemCaseSensitive(program_info, "authors")) {
+    cJSON_ArrayForEach(romHash, cJSON_GetObjectItemCaseSensitive(romInfo, "authors")) {
         if (cJSON_IsString(romHash) && (romHash->valuestring != NULL)) {
             SDL_LogInfo(
                 SDL_LOG_CATEGORY_APPLICATION,
@@ -129,7 +129,7 @@ void printProgramInfo(cJSON *program_info, cJSON *romHash)
             );
         }
     }
-    cJSON *description = cJSON_GetObjectItemCaseSensitive(program_info, "description");
+    cJSON *description = cJSON_GetObjectItemCaseSensitive(romInfo, "description");
     SDL_LogInfo(
         SDL_LOG_CATEGORY_APPLICATION,
         "Description: %s\n",
@@ -150,10 +150,10 @@ bool isRomInDatabase(FILE *fp)
     infoChunk.size = 0;
 
     curl_global_init(CURL_GLOBAL_ALL);
-    CURL *curl_handle;
-    curl_handle = curl_easy_init();
+    CURL *curlHandle;
+    curlHandle = curl_easy_init();
 
-    if (curl_handle == NULL) {
+    if (curlHandle == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to initialize curl\n"
@@ -163,11 +163,11 @@ bool isRomInDatabase(FILE *fp)
 
     /* pull the SHA1 hash database */
     if (pullDatabase(
-        curl_handle,
+        curlHandle,
         &hashChunk,
         "https://raw.githubusercontent.com/chip-8/chip-8-database/refs/heads/master/database/sha1-hashes.json"
     ) != 0) {
-        curl_easy_cleanup(curl_handle);
+        curl_easy_cleanup(curlHandle);
         return false;
     }
 
@@ -181,7 +181,7 @@ bool isRomInDatabase(FILE *fp)
                 error_ptr
             );
         }
-        curl_easy_cleanup(curl_handle);
+        curl_easy_cleanup(curlHandle);
         return false;
     }
 
@@ -193,7 +193,7 @@ bool isRomInDatabase(FILE *fp)
             "failed to print json\n"
         );
         cJSON_Delete(hashJson);
-        curl_easy_cleanup(curl_handle);
+        curl_easy_cleanup(curlHandle);
         return false;
     }
     SDL_LogDebug(
@@ -221,7 +221,7 @@ bool isRomInDatabase(FILE *fp)
         free(hashString);
         free(hashChunk.memory);
         cJSON_Delete(hashJson);
-        curl_easy_cleanup(curl_handle);
+        curl_easy_cleanup(curlHandle);
         return false;
     } else {
         SDL_LogDebug(
@@ -233,7 +233,7 @@ bool isRomInDatabase(FILE *fp)
 
     /* pull the program info database */
     if (pullDatabase(
-        curl_handle,
+        curlHandle,
         &infoChunk,
         "https://raw.githubusercontent.com/chip-8/chip-8-database/refs/heads/master/database/programs.json"
     ) != 0) {
@@ -244,7 +244,7 @@ bool isRomInDatabase(FILE *fp)
         free(hashString);
         free(hashChunk.memory);
         cJSON_Delete(hashJson);
-        curl_easy_cleanup(curl_handle);
+        curl_easy_cleanup(curlHandle);
         return false;
     }
 
@@ -261,7 +261,7 @@ bool isRomInDatabase(FILE *fp)
         free(hashString);
         free(hashChunk.memory);
         cJSON_Delete(hashJson);
-        curl_easy_cleanup(curl_handle);
+        curl_easy_cleanup(curlHandle);
         return false;
     }
 
@@ -271,16 +271,16 @@ bool isRomInDatabase(FILE *fp)
         (unsigned long)infoChunk.size
     );
 
-    /* get program info using the index found earlier */
+    /* get ROM info using the index found earlier */
     int index = romHash->valueint;
-    cJSON *program_info = cJSON_GetArrayItem(infoJson, index);
-    if (program_info == NULL) {
+    cJSON *romInfo = cJSON_GetArrayItem(infoJson, index);
+    if (romInfo == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to retrieve program info from database\n"
         );
     } else {
-        printProgramInfo(program_info, romHash);
+        printRomInfo(romInfo, romHash);
     }
 
     /* cleanup */
@@ -289,7 +289,7 @@ bool isRomInDatabase(FILE *fp)
     free(infoChunk.memory);
     cJSON_Delete(hashJson);
     cJSON_Delete(infoJson);
-    curl_easy_cleanup(curl_handle);
+    curl_easy_cleanup(curlHandle);
 
     return true;
 }
