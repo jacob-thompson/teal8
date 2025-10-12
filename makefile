@@ -30,11 +30,9 @@ OUT = bin/teal8
 .PHONY: clean test
 
 $(BDIR)/%.o: src/%.c $(DEPS)
-	@mkdir -p $(BDIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(OUT): $(OBJ)
-	@mkdir -p bin
 	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 test:
