@@ -28,6 +28,8 @@ CHIP-8 interpreter written in pure C.
 
 ![screenshot](resources/screenshot.png)
 
+CHIP-8 is a simple, interpreted programming language developed in the 1970s. Due to its simplicity, CHIP-8 has become a popular choice for learning about emulation and low-level programming.
+
 ## prerequisites
 
 * [make](https://www.gnu.org/software/make/) is used for compilation.
