@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include "../include/stack.h"
 
 int stacked(stack *stack)
