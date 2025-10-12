@@ -30,36 +30,46 @@ sudo pacman -S make sdl2 curl openssl
 ## compile
 
 ```bash
-git clone https://github.com/jacob-thompson/chip-8.git
-cd chip-8
+git clone https://github.com/jacob-thompson/teal8.git
+cd teal8
 make
 ```
 
-The `chip8` binary will be in `bin/`.
+The `teal8` binary will be in `bin/`.
 
 ## usage
 
 You can add the program to your PATH:
 
 ```bash
-export PATH="path/to/chip-8/bin:$PATH"
+export PATH="path/to/teal8/bin:$PATH"
 ```
 
 Run the program:
 
 ```bash
-chip8 <rom> <rate=1000>
+teal8 <rom> <rate=1000> <flags>
 ```
 
 You can omit the rom's file extension:
 
 ```bash
-chip8 roms/spockpaperscissors
+teal8 roms/spockpaperscissors
 ```
 
 > [!NOTE]
 > - `<rom>` is the path to the ROM file
 > - `<rate>` is the amount of instructions to execute per second (default: 1000)
+> - `<flags>` are optional flags (see below)
+
+The following flags are available:
+
+```
+--mute (-m)        Mute sound
+--force (-f)       Force run ROM even if not recognized
+--help (-h)        Show help message
+--version (-v)     Show version
+```
 
 ## controls
 

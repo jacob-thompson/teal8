@@ -11,10 +11,10 @@
 #define SCHIP_WIDTH 128
 #define SCHIP_HEIGHT 64
 
-/**
-    * The display struct.
-    * Contains the SDL window, renderer, and the pixels to be drawn.
-*/
+/*
+ * The display struct.
+ * Contains the SDL window, renderer, and the pixels to be drawn.
+ */
 typedef struct display {
     SDL_Window *window;
     SDL_Renderer *renderer;
@@ -32,48 +32,48 @@ typedef struct display {
     bool dirty;      // track if display needs redraw
 } display;
 
-/**
-    * Clear the pixels of the display.
-    * @param display the display
-*/
+/*
+ * Clear the pixels of the display.
+ * @param display the display
+ */
 void resetDisplay(display *display);
 
-/**
-    * Create the pixels of the display.
-    * @param display the display
-*/
+/*
+ * Create the pixels of the display.
+ * @param display the display
+ */
 void createPixels(display *display);
 
-/**
-    * Initialize the display.
-    * @param display the display
-    * @return 0 on success, 1 on failure
-*/
+/*
+ * Initialize the display.
+ * @param display the display
+ * @return 0 on success, 1 on failure
+ */
 int initDisplay(display *display);
 
-/**
-    * Handle an event.
-    * @param display the display
-    * @param event the event
-*/
+/*
+ * Handle an event.
+ * @param display the display
+ * @param event the event
+ */
 void handleEvent(display *display, SDL_Event *event);
 
-/**
-    * Draw the background of the display.
-    * @param display the display
-    * @return 0 on success, 1 on failure
-*/
+/*
+ * Draw the background of the display.
+ * @param display the display
+ * @return 0 on success, 1 on failure
+ */
 int drawBackground(display *display);
 
-/**
-    * Draw the pixels of the display.
-    * @param display the display
-    * @return 0 on success, 1 on failure
-*/
+/*
+ * Draw the pixels of the display.
+ * @param display the display
+ * @return 0 on success, 1 on failure
+ */
 int drawPixels(display *display);
 
-/**
-    * Clear keypress events.
-    * @param keys the keys to be cleared
+/*
+ * Clear keypress events.
+ * @param keys the keys to be cleared
 */
 void clearKeys(bool *keys);

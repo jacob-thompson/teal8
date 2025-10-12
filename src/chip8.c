@@ -1,6 +1,8 @@
 #include "../include/emulator.h"
 #include "../include/file.h"
 
+#define VERSION "1.0.0"
+
 int main(int argc, char **argv)
 {
     srand(time(NULL));
@@ -8,63 +10,168 @@ int main(int argc, char **argv)
     //SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
 
     uint16_t rate = DEFAULT_INSTRUCTION_RATE;
-    bool mute = false;
-    if (argc < 2 || argc > 4) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "usage: %s <rom> <rate>\n", argv[0]);
+    bool mute = false; // mute audio (-m or --mute)
+    bool force = false; // force load rom regardless of validity (-f or --force)
+
+    /* args */
+    if (argc < 2 || argc > 5) {
+        usage(argv[0], SDL_LOG_PRIORITY_ERROR);
         return EXIT_FAILURE;
-    } else if (argc == 3 && isNumber(argv[2])) {
-        rate = atoi(argv[2]);
-    } else if (argc == 3 && !isNumber(argv[2])) {
-        if (strcmp("-m", argv[2]) == 0 || strcmp("--mute", argv[2]) == 0) {
+    } else if (argc == 2 &&
+              (strcmp("-h", argv[1]) == 0 ||
+               strcmp("--help", argv[1]) == 0)) {
+        usage(argv[0], SDL_LOG_PRIORITY_INFO);
+        return EXIT_SUCCESS;
+    } else if (argc == 2 &&
+              (strcmp("-v", argv[1]) == 0 ||
+               strcmp("--version", argv[1]) == 0)) {
+        SDL_LogInfo(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "%s version %s\n",
+            argv[0],
+            VERSION
+        );
+        return EXIT_SUCCESS;
+    } else if (argc == 3) {
+        /* check for valid flags and rate */
+        if (isNumber(argv[2])) {
+            rate = atoi(argv[2]);
+        } else if (strcmp("-m", argv[2]) == 0 || strcmp("--mute", argv[2]) == 0) {
             mute = true;
+        } else if (strcmp("-f", argv[2]) == 0 || strcmp("--force", argv[2]) == 0) {
+            force = true;
+        } else {
+            SDL_LogError(
+                SDL_LOG_CATEGORY_APPLICATION,
+                "invalid argument: %s\n",
+                argv[2]
+            );
+            return EXIT_FAILURE;
         }
     } else if (argc == 4) {
-        if (strcmp("-m", argv[3]) == 0 || strcmp("--mute", argv[3]) == 0) {
+        /* check for valid flags and rate */
+        if (isNumber(argv[2]) &&
+            (strcmp("-m", argv[3]) == 0 || strcmp("--mute", argv[3]) == 0)) {
+            rate = atoi(argv[2]);
             mute = true;
+        } else if (isNumber(argv[2]) &&
+                  (strcmp("-f", argv[3]) == 0 || strcmp("--force", argv[3]) == 0)) {
+            rate = atoi(argv[2]);
+            force = true;
+        } else if ((strcmp("-m", argv[2]) == 0 || strcmp("--mute", argv[2]) == 0) &&
+                   (strcmp("-f", argv[3]) == 0 || strcmp("--force", argv[3]) == 0)) {
+            mute = true;
+            force = true;
+        } else if ((strcmp("-f", argv[2]) == 0 || strcmp("--force", argv[2]) == 0) &&
+                   (strcmp("-m", argv[3]) == 0 || strcmp("--mute", argv[3]) == 0)) {
+            mute = true;
+            force = true;
+        } else {
+            SDL_LogError(
+                SDL_LOG_CATEGORY_APPLICATION,
+                "invalid arguments: %s %s\n",
+                argv[2],
+                argv[3]
+            );
+            return EXIT_FAILURE;
+        }
+    } else if (argc == 5) {
+        if (isNumber(argv[2]) &&
+          ((strcmp("-m", argv[3]) == 0 || strcmp("--mute", argv[3]) == 0) &&
+           (strcmp("-f", argv[4]) == 0 || strcmp("--force", argv[4]) == 0))) {
+            rate = atoi(argv[2]);
+            mute = true;
+            force = true;
+        } else if (isNumber(argv[2]) &&
+                 ((strcmp("-f", argv[3]) == 0 || strcmp("--force", argv[3]) == 0) &&
+                  (strcmp("-m", argv[4]) == 0 || strcmp("--mute", argv[4]) == 0))) {
+            rate = atoi(argv[2]);
+            mute = true;
+            force = true;
+        } else {
+            SDL_LogError(
+                SDL_LOG_CATEGORY_APPLICATION,
+                "invalid arguments: %s %s\n",
+                argv[3],
+                argv[4]
+            );
+            return EXIT_FAILURE;
         }
     }
-
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "opening %s\n", argv[1]);
 
     FILE *rom = getRom(argv[1]);
     struct stat st;
 
-    if (!isFileValid(argv[1], rom, &st)) {
+    if (!force && !isFileValid(argv[1], rom, &st)) {
         return EXIT_FAILURE; // error has already been logged
+    } else if (force) {
+        SDL_LogDebug(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "force loading %s\n",
+            argv[1]
+        );
+    } else {
+        SDL_LogDebug(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "loading %s\n",
+            argv[1]
+        );
     }
 
     emulator chip8;
     initializeEmulator(&chip8, rom);
     chip8.muted = mute;
+
+    if (chip8.muted) {
+        SDL_LogDebug(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "emulator initialized with %s audio\n",
+            chip8.muted ? "muted" : "unmuted"
+        );
+    }
+
     if (initDisplay(&chip8.display) != 0) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error creating SDL display: %s\n", SDL_GetError());
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "error creating SDL display: %s\n",
+            SDL_GetError()
+        );
         return EXIT_FAILURE;
     }
 
     if (!chip8.muted && initAudio(&chip8.sound) != 0) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error creating SDL audio: %s\n", SDL_GetError());
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "error creating SDL audio: %s\n",
+            SDL_GetError()
+        );
         return EXIT_FAILURE;
     }
 
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "running %s at %d IPS\n", argv[1], rate);
+    SDL_LogDebug(
+        SDL_LOG_CATEGORY_APPLICATION,
+        "running %s at %d IPS\n",
+        argv[1],
+        rate
+    );
 
     fclose(rom); // the rom is written to memory, so we can close it now
 
     uint32_t ticks;
     uint16_t opcode;
     uint16_t timerDelay = 1000 / TIMER_RATE;
-    double msPerInstruction = 1000.0 / rate;  // milliseconds per instruction
+    double msPerInstruction = 1000.0 / rate;
     double nextInstructionTime = SDL_GetTicks();
 
-    // main loop
+    /* main loop */
     while (chip8.display.poweredOn) {
 
-        // update timers
+        /* update timers */
         ticks = SDL_GetTicks();
 
-        // check if it is time to execute the next instruction
+        /* check if it is time to execute the next instruction */
         if ((double)ticks < nextInstructionTime) {
-            // not time yet, but still handle events
+            /* not time yet, but still handle events */
             clearKeys(chip8.display.keyUp);
 
             SDL_Event event;
@@ -81,24 +188,27 @@ int main(int argc, char **argv)
             continue;
         }
 
-        // schedule next instruction (accumulate fractional time for accuracy)
+        /* schedule next instruction */
         nextInstructionTime += msPerInstruction;
 
-        // update timers
+        /* update timers */
         if (ticks - chip8.timers.lastUpdate >= timerDelay) {
             if (chip8.timers.delay > 0) {
                 chip8.timers.delay--;
             }
             if (chip8.timers.sound > 0) {
-                SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "beep\n");
+                SDL_LogDebug(
+                    SDL_LOG_CATEGORY_APPLICATION,
+                    "beep\n"
+                );
                 if (!chip8.muted) {
-                    // start audio playback
+                    /* start audio playback */
                     chip8.sound.playing = true;
                     SDL_PauseAudioDevice(chip8.sound.deviceId, 0);
                 }
                 chip8.timers.sound--;
             } else if (chip8.sound.playing && !chip8.muted) {
-                // stop audio playback and reset phase
+                /* stop audio playback and reset phase */
                 chip8.sound.playing = false;
                 chip8.sound.phase = 0.0;
                 SDL_PauseAudioDevice(chip8.sound.deviceId, 1);
@@ -108,7 +218,7 @@ int main(int argc, char **argv)
             chip8.timers.lastUpdate = ticks;
         }
 
-        // handle events
+        /* handle events */
         clearKeys(chip8.display.keyUp);
 
         SDL_Event event;
@@ -123,42 +233,28 @@ int main(int argc, char **argv)
             continue;
         }
 
-        // fetch, decode, and execute opcode
+        /* fetch, decode, and execute opcode */
         opcode = fetchOpcode(&chip8);
+        chip8.pc += 2; // increment program counter
+        decodeAndExecuteOpcode(&chip8, opcode);
 
-        //printf("opcode: %04x\n", opcode);
-        //printf("v0: %02x\n", chip8.v[0]);
-        //printf("v1: %02x\n", chip8.v[1]);
-        //printf("v2: %02x\n", chip8.v[2]);
-        //printf("v3: %02x\n", chip8.v[3]);
-        //printf("v4: %02x\n", chip8.v[4]);
-        //printf("v5: %02x\n", chip8.v[5]);
-        //printf("v6: %02x\n", chip8.v[6]);
-        //printf("v7: %02x\n", chip8.v[7]);
-        //printf("v8: %02x\n", chip8.v[8]);
-        //printf("v9: %02x\n", chip8.v[9]);
-        //printf("va: %02x\n", chip8.v[10]);
-        //printf("vb: %02x\n", chip8.v[11]);
-        //printf("vc: %02x\n", chip8.v[12]);
-        //printf("vd: %02x\n", chip8.v[13]);
-        //printf("ve: %02x\n", chip8.v[14]);
-        //printf("vf: %02x\n", chip8.v[15]);
-        //printf("stacked values: %d\n", stacked(&chip8.stack));
-        //printf(" ------- \n");
-
-        chip8.pc += 2;
-
-        decodeOpcode(&chip8, opcode);
-
-        // draw the frame only if display has changed
+        /* draw the frame only if display has changed */
         if (chip8.display.dirty) {
             if (drawBackground(&chip8.display) != 0) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error drawing background: %s\n", SDL_GetError());
+                SDL_LogError(
+                    SDL_LOG_CATEGORY_APPLICATION,
+                    "error drawing background: %s\n",
+                    SDL_GetError()
+                );
                 return EXIT_FAILURE;
             }
 
             if (drawPixels(&chip8.display) != 0) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "error drawing pixels: %s\n", SDL_GetError());
+                SDL_LogError(
+                    SDL_LOG_CATEGORY_APPLICATION,
+                    "error drawing pixels: %s\n",
+                    SDL_GetError()
+                );
                 return EXIT_FAILURE;
             }
 
@@ -168,25 +264,37 @@ int main(int argc, char **argv)
 
     }
 
-    // cleanup
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "cleaning up\n");
+    /* cleanup */
+    SDL_LogDebug(
+        SDL_LOG_CATEGORY_APPLICATION,
+        "cleaning up\n"
+    );
 
     if (chip8.sound.poweredOn) {
-        SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "shutting down audio\n");
+        SDL_LogDebug(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "shutting down audio\n"
+        );
         if (chip8.sound.playing) {
-            // stop audio playback
+            /* stop audio playback */
             SDL_PauseAudioDevice(chip8.sound.deviceId, 1);
         }
         SDL_CloseAudioDevice(chip8.sound.deviceId);
     }
 
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "shutting down display\n");
+    SDL_LogDebug(
+        SDL_LOG_CATEGORY_APPLICATION,
+        "shutting down display\n"
+    );
     free(chip8.display.pixels);
     free(chip8.display.pixelDrawn);
     SDL_DestroyRenderer(chip8.display.renderer);
     SDL_DestroyWindow(chip8.display.window);
 
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "quitting SDL\n");
+    SDL_LogDebug(
+        SDL_LOG_CATEGORY_APPLICATION,
+        "quitting SDL\n"
+    );
     SDL_Quit();
 
     return EXIT_SUCCESS;

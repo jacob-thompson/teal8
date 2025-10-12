@@ -10,7 +10,7 @@ void audioCallback(void *userdata, Uint8 *stream, int len) {
     int sample_count = len / sizeof(Sint16);
 
     for (int i = 0; i < sample_count; ++i) {
-        // square wave for beep tone
+        /* square wave for beep tone */
         samples[i] = sin(aud->phase) > 0 ? AMPLITUDE : -AMPLITUDE;
         aud->phase += phase_inc;
         if (aud->phase >= 2.0 * M_PI) {

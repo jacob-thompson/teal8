@@ -19,10 +19,10 @@
 #define CHIP8 100
 #define SCHIP 101
 
-/**
-    * The emulator struct.
-    * This struct contains the memory, registers, index register, program counter, timers, stack, and display.
-*/
+/*
+ * The emulator struct.
+ * This struct contains the memory, registers, index register, program counter, timers, stack, and display.
+ */
 typedef struct {
     uint8_t memory[MEMORY_IN_BYTES]; // 4KB memory
     uint8_t v[REGISTERS]; // 16 8-bit registers
@@ -37,70 +37,76 @@ typedef struct {
     bool muted; // is the audio muted?
 } emulator;
 
-/**
-    * Check if a string is a number.
-    * @param num the string to check
-    * @return true if the string is a number, false otherwise
-*/
+/*
+ * Print the usage of the program.
+ * @param programName the name of the program
+ */
+void usage(const char *programName, SDL_LogPriority priority);
+
+/*
+ * Check if a string is a number.
+ * @param num the string to check
+ * @return true if the string is a number, false otherwise
+ */
 bool isNumber(const char num[]);
 
-/**
-    * Get the rom file.
-    * @param rom the rom file
-    * @return the rom file
-    * @return NULL if the rom file could not be opened
-    * @return NULL if the rom file is NULL
-    * @return NULL if the rom file is not a valid chip8 rom
-*/
+/*
+ * Get the rom file.
+ * @param rom the rom file
+ * @return the rom file
+ * @return NULL if the rom file could not be opened
+ * @return NULL if the rom file is NULL
+ * @return NULL if the rom file is not a valid chip8 rom
+ */
 FILE *getRom(const char *rom);
 
-/**
-    * Write the font to the memory of the emulator.
-    * font data is written into memory between 0x050 and 0x09F.
-    * @param memory the memory of the emulator
-*/
+/*
+ * Write the font to the memory of the emulator.
+ * font data is written into memory between 0x050 and 0x09F.
+ * @param memory the memory of the emulator
+ */
 void writeFontToMemory(unsigned char *memory);
 
-/**
-    * Write the rom to the memory of the emulator.
-    * The program counter is set to 0x200.
-    * @param chip8 the emulator
-    * @param rom the rom file
-*/
+/*
+ * Write the rom to the memory of the emulator.
+ * The program counter is set to 0x200.
+ * @param chip8 the emulator
+ * @param rom the rom file
+ */
 void writeRomToMemory(emulator *chip8, FILE *rom);
 
-/**
-    * Initialize the emulator.
-    * @param chip8 the emulator
-*/
+/*
+ * Initialize the emulator.
+ * @param chip8 the emulator
+ */
 void initializeEmulator(emulator *chip8, FILE *rom);
 
-/**
-    * Print the memory of the emulator.
-    * For debugging purposes.
-    * @param chip8 the emulator
-*/
+/*
+ * Print the memory of the emulator.
+ * For debugging purposes.
+ * @param chip8 the emulator
+ */
 void printMemory(emulator *chip8);
 
-/**
-    * Generate a random number between min and max.
-    * @param min the minimum number
-    * @param max the maximum number
-    * @return the random number
-*/
+/*
+ * Generate a random number between min and max.
+ * @param min the minimum number
+ * @param max the maximum number
+ * @return the random number
+ */
 int randomNumber(int min, int max);
 
-/**
-    * Fetch the opcode from the memory of the emulator.
-    * The opcode is 2 bytes long.
-    * @param chip8 the emulator
-    * @return the opcode
-*/
+/*
+ * Fetch the opcode from the memory of the emulator.
+ * The opcode is 2 bytes long.
+ * @param chip8 the emulator
+ * @return the opcode
+ */
 uint16_t fetchOpcode(emulator *chip8);
 
-/**
-    * Decode the opcode.
-    * @param chip8 the emulator
-    * @param opcode the opcode
-*/
-void decodeOpcode(emulator *chip8, unsigned short opcode);
+/*
+ * Decode the opcode.
+ * @param chip8 the emulator
+ * @param opcode the opcode
+ */
+void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode);

@@ -65,7 +65,11 @@ int initDisplay(display *display)
     else
         SDL_GetWindowSize(display->window, &display->width, &display->height);
 
-    display->renderer = SDL_CreateRenderer(display->window, -1, SDL_RENDERER_ACCELERATED);
+    display->renderer = SDL_CreateRenderer(
+        display->window,
+        -1,
+        SDL_RENDERER_ACCELERATED
+    );
     if (display->renderer == NULL)
         return EXIT_FAILURE;
 
@@ -86,7 +90,7 @@ int initDisplay(display *display)
 void handleEvent(display *display, SDL_Event *event)
 {
     switch (event->type) {
-        // handle key presses
+        /* handle key presses */
         case SDL_KEYUP:
             switch (event->key.keysym.scancode) {
                 case SDL_SCANCODE_ESCAPE:
@@ -219,7 +223,7 @@ void handleEvent(display *display, SDL_Event *event)
             }
             break;
 
-        // quit gracefully
+        /* quit gracefully */
         case SDL_QUIT:
             display->poweredOn = false;
     }
@@ -246,7 +250,10 @@ int drawPixels(display *display)
             if (
                 display->pixelDrawn[y * display->pixelWidth + x]
                 &&
-                SDL_RenderFillRect(display->renderer, &display->pixels[y * display->pixelWidth + x])
+                SDL_RenderFillRect(
+                    display->renderer,
+                    &display->pixels[y * display->pixelWidth + x]
+                )
                 !=
                 EXIT_SUCCESS
             )

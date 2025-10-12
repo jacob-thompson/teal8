@@ -1,9 +1,3 @@
-ifeq (run, $(firstword $(MAKECMDGOALS)))
-  # get arguments for `make run`
-  RUN_ARGS := $(wordlist 2, $(words $(MAKECMDGOALS)), $(MAKECMDGOALS))
-  $(eval $(RUN_ARGS):;@:)
-endif
-
 CC = cc
 
 CFLAGS = -Wall -Wno-unused-function
@@ -11,7 +5,7 @@ LDFLAGS =
 LDLIBS =
 
 SDL_CFLAGS = $(shell sdl2-config --cflags)
-SDL_LDFLAGS = $(shell sdl2-config --libs) # adjusts library path and links to SDL2
+SDL_LDFLAGS = $(shell sdl2-config --libs)
 
 CURL_CFLAGS = $(shell curl-config --cflags)
 CURL_LIBS = $(shell curl-config --libs)
@@ -33,16 +27,13 @@ OBJ = $(patsubst %, $(BDIR)/%, $(_OBJ))
 
 OUT = bin/teal8
 
-.PHONY: clean run test
+.PHONY: clean test
 
 $(BDIR)/%.o: src/%.c $(DEPS) clean
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(OUT): $(OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
-
-run:
-	./$(OUT) $(RUN_ARGS)
 
 test:
 	./$(OUT) roms/test/quirks
