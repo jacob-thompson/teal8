@@ -28,7 +28,7 @@ CHIP-8 interpreter written in pure C.
 
 ![screenshot](resources/screenshot.png)
 
-[CHIP-8](https://en.wikipedia.org/wiki/CHIP-8) is an interpreted programming language developed by Joseph Weisbecker in the 1970s. Due to its simplicity, CHIP-8 is a popular choice for learning about emulation and low-level programming.
+[CHIP-8](https://en.wikipedia.org/wiki/CHIP-8) is an interpreted programming language developed by Joseph Weisbecker. [teal8](https://jacob-thompson.github.io/portfolio/teal8/) is an interpreter for running CHIP-8 ROMs.
 
 ## prerequisites
 
