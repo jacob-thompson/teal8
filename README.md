@@ -1,3 +1,14 @@
+[contributors-shield]: https://img.shields.io/github/contributors/jacob-thompson/teal8.svg?style=flat
+[contributors-url]: https://github.com/jacob-thompson/teal8/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/jacob-thompson/teal8.svg?style=flat
+[forks-url]: https://github.com/jacob-thompson/teal8/network/members
+[stars-shield]: https://img.shields.io/github/stars/jacob-thompson/teal8.svg?style=flat
+[stars-url]: https://github.com/jacob-thompson/teal8/stargazers
+[issues-shield]: https://img.shields.io/github/issues/jacob-thompson/teal8.svg?style=flat
+[issues-url]: https://github.com/jacob-thompson/teal8/issues
+[license-shield]: https://img.shields.io/github/license/jacob-thompson/teal8.svg?style=flat
+[license-url]: https://github.com/jacob-thompson/teal8/blob/main/LICENSE
+
 <br />
 <div align="center">
 
@@ -103,3 +114,14 @@ teal8 --help
 - [tobiasvl](https://tobiasvl.github.io/blog/write-a-chip-8-emulator/)
 - [Timendus](https://github.com/Timendus/chip8-test-suite)
 - [johnearnest](https://johnearnest.github.io/chip8Archive/)
+
+[contributors-shield]: https://img.shields.io/github/contributors/jacob-thompson/teal8.svg?style=flat
+[contributors-url]: https://github.com/jacob-thompson/teal8/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/jacob-thompson/teal8.svg?style=flat
+[forks-url]: https://github.com/jacob-thompson/teal8/network/members
+[stars-shield]: https://img.shields.io/github/stars/jacob-thompson/teal8.svg?style=flat
+[stars-url]: https://github.com/jacob-thompson/teal8/stargazers
+[issues-shield]: https://img.shields.io/github/issues/jacob-thompson/teal8.svg?style=flat
+[issues-url]: https://github.com/jacob-thompson/teal8/issues
+[license-shield]: https://img.shields.io/github/license/jacob-thompson/teal8.svg?style=flat
+[license-url]: https://github.com/jacob-thompson/teal8/blob/main/LICENSE
