@@ -22,24 +22,11 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-      - name: Get previous tag
-        id: prev_tag
-        run: |
-          PREV_TAG=$(git tag --sort=-creatordate | grep -v "${GITHUB_REF_NAME}" | head -n 1)
-          echo "PREV_TAG=$PREV_TAG" >> $GITHUB_ENV
-
-      - name: Set release notes with commits since last tag
+      - name: Set release notes
         id: set-notes
         run: |
-          VERSION="${GITHUB_REF_NAME}"
-          PREV="${PREV_TAG}"
-          if [ -z "$PREV" ]; then
-          BODY=$(git log --pretty=format:"- %s (%h)" --no-merges)
-          else
-          BODY=$(git log "$PREV"..HEAD --pretty=format:"- %s (%h)" --no-merges)
-          fi
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "RELEASE_NOTES=Release $VERSION\n\nCommits since $PREV:\n$BODY" >> $GITHUB_ENV
+          echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "RELEASE_NOTES=Release ${{ github.ref_name }}" >> $GITHUB_ENV
 
       - name: Push release
         id: push-release
