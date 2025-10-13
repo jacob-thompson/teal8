@@ -2,8 +2,6 @@ name: Create Release
 
 on:
   push:
-    branches:
-      - main
     tags:
       - '*.*.0'
 
@@ -25,11 +23,9 @@ jobs:
 
       - name: Set release notes
         id: set-notes
-        shell: bash
         run: |
-          VERSION=${GITHUB_REF#refs/tags/}
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "RELEASE_NOTES=Release $VERSION" >> $GITHUB_ENV
+          echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "RELEASE_NOTES=Release ${{ github.ref_name }}" >> $GITHUB_ENV
 
       - name: Push release
         id: push-release
