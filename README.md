@@ -34,25 +34,26 @@ CHIP-8 interpreter written in pure C.
 
 * [make](https://www.gnu.org/software/make/) is used for compilation.
 * [SDL2](https://www.libsdl.org/) is used to render the graphics and handle the input.
+* [SDL2_image](https://wiki.libsdl.org/SDL2_image/FrontPage) is used to set window properties.
 * [curl](https://curl.se/) is used to pull data about ROMs from the [chip-8-database](https://github.com/chip-8/chip-8-database).
 * [openSSL](https://www.openssl.org/) is used to get SHA1 hashes of ROMs.
 
 #### macOS
 
 ```bash
-brew install make sdl2 curl openssl
+brew install make sdl2 sdl2_image curl openssl
 ```
 
 #### Ubuntu
 
 ```bash
-sudo apt-get install make libsdl2-dev libcurl4-openssl-dev libssl-dev
+sudo apt-get install make libsdl2-dev libsdl2-image-dev libcurl4-openssl-dev libssl-dev
 ```
 
 #### Arch Linux
 
 ```bash
-sudo pacman -S make sdl2 curl openssl
+sudo pacman -S make sdl2 sdl2_image curl openssl
 ```
 
 ## compile

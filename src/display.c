@@ -60,7 +60,7 @@ void createPixels(display *display)
     }
 }
 
-int initDisplay(display *display)
+int initDisplay(display *display, const char *iconPath)
 {
     if (
         SDL_InitSubSystem(
@@ -73,6 +73,15 @@ int initDisplay(display *display)
         return EXIT_FAILURE;
     }
 
+    if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to initialize SDL_image: %s\n",
+            IMG_GetError()
+        );
+        return EXIT_FAILURE;
+    }
+
     display->window = SDL_CreateWindow(
         "teal8",
         SDL_WINDOWPOS_CENTERED,
@@ -81,18 +90,45 @@ int initDisplay(display *display)
         CHIP8_HEIGHT * SCALE,
         0
     );
-    if (display->window == NULL)
+    if (display->window == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to create window: %s\n",
+            SDL_GetError()
+        );
         return EXIT_FAILURE;
-    else
-        SDL_GetWindowSize(display->window, &display->width, &display->height);
+    }
+
+    SDL_GetWindowSize(display->window, &display->width, &display->height);
 
     display->renderer = SDL_CreateRenderer(
         display->window,
         -1,
         SDL_RENDERER_ACCELERATED
     );
-    if (display->renderer == NULL)
+    if (display->renderer == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to create renderer: %s\n",
+            SDL_GetError()
+        );
+        SDL_DestroyWindow(display->window);
         return EXIT_FAILURE;
+    }
+
+    SDL_Surface *iconSurface = IMG_Load(iconPath);
+    if (iconSurface == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to load icon: %s\n",
+            IMG_GetError()
+        );
+        SDL_DestroyRenderer(display->renderer);
+        SDL_DestroyWindow(display->window);
+        return EXIT_FAILURE;
+    }
+    SDL_SetWindowIcon(display->window, iconSurface);
+    SDL_FreeSurface(iconSurface);
 
     display->pixels = NULL;
     display->pixelDrawn = NULL;
