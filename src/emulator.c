@@ -21,7 +21,7 @@ void printVersion(const char *programName)
         SDL_LOG_CATEGORY_APPLICATION,
         "%s version %s\n",
         programName,
-        VERSION
+        TEAL8VERSION
     );
 }
 
@@ -41,7 +41,7 @@ void printUsage(const char *programName, SDL_LogPriority priority)
         "\tA S D F\n"
         "\tZ X C V\n",
         programName,
-        VERSION,
+        TEAL8VERSION,
         programName,
         DEFAULT_INSTRUCTION_RATE
     );
