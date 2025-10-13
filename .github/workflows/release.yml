@@ -13,6 +13,7 @@ jobs:
       contents: write
     name: Create release
     runs-on: ubuntu-latest
+    shell: bash
     steps:
       - name: Checkout code
       - uses: actions/checkout@v4
@@ -30,7 +31,7 @@ jobs:
           echo "RELEASE_NOTES=Release $VERSION" >> $GITHUB_ENV
 
       - name: Push release
-        id: create-release
+        id: push-release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
