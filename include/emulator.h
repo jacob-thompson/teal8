@@ -3,26 +3,18 @@
 
 #include <getopt.h>
 
+#include <SDL_log.h>
+
 #include "../include/audio.h"
 #include "../include/display.h"
 #include "../include/stack.h"
 #include "../include/timers.h"
 
-#define VERSION "1.0.0"
+#define MEMORY_BYTES 0x1000 // 4KB memory
 
-#define MEMORY_IN_BYTES 4096
+#define DEFAULT_INSTRUCTION_RATE 1000 // 1000 instructions per second
 
-#define FONT_START_ADDRESS 0x000
-#define FONT_BYTES 0x50
-
-#define PROGRAM_START_ADDRESS 0x200
-
-#define DEFAULT_INSTRUCTION_RATE 1000
-#define TIMER_RATE 60
-#define VBLANK_INTERVAL (1000 / 60)  // ~16.67ms for 60Hz vertical blank
-
-#define REGISTERS 16
-#define LAST_REGISTER 0xF
+#define REGISTERS 16 // 16 8-bit registers (V0 to VF)
 
 #define CHIP8 100
 #define SCHIP 101
@@ -39,7 +31,7 @@ static struct option longOptions[] =
 };
 
 typedef struct emulator {
-    uint8_t memory[MEMORY_IN_BYTES]; // 4KB memory
+    uint8_t memory[MEMORY_BYTES]; // 4KB memory
     uint8_t v[REGISTERS]; // 16 8-bit registers
     uint8_t specType; // chip8 or schip
     uint16_t ix; // 16-bit index register

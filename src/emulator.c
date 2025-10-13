@@ -1,8 +1,19 @@
-#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
-#include <time.h>
+
+#include <SDL_log.h>
+#include <SDL_timer.h>
 
 #include "../include/emulator.h"
+
+#define FONT_START_ADDRESS 0x000 // 0 decimal
+#define FONT_BYTES 0x50 // 80 decimal
+
+#define PROGRAM_START_ADDRESS 0x200 // 512 decimal
+
+#define VBLANK_INTERVAL (1000 / 60)  // ~16.67ms for 60Hz vertical blank
+
+#define LAST_REGISTER 0xF // index of the last register (VF)
 
 void printVersion(const char *programName)
 {
@@ -10,7 +21,7 @@ void printVersion(const char *programName)
         SDL_LOG_CATEGORY_APPLICATION,
         "%s version %s\n",
         programName,
-        VERSION
+        TEAL8VERSION
     );
 }
 
@@ -30,7 +41,7 @@ void printUsage(const char *programName, SDL_LogPriority priority)
         "\tA S D F\n"
         "\tZ X C V\n",
         programName,
-        VERSION,
+        TEAL8VERSION,
         programName,
         DEFAULT_INSTRUCTION_RATE
     );
@@ -119,14 +130,14 @@ void writeFontToMemory(unsigned char *memory)
 void writeRomToMemory(emulator *chip8, FILE *rom)
 {
     chip8->pc = PROGRAM_START_ADDRESS;
-    while (chip8->pc < MEMORY_IN_BYTES && fread(&chip8->memory[chip8->pc], 1, 1, rom) == 1)
+    while (chip8->pc < MEMORY_BYTES && fread(&chip8->memory[chip8->pc], 1, 1, rom) == 1)
         chip8->pc++;
 
-    if (chip8->pc >= MEMORY_IN_BYTES) {
+    if (chip8->pc >= MEMORY_BYTES) {
         SDL_LogWarn(
             SDL_LOG_CATEGORY_APPLICATION,
             "ROM too large, truncated at %d bytes\n",
-            MEMORY_IN_BYTES - PROGRAM_START_ADDRESS
+            MEMORY_BYTES - PROGRAM_START_ADDRESS
         );
     }
 
@@ -157,8 +168,8 @@ void initializeEmulator(emulator *chip8, FILE *rom)
 /*
 void printMemory(emulator *chip8)
 {
-    for (int i = 0; i < MEMORY_IN_BYTES; i++) {
-        if (i % 16 == 0)
+    for (int i = 0x0; i < MEMORY_BYTES; i++) {
+        if (i % 0x10 == 0)
             fprintf(stdout, "\n");
         fprintf(stdout, "%02X ", chip8->memory[i]);
     }
@@ -196,7 +207,7 @@ int randomNumber(int min, int max)
 
 uint16_t fetchOpcode(emulator *chip8)
 {
-    if (chip8->pc >= MEMORY_IN_BYTES - 1) {
+    if (chip8->pc >= MEMORY_BYTES - 1) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "program counter out of bounds: 0x%04X\n",
@@ -452,7 +463,7 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                 if (sY + yline >= chip8->display.pixelHeight)
                     continue; // clip vertically
 
-                if (chip8->ix + yline >= MEMORY_IN_BYTES)
+                if (chip8->ix + yline >= MEMORY_BYTES)
                     break; // prevent buffer overflow
 
                 uint8_t pixel = chip8->memory[chip8->ix + yline];
@@ -526,17 +537,17 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                      * store the binary-coded base-10 representation of Vx
                      * in memory locations I, I+1, and I+2
                      */
-                    if (chip8->ix < MEMORY_IN_BYTES)
+                    if (chip8->ix < MEMORY_BYTES)
                         chip8->memory[chip8->ix] = chip8->v[x] / 100;
-                    if (chip8->ix + 1 < MEMORY_IN_BYTES)
+                    if (chip8->ix + 1 < MEMORY_BYTES)
                         chip8->memory[chip8->ix + 1] = (chip8->v[x] / 10) % 10;
-                    if (chip8->ix + 2 < MEMORY_IN_BYTES)
+                    if (chip8->ix + 2 < MEMORY_BYTES)
                         chip8->memory[chip8->ix + 2] = chip8->v[x] % 10;
                     break;
                 case 0x55:
                     /* store V0 to Vx in memory starting at address I */
                     for (int i = 0; i <= x; i++) {
-                        if (chip8->ix + i < MEMORY_IN_BYTES)
+                        if (chip8->ix + i < MEMORY_BYTES)
                             chip8->memory[chip8->ix + i] = chip8->v[i];
                     }
                     if (chip8->specType == CHIP8)
@@ -545,7 +556,7 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                 case 0x65:
                     /* fill V0 to Vx with values from memory starting at address I */
                     for (int i = 0; i <= x; i++) {
-                        if (chip8->ix + i < MEMORY_IN_BYTES)
+                        if (chip8->ix + i < MEMORY_BYTES)
                             chip8->v[i] = chip8->memory[chip8->ix + i];
                     }
                     if (chip8->specType == CHIP8)

@@ -8,9 +8,6 @@
 
 #include "../include/cJSON.h"
 
-#define SHA1_BLOCK_SIZE 20
-#define SHA1_HASH_SIZE 41
-
 /* MemoryStruct holds data for curl callback */
 struct MemoryStruct {
     char *memory;

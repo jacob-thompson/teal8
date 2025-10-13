@@ -1,5 +1,7 @@
 .DS_STORE
 .cache
+.sec
 bin/teal8
 build/*.o
 compile_commands.json
+compiler_flags

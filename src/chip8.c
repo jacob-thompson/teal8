@@ -1,5 +1,9 @@
+#include <SDL.h>
+
 #include "../include/emulator.h"
 #include "../include/file.h"
+
+#define TIMER_INTERVAL (1000 / 60) // ~16.67ms for 60Hz timer update
 
 int main(int argc, char **argv)
 {
@@ -138,7 +142,6 @@ int main(int argc, char **argv)
 
     uint32_t ticks;
     uint16_t opcode;
-    uint16_t timerDelay = 1000 / TIMER_RATE;
     double msPerInstruction = 1000.0 / rate;
     double nextInstructionTime = SDL_GetTicks();
 
@@ -150,32 +153,17 @@ int main(int argc, char **argv)
 
         /* check if it is time to execute the next instruction */
         if ((double)ticks < nextInstructionTime) {
-            /* not time yet, but still handle events */
-            clearKeys(chip8.display.keyUp);
-
-            SDL_Event event;
-            while (SDL_PollEvent(&event))
-                handleEvent(&chip8.display, &event);
-
-            if (chip8.display.reset) {
-                FILE *resetRom = getRom(inputFile);
-                if (resetRom != NULL) {
-                    initializeEmulator(&chip8, resetRom);
-                    fclose(resetRom);
-                }
-                resetDisplay(&chip8.display);
-                chip8.display.reset = false;
-                nextInstructionTime = SDL_GetTicks();
-            }
-
-            continue;
+            continue; // not time yet
         }
 
         /* schedule next instruction */
         nextInstructionTime += msPerInstruction;
 
-        /* update timers */
-        if (ticks - chip8.timers.lastUpdate >= timerDelay) {
+        /*
+         * handle timer updates at 60Hz
+         * timers are decremented if they are greater than zero
+         */
+        if (ticks - chip8.timers.lastUpdate >= TIMER_INTERVAL) {
             if (chip8.timers.delay > 0) {
                 chip8.timers.delay--;
             }

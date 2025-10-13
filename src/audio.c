@@ -1,7 +1,14 @@
 #include <time.h>
 #include <math.h>
 
+#include <SDL.h>
+
 #include "../include/audio.h"
+
+#define TONE_FREQ 440 // A440 tone
+#define AMPLITUDE 1000 // volume of the tone
+#define SAMPLE_RATE 44100 // samples per second
+#define BUFFER_SIZE 512 // audio buffer size
 
 void audioCallback(void *userdata, Uint8 *stream, int len) {
     audio *aud = (audio *)userdata;
