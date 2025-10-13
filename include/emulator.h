@@ -10,11 +10,7 @@
 #include "../include/stack.h"
 #include "../include/timers.h"
 
-#define TEAL_VERSION_MAJOR 1
-#define TEAL_VERSION_MINOR 0
-#define TEAL_VERSION_PATCH 0
-
-#define MEMORY_IN_BYTES 4096 // 4KB memory
+#define MEMORY_BYTES 0x1000 // 4KB memory
 
 #define DEFAULT_INSTRUCTION_RATE 1000 // 1000 instructions per second
 
@@ -35,7 +31,7 @@ static struct option longOptions[] =
 };
 
 typedef struct emulator {
-    uint8_t memory[MEMORY_IN_BYTES]; // 4KB memory
+    uint8_t memory[MEMORY_BYTES]; // 4KB memory
     uint8_t v[REGISTERS]; // 16 8-bit registers
     uint8_t specType; // chip8 or schip
     uint16_t ix; // 16-bit index register
