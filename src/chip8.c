@@ -228,12 +228,7 @@ int main(int argc, char **argv)
     }
 
     if (initDisplay(&chip8.display, iconPath) != 0) {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "error creating SDL display: %s\n",
-            SDL_GetError()
-        );
-        return EXIT_FAILURE;
+        return EXIT_FAILURE; // error has already been logged
     }
 
     if (!chip8.muted && initAudio(&chip8.sound) != 0) {

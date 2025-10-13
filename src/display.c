@@ -70,6 +70,11 @@ int initDisplay(display *display, const char *iconPath)
             |
             SDL_INIT_EVENTS
         ) != EXIT_SUCCESS) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to initialize SDL (display): %s\n",
+            SDL_GetError()
+        );
         return EXIT_FAILURE;
     }
 
