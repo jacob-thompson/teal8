@@ -13,18 +13,19 @@ jobs:
       contents: write
     name: Create release
     runs-on: ubuntu-latest
-    shell: bash
     steps:
       - name: Checkout code
       - uses: actions/checkout@v4
 
       - name: Set up user
+        shell: bash
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
       - name: Set release notes
         id: set-notes
+        shell: bash
         run: |
           VERSION=${GITHUB_REF#refs/tags/}
           echo "VERSION=$VERSION" >> $GITHUB_ENV
