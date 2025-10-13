@@ -29,9 +29,9 @@ OBJ = $(patsubst %, $(BDIR)/%, $(_OBJ))
 
 OUT = bin/teal8
 
-.PHONY: clean test
+.PHONY: clean test force
 
-$(BDIR)/%.o: src/%.c $(DEPS)
+$(BDIR)/%.o: src/%.c $(DEPS) compiler_flags
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(OUT): $(OBJ)
@@ -42,3 +42,6 @@ test:
 
 clean:
 	rm -f $(OBJ) $(OUT)
+
+compiler_flags: force
+	echo '$(CFLAGS)' | cmp -s - $@ || echo '$(CFLAGS)' > $@
