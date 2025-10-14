@@ -1,3 +1,9 @@
+#if defined(__APPLE__)
+#include <mach-o/dyld.h>
+#endif
+
+#include <sys/syslimits.h>
+
 #include <SDL.h>
 
 #include "../include/emulator.h"
@@ -7,6 +13,114 @@
 
 int main(int argc, char **argv)
 {
+    char *binPath, *iconPath;
+    uint32_t size;
+
+    /* get resource path in order to set the window icon */
+#if defined(__APPLE__) // macOS
+
+    _NSGetExecutablePath(NULL, &size); // get the size needed
+    binPath = malloc(sizeof(char) * PATH_MAX);
+    if (binPath == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to allocate memory for executable path\n"
+        );
+        return EXIT_FAILURE;
+    }
+
+    if (_NSGetExecutablePath(binPath, &size) == 0) {
+        SDL_LogDebug(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "path = %s\n",
+            binPath
+        );
+    }
+
+    iconPath = malloc(sizeof(char) * PATH_MAX);
+    if (iconPath == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to allocate memory for resource path\n"
+        );
+        return EXIT_FAILURE;
+    }
+
+    int len, charsToTrim;
+    len = strlen(binPath);
+    charsToTrim = 10; // /bin/teal8 is 10 characters
+    if (len >= charsToTrim) {
+        binPath[len - charsToTrim] = '\0'; // trim
+    } else {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "executable path is unexpectedly short\n"
+        );
+        free(binPath);
+        free(iconPath);
+        return EXIT_FAILURE;
+    }
+
+    /* construct the path to the icon */
+    snprintf(iconPath, PATH_MAX, "%s/resources/icon.png", binPath);
+
+#elif defined(__linux__)
+
+    binPath = malloc(sizeof(char) * PATH_MAX);
+    if (binPath == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to allocate memory for executable path\n"
+        );
+        return EXIT_FAILURE;
+    }
+
+    ssize_t count = readlink("/proc/self/exe", binPath, PATH_MAX);
+    if (count != -1) {
+        binPath[count] = '\0'; // null-terminate the string
+        SDL_LogDebug(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "path = %s\n",
+            binPath
+        );
+    } else {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to read /proc/self/exe\n"
+        );
+        free(binPath);
+        return EXIT_FAILURE;
+    }
+
+    iconPath = malloc(sizeof(char) * PATH_MAX);
+    if (iconPath == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to allocate memory for resource path\n"
+        );
+        return EXIT_FAILURE;
+    }
+
+    int len, charsToTrim;
+    len = strlen(binPath);
+    charsToTrim = 10; // /bin/teal8 is 10 characters
+    if (len >= charsToTrim) {
+        binPath[len - charsToTrim] = '\0'; // trim
+    } else {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "executable path is unexpectedly short\n"
+        );
+        free(binPath);
+        free(iconPath);
+        return EXIT_FAILURE;
+    }
+
+    /* construct the path to the icon */
+    snprintf(iconPath, PATH_MAX, "%s/resources/icon.png", binPath);
+
+#endif
+
     srand(time(NULL));
 
     //SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
@@ -113,13 +227,8 @@ int main(int argc, char **argv)
         );
     }
 
-    if (initDisplay(&chip8.display) != 0) {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "error creating SDL display: %s\n",
-            SDL_GetError()
-        );
-        return EXIT_FAILURE;
+    if (initDisplay(&chip8.display, iconPath) != 0) {
+        return EXIT_FAILURE; // error has already been logged
     }
 
     if (!chip8.muted && initAudio(&chip8.sound) != 0) {
@@ -245,6 +354,9 @@ int main(int argc, char **argv)
         "cleaning up\n"
     );
 
+    free(binPath);
+    free(iconPath);
+
     if (chip8.sound.poweredOn) {
         SDL_LogDebug(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -270,6 +382,7 @@ int main(int argc, char **argv)
         SDL_LOG_CATEGORY_APPLICATION,
         "quitting SDL\n"
     );
+    IMG_Quit();
     SDL_Quit();
 
     return EXIT_SUCCESS;
