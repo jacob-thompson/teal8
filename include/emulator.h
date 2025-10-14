@@ -22,6 +22,7 @@
 /* long options for getopt_long */
 static struct option longOptions[] =
 {
+    {"debug", no_argument, NULL, 'd'},
     {"force", no_argument, NULL, 'f'},
     {"mute", no_argument, NULL, 'm'},
     {"ips", required_argument, NULL, 'i'},
