@@ -66,15 +66,13 @@ make
 
 The `teal8` binary will be in `bin/`.
 
-## usage
-
-You can add the program binary to your PATH:
+You can add the binary to your PATH:
 
 ```bash
 export PATH="path/to/teal8/bin:$PATH"
 ```
 
-Run the program:
+## usage
 
 ```bash
 teal8 [-m|--mute] [-f|--force] [-i|--ips <number>] <rom>
@@ -83,7 +81,7 @@ teal8 [-m|--mute] [-f|--force] [-i|--ips <number>] <rom>
 You can omit the rom's file extension:
 
 ```bash
-teal8 roms/spockpaperscissors
+teal8 roms/rps
 ```
 
 The following flags are available:

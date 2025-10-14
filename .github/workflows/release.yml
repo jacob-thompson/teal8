@@ -16,26 +16,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up user
-        shell: bash
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
-      - name: Set release notes
-        id: set-notes
-        run: |
-          echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
-          echo "RELEASE_NOTES=Release ${{ github.ref_name }}" >> $GITHUB_ENV
-
-      - name: Push release
-        id: push-release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create release with auto-generated notes
+        uses: actions/github-script@v7
         with:
-          tag_name: ${{ env.VERSION }}
-          release_name: "Release ${{ env.VERSION }}"
-          body: ${{ env.RELEASE_NOTES }}
-          draft: false
-          prerelease: false
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const tag = process.env.GITHUB_REF_NAME || context.ref.replace('refs/tags/', '');
+            await github.rest.repos.createRelease({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            tag_name: tag,
+            name: `Release ${tag}`,
+            generate_release_notes: true,
+            draft: false,
+            prerelease: false
+            });
