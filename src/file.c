@@ -120,7 +120,7 @@ void printRomInfo(cJSON *romInfo, cJSON *romHash)
 {
     SDL_LogDebug(
         SDL_LOG_CATEGORY_APPLICATION,
-        "Program info: %s\n",
+        "ROM info: %s\n",
         cJSON_Print(romInfo)
     );
 
@@ -254,7 +254,7 @@ bool isRomInDatabase(FILE *fp)
     if (cJSON_IsNull(romHash) || romHash == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
-            "rom hash not found in database: %s\n",
+            "ROM hash not found in database: %s\n",
             hashString
         );
         free(hashString);
@@ -265,7 +265,7 @@ bool isRomInDatabase(FILE *fp)
     } else {
         SDL_LogDebug(
             SDL_LOG_CATEGORY_APPLICATION,
-            "rom hash found in database: %s\n",
+            "ROM hash found in database: %s\n",
             cJSON_Print(romHash)
         );
     }
@@ -278,7 +278,7 @@ bool isRomInDatabase(FILE *fp)
     ) != 0) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
-            "failed to pull program info database\n"
+            "failed to pull ROM info database\n"
         );
         free(hashString);
         free(hashChunk.memory);
@@ -317,7 +317,7 @@ bool isRomInDatabase(FILE *fp)
     if (romInfo == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
-            "failed to retrieve program info from database\n"
+            "failed to retrieve ROM info from database\n"
         );
     } else {
         printRomInfo(romInfo, romHash);
