@@ -9,23 +9,28 @@ int main(int argc, char **argv)
 {
     srand(time(NULL));
 
-    //SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
-
     /* data that may be configured by args */
     uint16_t rate;
     int opt, longIndex;
-    bool mute, force;
+    bool debugMode, force, mute;
 
     /* defaults */
     rate = DEFAULT_INSTRUCTION_RATE; // 1000 instructions per second
     longIndex = 0; // used as the index for longOptions
-    mute = false; // mute audio (-m or --mute)
     force = false; // force load rom regardless of validity (-f or --force)
+    mute = false; // mute audio (-m or --mute)
 
     /* parsing args */
     while (argc > 1 &&
-          (opt = getopt_long(argc, argv,  "fmi:hv", longOptions, &longIndex)) != -1) {
+          (opt = getopt_long(argc, argv,  "dfmi:hv", longOptions, &longIndex)) != -1) {
         switch (opt) {
+            case 'd': //debug
+                SDL_LogSetPriority(
+                    SDL_LOG_CATEGORY_APPLICATION,
+                    SDL_LOG_PRIORITY_DEBUG
+                );
+                debugMode = true;
+                break;
             case 'f': // force
                 force = true;
                 break;
@@ -104,14 +109,20 @@ int main(int argc, char **argv)
     emulator chip8;
     initializeEmulator(&chip8, rom);
     chip8.muted = mute;
+    chip8.debug = debugMode;
 
-    if (chip8.muted) {
-        SDL_LogDebug(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "emulator initialized with %s audio\n",
-            chip8.muted ? "muted" : "unmuted"
-        );
-    }
+    SDL_LogDebug(
+        SDL_LOG_CATEGORY_APPLICATION,
+        "teal8 initialized with %s audio\n",
+        chip8.muted ? "muted" : "unmuted"
+    );
+
+    SDL_LogDebug(
+        SDL_LOG_CATEGORY_APPLICATION,
+        "debug mode is %s\n",
+        chip8.debug ? "enabled" : "disabled"
+    );
+
 
     if (initDisplay(&chip8.display) != 0) {
         SDL_LogError(

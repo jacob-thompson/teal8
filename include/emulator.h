@@ -42,6 +42,7 @@ typedef struct emulator {
     display display; // display structure
     audio sound; // sound structure
     bool muted; // is the sound muted?
+    bool debug; // are we in debug mode?
 } emulator;
 
 /*

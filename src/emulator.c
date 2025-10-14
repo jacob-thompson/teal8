@@ -163,6 +163,8 @@ void initializeEmulator(emulator *chip8, FILE *rom)
     chip8->stack.sp = 0;
 
     chip8->specType = CHIP8;
+
+    chip8->debug = false;
 }
 
 /*
