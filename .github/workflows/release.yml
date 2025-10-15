@@ -1,3 +1,5 @@
+name: Create Release
+
 on:
   push:
     tags:
@@ -14,37 +16,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create release with changelog from previous release
+      - name: Create release with auto-generated notes
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const tag = process.env.GITHUB_REF_NAME || context.ref.replace('refs/tags/', '');
-            // Fetch all releases, sorted by created date
-            const releases = await github.paginate(
-              github.rest.repos.listReleases,
-              {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                per_page: 100
-              }
-            );
-            // Find the most recent release before this tag
-            let previousReleaseTag = null;
-            for (const release of releases) {
-              if (release.tag_name !== tag) {
-                previousReleaseTag = release.tag_name;
-                break;
-              }
-            }
-            // Create the release with release notes comparing against previous release tag
             await github.rest.repos.createRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag_name: tag,
-              name: `Release ${tag}`,
-              generate_release_notes: true,
-              previous_tag_name: previousReleaseTag,
-              draft: false,
-              prerelease: false
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            tag_name: tag,
+            name: `Release ${tag}`,
+            generate_release_notes: true,
+            draft: false,
+            prerelease: false
             });
