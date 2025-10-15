@@ -6,8 +6,8 @@ CFLAGS = -Wall -Wno-unused-function -DTEAL8VERSION=\"$(GIT_VERSION)\"
 LDFLAGS =
 LDLIBS =
 
-SDL_CFLAGS = $(shell sdl2-config --cflags)
-SDL_LDFLAGS = $(shell sdl2-config --libs)
+SDL_CFLAGS = $(shell pkg-config --cflags sdl2 sdl2_image)
+SDL_LDFLAGS = $(shell pkg-config --libs sdl2 sdl2_image)
 
 CURL_CFLAGS = $(shell curl-config --cflags)
 CURL_LIBS = $(shell curl-config --libs)
@@ -44,4 +44,6 @@ clean:
 	rm -f $(OBJ) $(OUT)
 
 compiler_flags: force
-	echo '$(CFLAGS)' | cmp -s - $@ || echo '$(CFLAGS)' > $@
+	echo '$(CFLAGS)' > compiler_flags_temp
+	cmp -s compiler_flags_temp $@ || mv compiler_flags_temp $@
+	rm -f compiler_flags_temp

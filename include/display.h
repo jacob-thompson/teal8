@@ -7,6 +7,7 @@
 #include <SDL_render.h>
 #include <SDL_rect.h>
 #include <SDL_events.h>
+#include <SDL_image.h>
 
 #define KEY_COUNT 16 // 16 keys (0x0 to 0xF)
 
@@ -51,9 +52,10 @@ void createPixels(display *display);
 /*
  * Initialize the display.
  * @param display the display
+ * @param iconPath path to the icon file
  * @return 0 on success, 1 on failure
  */
-int initDisplay(display *display);
+int initDisplay(display *display, const char* iconPath);
 
 /*
  * Handle an event.
