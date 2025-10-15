@@ -75,7 +75,7 @@ export PATH="path/to/teal8/bin:$PATH"
 ## usage
 
 ```bash
-teal8 [-m|--mute] [-f|--force] [-i|--ips <number>] <rom>
+teal8 [-d|--debug] [-m|--mute] [-f|--force] [-i|--ips <number>] <rom>
 ```
 
 You can omit the rom's file extension:

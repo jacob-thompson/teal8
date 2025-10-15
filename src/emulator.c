@@ -30,7 +30,7 @@ void printUsage(const char *programName, SDL_LogPriority priority)
     SDL_LogMessage(
         SDL_LOG_CATEGORY_APPLICATION,
         priority,
-        "%s version %s\nusage:\t%s [-m|--mute] [-f|--force] [-i|--ips <number>] <rom>\n"
+        "%s version %s\nusage:\t%s [-d|--debug] [-m|--mute] [-f|--force] [-i|--ips <number>] <rom>\n"
         "\t-m (--mute)\tmute audio\n"
         "\t-f (--force)\tforce load rom regardless of validity\n"
         "\t-i (--ips)\tinstructions per second (default: %d)\n"
@@ -163,6 +163,8 @@ void initializeEmulator(emulator *chip8, FILE *rom)
     chip8->stack.sp = 0;
 
     chip8->specType = CHIP8;
+
+    chip8->debug = false;
 }
 
 /*
