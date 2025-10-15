@@ -26,7 +26,7 @@ CHIP-8 interpreter written in pure C.
 
 ## about 
 
-![screenshot](resources/screenshot.png)
+![screenshot](resources/teal8.png)
 
 [CHIP-8](https://en.wikipedia.org/wiki/CHIP-8) is an interpreted programming language developed by Joseph Weisbecker. [teal8](https://jacob-thompson.github.io/portfolio/teal8/) is an interpreter for running CHIP-8 ROMs.
 
