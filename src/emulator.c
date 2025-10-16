@@ -425,7 +425,7 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
             break;
         case 0xA:
             /* set I to address NNN */
-            chip8->ix = nnn;
+            chip8->i = nnn;
             break;
         case 0xB:
             /*
@@ -463,10 +463,10 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                 if (sY + yline >= chip8->display.pixelHeight)
                     continue; // clip vertically
 
-                if (chip8->ix + yline >= MEMORY_BYTES)
+                if (chip8->i + yline >= MEMORY_BYTES)
                     break; // prevent buffer overflow
 
-                uint8_t pixel = chip8->memory[chip8->ix + yline];
+                uint8_t pixel = chip8->memory[chip8->i + yline];
                 for (int xline = 0; xline < 8; xline++) {
                     if ((pixel & (0x80 >> xline)) != 0) {
                         if (sX + xline >= chip8->display.pixelWidth)
@@ -526,41 +526,41 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                     break;
                 case 0x1E:
                     /* add Vx to I */
-                    chip8->ix += chip8->v[x];
+                    chip8->i += chip8->v[x];
                     break;
                 case 0x29:
                     /* set I to the location of the sprite for the character in Vx */
-                    chip8->ix = (chip8->v[x] & 0x0F) * 5;
+                    chip8->i = (chip8->v[x] & 0x0F) * 5;
                     break;
                 case 0x33:
                     /*
                      * store the binary-coded base-10 representation of Vx
                      * in memory locations I, I+1, and I+2
                      */
-                    if (chip8->ix < MEMORY_BYTES)
-                        chip8->memory[chip8->ix] = chip8->v[x] / 100;
-                    if (chip8->ix + 1 < MEMORY_BYTES)
-                        chip8->memory[chip8->ix + 1] = (chip8->v[x] / 10) % 10;
-                    if (chip8->ix + 2 < MEMORY_BYTES)
-                        chip8->memory[chip8->ix + 2] = chip8->v[x] % 10;
+                    if (chip8->i < MEMORY_BYTES)
+                        chip8->memory[chip8->i] = chip8->v[x] / 100;
+                    if (chip8->i + 1 < MEMORY_BYTES)
+                        chip8->memory[chip8->i + 1] = (chip8->v[x] / 10) % 10;
+                    if (chip8->i + 2 < MEMORY_BYTES)
+                        chip8->memory[chip8->i + 2] = chip8->v[x] % 10;
                     break;
                 case 0x55:
                     /* store V0 to Vx in memory starting at address I */
                     for (int i = 0; i <= x; i++) {
-                        if (chip8->ix + i < MEMORY_BYTES)
-                            chip8->memory[chip8->ix + i] = chip8->v[i];
+                        if (chip8->i + i < MEMORY_BYTES)
+                            chip8->memory[chip8->i + i] = chip8->v[i];
                     }
                     if (chip8->specType == CHIP8)
-                        chip8->ix += x + 1;
+                        chip8->i += x + 1;
                     break;
                 case 0x65:
                     /* fill V0 to Vx with values from memory starting at address I */
                     for (int i = 0; i <= x; i++) {
-                        if (chip8->ix + i < MEMORY_BYTES)
-                            chip8->v[i] = chip8->memory[chip8->ix + i];
+                        if (chip8->i + i < MEMORY_BYTES)
+                            chip8->v[i] = chip8->memory[chip8->i + i];
                     }
                     if (chip8->specType == CHIP8)
-                        chip8->ix += x + 1;
+                        chip8->i += x + 1;
                     break;
                 case 0x75:
                     /* store V0 to Vx in the RPL user flags */
