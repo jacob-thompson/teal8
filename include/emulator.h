@@ -10,7 +10,7 @@
 #include "../include/stack.h"
 #include "../include/timers.h"
 
-#define MEMORY_BYTES 0x1000 // 4KB memory
+#define MEMORY_BYTES 0x1000 // 4096 decimal
 
 #define DEFAULT_INSTRUCTION_RATE 1000 // 1000 instructions per second
 
