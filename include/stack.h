@@ -6,7 +6,7 @@
 #define STACK_SIZE 16 // 16 levels of stack
 
 typedef struct stack {
-    uint16_t s[STACK_SIZE]; // 16 16-bit registers
+    uint16_t s[STACK_SIZE]; // 16 addresses
     uint8_t sp; // stack pointer index (0x0-0xF)
 } stack;
 
