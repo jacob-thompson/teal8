@@ -128,23 +128,23 @@ int main(int argc, char **argv)
     /* data that may be configured by args */
     uint16_t rate;
     int opt, longIndex;
-    bool mute, force;
+    SDL_bool mute, force;
 
     /* defaults */
     rate = DEFAULT_INSTRUCTION_RATE; // 1000 instructions per second
     longIndex = 0; // used as the index for longOptions
-    mute = false; // mute audio (-m or --mute)
-    force = false; // force load rom regardless of validity (-f or --force)
+    mute = SDL_FALSE; // mute audio (-m or --mute)
+    force = SDL_FALSE; // force load rom regardless of validity (-f or --force)
 
     /* parsing args */
     while (argc > 1 &&
           (opt = getopt_long(argc, argv,  "fmi:hv", longOptions, &longIndex)) != -1) {
         switch (opt) {
             case 'f': // force
-                force = true;
+                force = SDL_TRUE;
                 break;
             case 'm': // mute
-                mute = true;
+                mute = SDL_TRUE;
                 break;
             case 'i': // ips
                 if (isNumber(optarg)) {
@@ -283,13 +283,13 @@ int main(int argc, char **argv)
                 );
                 if (!chip8.muted) {
                     /* start audio playback */
-                    chip8.sound.playing = true;
+                    chip8.sound.playing = SDL_TRUE;
                     SDL_PauseAudioDevice(chip8.sound.deviceId, 0);
                 }
                 chip8.timers.sound--;
             } else if (chip8.sound.playing && !chip8.muted) {
                 /* stop audio playback and reset phase */
-                chip8.sound.playing = false;
+                chip8.sound.playing = SDL_FALSE;
                 chip8.sound.phase = 0.0;
                 SDL_PauseAudioDevice(chip8.sound.deviceId, 1);
             }
@@ -298,12 +298,22 @@ int main(int argc, char **argv)
             chip8.timers.lastUpdate = ticks;
         }
 
+        SDL_LogDebug(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "timers updated\n"
+        );
+
         /* handle events */
         clearKeys(chip8.display.keyUp);
 
         SDL_Event event;
         while (SDL_PollEvent(&event))
             handleEvent(&chip8.display, &event);
+
+        SDL_LogDebug(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "events handled\n"
+        );
 
         if (chip8.display.reset) {
             FILE *resetRom = getRom(inputFile);
@@ -312,15 +322,26 @@ int main(int argc, char **argv)
                 fclose(resetRom);
             }
             resetDisplay(&chip8.display);
-            chip8.display.reset = false;
+            chip8.display.reset = SDL_FALSE;
             nextInstructionTime = SDL_GetTicks();
             continue;
         }
 
         /* fetch, decode, and execute opcode */
         opcode = fetchOpcode(&chip8);
+        SDL_LogDebug(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "handling opcode %x\n",
+            opcode
+        );
+
         chip8.pc += 2; // increment program counter
+
         decodeAndExecuteOpcode(&chip8, opcode);
+        SDL_LogDebug(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "opcode successfully fetched, decoded, and executed\n"
+        );
 
         /* draw the frame only if display has changed */
         if (chip8.display.dirty) {
@@ -343,7 +364,7 @@ int main(int argc, char **argv)
             }
 
             SDL_RenderPresent(chip8.display.renderer);
-            chip8.display.dirty = false;
+            chip8.display.dirty = SDL_FALSE;
         }
 
     }

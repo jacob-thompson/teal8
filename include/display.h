@@ -1,8 +1,6 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include <stdbool.h>
-
 #include <SDL_video.h>
 #include <SDL_render.h>
 #include <SDL_rect.h>
@@ -24,17 +22,17 @@ typedef struct display {
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Rect *pixels;
-    bool *pixelDrawn;
-    bool poweredOn;
-    bool reset;
-    bool keyDown[KEY_COUNT];
-    bool keyUp[KEY_COUNT];
+    SDL_bool *pixelDrawn;
+    SDL_bool poweredOn;
+    SDL_bool reset;
+    SDL_bool keyDown[KEY_COUNT];
+    SDL_bool keyUp[KEY_COUNT];
     uint32_t lastUpdate;
     int width;
     int height;
     int pixelWidth;  // cached width / SCALE
     int pixelHeight; // cached height / SCALE
-    bool dirty;      // track if display needs redraw
+    SDL_bool dirty;      // track if display needs redraw
 } display;
 
 /*
@@ -82,6 +80,6 @@ int drawPixels(display *display);
  * Clear keypress events.
  * @param keys the keys to be cleared
 */
-void clearKeys(bool *keys);
+void clearKeys(SDL_bool *keys);
 
 #endif /* DISPLAY_H */

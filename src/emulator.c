@@ -47,18 +47,18 @@ void printUsage(const char *programName, SDL_LogPriority priority)
     );
 }
 
-bool isNumber(const char num[])
+SDL_bool isNumber(const char num[])
 {
     /* check if string is empty */
     if (num == NULL || num[0] == '\0')
-        return false;
+        return SDL_FALSE;
 
     /* check if each character is a numeral */
     for (int i = 0; num[i] != 0; ++i) {
         if (!isdigit(num[i]))
-            return false;
+            return SDL_FALSE;
     }
-    return true;
+    return SDL_TRUE;
 }
 
 FILE *getRom(const char *rom)
@@ -255,7 +255,7 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                     break;
                 case 0xFD:
                     /* exit the interpreter */
-                    chip8->display.poweredOn = false;
+                    chip8->display.poweredOn = SDL_FALSE;
                     break;
                 case 0xFE:
                     /* set the CHIP-8 display mode to 64x32 */
@@ -448,9 +448,11 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
              * on/off based on value in I;
              * set VF to 1 if any set pixels are changed to unset, 0 otherwise
              */
-            while (true) // wait for vertical blank interrupt
+            while (1) { // wait for vertical blank interrupt
                 if (chip8->display.lastUpdate + VBLANK_INTERVAL < SDL_GetTicks())
                     break;
+            }
+
 
             uint8_t sX, sY, sH;
             sX = chip8->v[x] % chip8->display.pixelWidth;
@@ -475,8 +477,8 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                         if (chip8->display.pixelDrawn[(sY + yline) * chip8->display.pixelWidth + (sX + xline)])
                             chip8->v[0xF] = 1;
 
-                        chip8->display.pixelDrawn[(sY + yline) * chip8->display.pixelWidth + (sX + xline)] ^= true;
-                        chip8->display.dirty = true;
+                        chip8->display.pixelDrawn[(sY + yline) * chip8->display.pixelWidth + (sX + xline)] ^= SDL_TRUE;
+                        chip8->display.dirty = SDL_TRUE;
                     }
                 }
             }

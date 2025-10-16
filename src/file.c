@@ -149,7 +149,7 @@ void printRomInfo(cJSON *romInfo, cJSON *romHash)
     );
 }
 
-bool isRomInDatabase(FILE *fp)
+SDL_bool isRomInDatabase(FILE *fp)
 {
     struct MemoryStruct hashChunk, infoChunk;
 
@@ -164,7 +164,7 @@ bool isRomInDatabase(FILE *fp)
         );
         if (hashChunk.memory != NULL) free(hashChunk.memory);
         if (infoChunk.memory != NULL) free(infoChunk.memory);
-        return false;
+        return SDL_FALSE;
     }
 
     /* initial size is 0 */
@@ -180,7 +180,7 @@ bool isRomInDatabase(FILE *fp)
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to initialize curl\n"
         );
-        return false;
+        return SDL_FALSE;
     }
 
     /* pull the SHA1 hash database */
@@ -192,7 +192,7 @@ bool isRomInDatabase(FILE *fp)
         free(hashChunk.memory);
         free(infoChunk.memory);
         curl_easy_cleanup(curlHandle);
-        return false;
+        return SDL_FALSE;
     }
 
     /* parse the JSON data */
@@ -209,7 +209,7 @@ bool isRomInDatabase(FILE *fp)
         free(hashChunk.memory);
         free(infoChunk.memory);
         curl_easy_cleanup(curlHandle);
-        return false;
+        return SDL_FALSE;
     }
 
     /*
@@ -221,7 +221,7 @@ bool isRomInDatabase(FILE *fp)
         );
         cJSON_Delete(hashJson);
         curl_easy_cleanup(curlHandle);
-        return false;
+        return SDL_FALSE;
     }
     SDL_LogDebug(
         SDL_LOG_CATEGORY_APPLICATION,
@@ -246,7 +246,7 @@ bool isRomInDatabase(FILE *fp)
         free(infoChunk.memory);
         cJSON_Delete(hashJson);
         curl_easy_cleanup(curlHandle);
-        return false;
+        return SDL_FALSE;
     }
 
     /* check if the hash is in the database */
@@ -261,7 +261,7 @@ bool isRomInDatabase(FILE *fp)
         free(hashChunk.memory);
         cJSON_Delete(hashJson);
         curl_easy_cleanup(curlHandle);
-        return false;
+        return SDL_FALSE;
     } else {
         SDL_LogDebug(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -284,7 +284,7 @@ bool isRomInDatabase(FILE *fp)
         free(hashChunk.memory);
         cJSON_Delete(hashJson);
         curl_easy_cleanup(curlHandle);
-        return false;
+        return SDL_FALSE;
     }
 
     /* parse the JSON data */
@@ -302,7 +302,7 @@ bool isRomInDatabase(FILE *fp)
         free(hashChunk.memory);
         cJSON_Delete(hashJson);
         curl_easy_cleanup(curlHandle);
-        return false;
+        return SDL_FALSE;
     }
 
     SDL_LogDebug(
@@ -331,10 +331,10 @@ bool isRomInDatabase(FILE *fp)
     cJSON_Delete(infoJson);
     curl_easy_cleanup(curlHandle);
 
-    return true;
+    return SDL_TRUE;
 }
 
-bool isFileValid(const char *filename, FILE *fp, struct stat *st)
+SDL_bool isFileValid(const char *filename, FILE *fp, struct stat *st)
 {
     /* check if file exists and is readable */
     if (fp == NULL || fstat(fileno(fp), st) == -1) {
@@ -343,7 +343,7 @@ bool isFileValid(const char *filename, FILE *fp, struct stat *st)
             "failed to open %s\n",
             filename
         );
-        return false;
+        return SDL_FALSE;
     }
 
     if (!isRomInDatabase(fp)) {
@@ -356,7 +356,7 @@ bool isFileValid(const char *filename, FILE *fp, struct stat *st)
             SDL_LOG_CATEGORY_APPLICATION,
             "pass -f to force load ROM\n"
         );
-        return false;
+        return SDL_FALSE;
     }
 
     SDL_LogDebug(
@@ -364,5 +364,5 @@ bool isFileValid(const char *filename, FILE *fp, struct stat *st)
         "%s opened successfully\n",
         filename
     );
-    return true;
+    return SDL_TRUE;
 }

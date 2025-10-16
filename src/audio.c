@@ -28,7 +28,7 @@ void audioCallback(void *userdata, Uint8 *stream, int len) {
 
 int initAudio(audio *audio) {
     if (SDL_InitSubSystem(SDL_INIT_AUDIO) != 0) {
-        audio->poweredOn = false;
+        audio->poweredOn = SDL_FALSE;
         return -1;
     }
 
@@ -42,12 +42,12 @@ int initAudio(audio *audio) {
     audio->deviceId = SDL_OpenAudioDevice(NULL, 0, &audio->spec, NULL, 0);
 
     if (audio->deviceId == 0) {
-        audio->poweredOn = false;
+        audio->poweredOn = SDL_FALSE;
         return -1;
     }
 
-    audio->poweredOn = true;
-    audio->playing = false;
+    audio->poweredOn = SDL_TRUE;
+    audio->playing = SDL_FALSE;
     audio->phase = 0.0;
     return 0;
 }

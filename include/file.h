@@ -1,7 +1,6 @@
 #ifndef FILE_H
 #define FILE_H
 
-#include <stdbool.h>
 #include <sys/stat.h>
 
 #include <curl/curl.h>
@@ -54,7 +53,7 @@ void printRomInfo(cJSON *romInfo, cJSON *romHash);
  * @return true if the ROM is in the database
  * @return false if the ROM is not in the database
  */
-bool isRomInDatabase(FILE *fp);
+SDL_bool isRomInDatabase(FILE *fp);
 
 /*
  * Check if a file is valid.
@@ -65,6 +64,6 @@ bool isRomInDatabase(FILE *fp);
  * @param st the stat struct
  * @return 0 if the file is valid, 1 otherwise
  */
-bool isFileValid(const char *filename, FILE *fp, struct stat *st);
+SDL_bool isFileValid(const char *filename, FILE *fp, struct stat *st);
 
 #endif /* FILE_H */

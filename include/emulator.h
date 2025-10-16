@@ -41,7 +41,7 @@ typedef struct emulator {
     stack stack; // stack & stack pointer
     display display; // display structure
     audio sound; // sound structure
-    bool muted; // is the sound muted?
+    SDL_bool muted; // is the sound muted?
 } emulator;
 
 /*
@@ -63,7 +63,7 @@ void printUsage(const char *programName, SDL_LogPriority priority);
  * @return true if the string is a number
  * @return false if the string is not a number
  */
-bool isNumber(const char num[]);
+SDL_bool isNumber(const char num[]);
 
 /*
  * Get the rom file.

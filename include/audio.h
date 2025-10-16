@@ -1,15 +1,13 @@
 #ifndef AUDIO_H
 #define AUDIO_H
 
-#include <stdbool.h>
-
 #include <SDL_audio.h>
 
 typedef struct audio {
     SDL_AudioDeviceID deviceId;
     SDL_AudioSpec spec;
-    bool playing;
-    bool poweredOn;
+    SDL_bool playing;
+    SDL_bool poweredOn;
     double phase;
 } audio;
 
