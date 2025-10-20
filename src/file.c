@@ -118,11 +118,13 @@ char *getHash(FILE *fp)
 
 void printRomInfo(cJSON *romInfo, cJSON *romHash)
 {
+    const char *infoString = cJSON_Print(romInfo);
     SDL_LogDebug(
         SDL_LOG_CATEGORY_APPLICATION,
         "ROM info: %s\n",
-        cJSON_Print(romInfo)
+        infoString
     );
+    free((void *)infoString);
 
     cJSON *title = cJSON_GetObjectItemCaseSensitive(romInfo, "title");
     cJSON *release = cJSON_GetObjectItemCaseSensitive(romInfo, "release");
@@ -236,7 +238,7 @@ SDL_bool isRomInDatabase(FILE *fp)
         (unsigned long)hashChunk.size
     );
 
-    char *hashString = getHash(fp);
+    const char *hashString = getHash(fp);
     if (hashString == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -257,7 +259,7 @@ SDL_bool isRomInDatabase(FILE *fp)
             "ROM hash not found in database: %s\n",
             hashString
         );
-        free(hashString);
+        free((void *)hashString);
         free(hashChunk.memory);
         cJSON_Delete(hashJson);
         curl_easy_cleanup(curlHandle);
@@ -266,8 +268,9 @@ SDL_bool isRomInDatabase(FILE *fp)
         SDL_LogDebug(
             SDL_LOG_CATEGORY_APPLICATION,
             "ROM hash found in database: %s\n",
-            cJSON_Print(romHash)
+            hashString
         );
+        free((void *)hashString);
     }
 
     /* pull the program info database */
@@ -280,7 +283,6 @@ SDL_bool isRomInDatabase(FILE *fp)
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to pull ROM info database\n"
         );
-        free(hashString);
         free(hashChunk.memory);
         cJSON_Delete(hashJson);
         curl_easy_cleanup(curlHandle);
@@ -298,7 +300,6 @@ SDL_bool isRomInDatabase(FILE *fp)
                 error_ptr
             );
         }
-        free(hashString);
         free(hashChunk.memory);
         cJSON_Delete(hashJson);
         curl_easy_cleanup(curlHandle);
@@ -324,7 +325,6 @@ SDL_bool isRomInDatabase(FILE *fp)
     }
 
     /* cleanup */
-    free(hashString);
     free(hashChunk.memory);
     free(infoChunk.memory);
     cJSON_Delete(hashJson);
