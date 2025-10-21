@@ -125,7 +125,7 @@ randomNumber(int min, int max);
  * Parameter: the emulator
  * Return: the opcode
  */
-const uint16_t
+uint16_t
 fetchOpcode(emulator *chip8);
 
 /*

@@ -218,7 +218,7 @@ randomNumber(int min, int max)
     return x % range + min;
 }
 
-const uint16_t
+uint16_t
 fetchOpcode(emulator *chip8)
 {
     if (chip8->pc >= AMOUNT_MEMORY_BYTES - 1) {
