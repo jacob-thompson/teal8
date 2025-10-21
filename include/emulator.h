@@ -113,22 +113,22 @@ initializeEmulator(emulator *chip8, FILE *rom);
  * Generate a random number between min and max.
  * Parameter: the minimum number
  * Parameter: the maximum number
- * Return: the random number
+ * Return: a random number between min and max
  */
 int
 randomNumber(int min, int max);
 
 /*
- * Fetch the opcode from the memory of the emulator.
+ * Fetch the current opcode from memory.
  * The opcode is 2 bytes long.
  * Parameter: the emulator
- * Return: the opcode
+ * Return: the current opcode
  */
 uint16_t
 fetchOpcode(emulator *chip8);
 
 /*
- * Decode the opcode.
+ * Decode and execute an opcode.
  * Parameter: the emulator
  * Parameter: the opcode
  */
