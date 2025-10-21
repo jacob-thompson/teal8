@@ -2,6 +2,9 @@
 
 #include "../include/display.h"
 
+#define BLACK_PIXEL_COLOR 0, 0, 0, 255
+#define WHITE_PIXEL_COLOR 255, 255, 255, 255
+
 void resetDisplay(display *display)
 {
     if (display->pixelDrawn == NULL)
@@ -111,7 +114,11 @@ int initDisplay(display *display, const char *iconPath)
         return EXIT_FAILURE;
     }
 
-    SDL_GetWindowSize(display->window, &display->width, &display->height);
+    SDL_GetWindowSize(
+        display->window,
+        &display->width,
+        &display->height
+    );
 
     display->renderer = SDL_CreateRenderer(
         display->window,
@@ -302,7 +309,13 @@ void handleEvent(display *display, SDL_Event *event)
 
 int drawBackground(display *display)
 {
-    if (SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255) != EXIT_SUCCESS)
+    if (
+        SDL_SetRenderDrawColor(display->renderer, BLACK_PIXEL_COLOR)
+        != EXIT_SUCCESS
+        ||
+        SDL_RenderClear(display->renderer)
+        != EXIT_SUCCESS
+    )
         return EXIT_FAILURE;
 
     if (SDL_RenderClear(display->renderer) != EXIT_SUCCESS)
@@ -313,10 +326,14 @@ int drawBackground(display *display)
 
 int drawPixels(display *display)
 {
-    if (display->pixelDrawn == NULL || display->pixels == NULL)
-        return EXIT_FAILURE;
-
-    if (SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255) != EXIT_SUCCESS)
+    if (
+        display->pixelDrawn == NULL
+        ||
+        display->pixels == NULL
+        ||
+        SDL_SetRenderDrawColor(display->renderer, WHITE_PIXEL_COLOR)
+        != EXIT_SUCCESS
+    )
         return EXIT_FAILURE;
 
     for (int y = 0; y < display->pixelHeight; y++)

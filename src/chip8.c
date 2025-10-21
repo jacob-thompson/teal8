@@ -137,8 +137,11 @@ int main(int argc, char **argv)
     force = SDL_FALSE; // force load rom regardless of validity (-f or --force)
 
     /* parsing args */
-    while (argc > 1 &&
-          (opt = getopt_long(argc, argv,  "fmi:hv", longOptions, &longIndex)) != -1) {
+    while (
+        argc > 1
+        &&
+        (opt = getopt_long(argc, argv,  "fmi:hv", longOptions, &longIndex)) != -1
+    ) {
         switch (opt) {
             case 'f': // force
                 force = SDL_TRUE;

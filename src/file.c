@@ -189,7 +189,8 @@ SDL_bool isRomInDatabase(FILE *fp)
     if (pullDatabase(
         curlHandle,
         &hashChunk,
-        "https://raw.githubusercontent.com/chip-8/chip-8-database/refs/heads/master/database/sha1-hashes.json"
+        "https://raw.githubusercontent.com/"
+        "chip-8/chip-8-database/refs/heads/master/database/sha1-hashes.json"
     ) != 0) {
         free(hashChunk.memory);
         free(infoChunk.memory);
@@ -277,7 +278,8 @@ SDL_bool isRomInDatabase(FILE *fp)
     if (pullDatabase(
         curlHandle,
         &infoChunk,
-        "https://raw.githubusercontent.com/chip-8/chip-8-database/refs/heads/master/database/programs.json"
+        "https://raw.githubusercontent.com/"
+        "chip-8/chip-8-database/refs/heads/master/database/programs.json"
     ) != 0) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,

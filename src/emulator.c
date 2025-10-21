@@ -30,7 +30,8 @@ void printUsage(const char *programName, SDL_LogPriority priority)
     SDL_LogMessage(
         SDL_LOG_CATEGORY_APPLICATION,
         priority,
-        "%s version %s\nusage:\t%s [-m|--mute] [-f|--force] [-i|--ips <number>] <rom>\n"
+        "%s version %s\n"
+        "usage:\t%s [-m|--mute] [-f|--force] [-i|--ips <number>] <rom>\n"
         "\t-m (--mute)\tmute audio\n"
         "\t-f (--force)\tforce load rom regardless of validity\n"
         "\t-i (--ips)\tinstructions per second (default: %d)\n"
@@ -130,8 +131,14 @@ void writeFontToMemory(unsigned char *memory)
 void writeRomToMemory(emulator *chip8, FILE *rom)
 {
     chip8->pc = PROGRAM_START_ADDRESS;
-    while (chip8->pc < MEMORY_BYTES && fread(&chip8->memory[chip8->pc], 1, 1, rom) == 1)
+
+    while (
+        chip8->pc < MEMORY_BYTES
+        &&
+        fread(&chip8->memory[chip8->pc], 1, 1, rom) == 1
+    ) {
         chip8->pc++;
+    }
 
     if (chip8->pc >= MEMORY_BYTES) {
         SDL_LogWarn(
