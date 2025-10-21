@@ -2,8 +2,8 @@
 
 #include "../include/display.h"
 
-#define BLACK_PIXEL_COLOR       0, 0, 0, 255            // RGBA for black pixel
-#define WHITE_PIXEL_COLOR       255, 255, 255, 255      // RGBA for white pixel
+#define BLACK_PIXEL_COLOR 0, 0, 0, 255            // RGBA for black pixel
+#define WHITE_PIXEL_COLOR 255, 255, 255, 255      // RGBA for white pixel
 
 void
 resetDisplay(display *display)
@@ -362,5 +362,5 @@ drawPixels(display *display)
 void
 clearKeys(SDL_bool *keys)
 {
-    memset(keys, SDL_FALSE, KEY_COUNT * sizeof *keys);
+    memset(keys, SDL_FALSE, AMOUNT_KEYS * sizeof *keys);
 }

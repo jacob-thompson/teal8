@@ -7,7 +7,7 @@
 #include "../include/emulator.h"
 
 #define FONT_START_ADDRESS      0x00            // 0 decimal
-#define FONT_BYTES              0x50            // 80 decimal
+#define AMOUNT_FONT_BYTES       0x50            // 80 decimal
 
 #define PROGRAM_START_ADDRESS   0x200           // 512 decimal
 
@@ -110,7 +110,7 @@ getRom(const char *rom)
 void
 writeFontToMemory(unsigned char *memory)
 {
-    const uint8_t font[FONT_BYTES] = {
+    const uint8_t font[AMOUNT_FONT_BYTES] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
         0x20, 0x60, 0x20, 0x20, 0x70, // 1
         0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -129,7 +129,7 @@ writeFontToMemory(unsigned char *memory)
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
     };
 
-    for (int i = 0x0; i < FONT_BYTES; i++)
+    for (int i = 0x0; i < AMOUNT_FONT_BYTES; i++)
         memory[FONT_START_ADDRESS + i] = font[i];
 }
 

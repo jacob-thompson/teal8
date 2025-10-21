@@ -6,7 +6,7 @@
 #include "../include/file.h"
 
 #define SHA1_BLOCK_SIZE     20          // SHA1 outputs a 20 byte digest
-#define SHA1_HASH_SIZE      41          // 40 chars + null terminator
+#define SHA1_STR_LEN        41          // 40 chars + null terminator
 
 static size_t
 writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -102,7 +102,7 @@ getHash(FILE *fp)
     rewind(fp); // reset file pointer to the beginning of the file
 
     /* convert hash to hex string */
-    char *hashString = malloc(SHA1_HASH_SIZE * sizeof(char));
+    char *hashString = malloc(SHA1_STR_LEN * sizeof(char));
     if (hashString == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -114,7 +114,7 @@ getHash(FILE *fp)
     for (int i = 0; i < SHA1_BLOCK_SIZE; i++)
         sprintf(&hashString[i << 1], "%02x", hash[i]);
 
-    hashString[SHA1_HASH_SIZE - 1] = '\0';
+    hashString[SHA1_STR_LEN - 1] = '\0';
 
     return hashString;
 }

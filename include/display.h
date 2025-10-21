@@ -7,7 +7,7 @@
 #include <SDL_events.h>
 #include <SDL_image.h>
 
-#define KEY_COUNT       16                      // 16 keys (0x0 to 0xF)
+#define AMOUNT_KEYS     16                      // 16 keys (0x0 to 0xF)
 
 #define SCALE           10                      // scale factor for the display
 
@@ -24,8 +24,8 @@ typedef struct {
     SDL_bool            *pixelDrawn;            // which pixels are drawn?
     SDL_bool            poweredOn;              // power flag
     SDL_bool            reset;                  // reset flag
-    SDL_bool            keyDown[KEY_COUNT];     // which keys are pressed?
-    SDL_bool            keyUp[KEY_COUNT];       // which keys are released?
+    SDL_bool            keyDown[AMOUNT_KEYS];     // which keys are pressed?
+    SDL_bool            keyUp[AMOUNT_KEYS];       // which keys are released?
     SDL_bool            dirty;                  // does display need redrawing?
     uint32_t            lastUpdate;             // tick count at last update
     int                 width;                  // current width
