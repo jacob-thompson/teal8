@@ -66,7 +66,7 @@ pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url)
 }
 
 const char *
-getHash(FILE *fp)
+getHash(FILE *romFile)
 {
     EVP_MD_CTX *shaContext = EVP_MD_CTX_new();
     if (shaContext == NULL) {
@@ -92,14 +92,14 @@ getHash(FILE *fp)
     size_t  bytesRead = 0;
 
     /* read the ROM file in chunks and update the SHA1 context */
-    while ((bytesRead = fread(buffer, 1, sizeof buffer, fp)) > 0)
+    while ((bytesRead = fread(buffer, 1, sizeof buffer, romFile)) > 0)
         EVP_DigestUpdate(shaContext, buffer, bytesRead);
 
     /* finalize the SHA1 hash */
     uint8_t hash[SHA1_BLOCK_SIZE];
     EVP_DigestFinal_ex(shaContext, hash, NULL);
     EVP_MD_CTX_free(shaContext);
-    rewind(fp); // reset file pointer to the beginning of the file
+    rewind(romFile); // reset file pointer to the beginning of the file
 
     /* convert hash to hex string */
     char *hashString = malloc(SHA1_STR_LEN * sizeof(char));
@@ -156,7 +156,7 @@ printRomInfo(cJSON *romInfo, cJSON *romHash)
 }
 
 SDL_bool
-isRomInDatabase(FILE *fp)
+isRomInDatabase(FILE *romFile)
 {
     struct MemoryStruct hashChunk, infoChunk;
 
@@ -243,7 +243,7 @@ isRomInDatabase(FILE *fp)
         (unsigned long)hashChunk.size
     );
 
-    const char *hashString = getHash(fp);
+    const char *hashString = getHash(romFile);
     if (hashString == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -342,23 +342,23 @@ isRomInDatabase(FILE *fp)
 }
 
 SDL_bool
-isFileValid(const char *fileName, FILE *fp, struct stat *st)
+isRomValid(const char *romName, FILE *romFile, struct stat *st)
 {
     /* check if file exists and is readable */
-    if (fp == NULL || fstat(fileno(fp), st) == -1) {
+    if (romFile == NULL || fstat(fileno(romFile), st) == -1) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to open %s\n",
-            fileName
+            romName
         );
         return SDL_FALSE;
     }
 
-    if (!isRomInDatabase(fp)) {
+    if (!isRomInDatabase(romFile)) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "%s not found in database\n",
-            fileName
+            romName
         );
         SDL_LogInfo(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -370,7 +370,7 @@ isFileValid(const char *fileName, FILE *fp, struct stat *st)
     SDL_LogDebug(
         SDL_LOG_CATEGORY_APPLICATION,
         "%s opened successfully\n",
-        fileName
+        romName
     );
     return SDL_TRUE;
 }

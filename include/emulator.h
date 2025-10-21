@@ -70,7 +70,7 @@ isNumber(const char num[]);
 
 /*
  * Get the rom file.
- * Parameter: string representing the path to the rom file
+ * Parameter: a string representing the path to the rom file
  * Return: the rom file
  * Return: NULL if the rom file could not be opened
  */
@@ -78,15 +78,15 @@ FILE *
 getRom(const char *rom);
 
 /*
- * Write the font to the memory of the emulator.
- * Font data is written into memory between 0x00 and 0x50.
+ * Write the font to memory.
+ * Font data is written into memory between addresses 0x00 and 0x50.
  * Parameter: the memory of the emulator
  */
 void
 writeFontToMemory(uint8_t *memory);
 
 /*
- * Write the rom to the memory of the emulator.
+ * Write the rom to memory.
  * The program counter is set to 0x200.
  * Parameter: the emulator
  * Parameter: the rom file
@@ -97,7 +97,7 @@ writeRomToMemory(emulator *chip8, FILE *rom);
 /*
  * Initialize the emulator.
  * Parameter: the emulator
- * Parameter: the rom file
+ * Parameter: a rom file
  */
 void
 initializeEmulator(emulator *chip8, FILE *rom);
@@ -130,7 +130,7 @@ fetchOpcode(emulator *chip8);
 /*
  * Decode and execute an opcode.
  * Parameter: the emulator
- * Parameter: the opcode
+ * Parameter: an opcode
  */
 void
 decodeAndExecuteOpcode(emulator *chip8, const uint16_t opcode);

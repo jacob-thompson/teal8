@@ -196,7 +196,7 @@ main(int argc, char **argv)
     FILE *rom               = getRom(inputFile);
     struct stat st;
 
-    if (!force && !isFileValid(inputFile, rom, &st)) {
+    if (!force && !isRomValid(inputFile, rom, &st)) {
         if (rom != NULL) fclose(rom);
         return -1;      // error has already been logged
     } else if (force) {

@@ -49,7 +49,7 @@ createPixels(display *display);
 /*
  * Initialize the display.
  * Parameter: the display structure
- * Parameter: string representing the path to the icon file
+ * Parameter: a string representing the path to the icon file
  * Return: 0 on success
  * Return: 1 on failure
  */

@@ -13,16 +13,16 @@ typedef struct {
 
 /*
  * Audio callback function to generate a tone.
- * Parameter: audio structure
- * Parameter: audio buffer to fill
- * Parameter: length of the audio buffer in bytes
+ * Parameter: the audio structure
+ * Parameter: the audio buffer to fill
+ * Parameter: the length of the audio buffer in bytes
  */
 void
 audioCallback(void *userdata, Uint8 *stream, const int len);
 
 /*
  * Initialize the audio system.
- * Parameter: audio structure
+ * Parameter: the audio structure
  * Return: 0 on success
  * Return: -1 on failure
  */
