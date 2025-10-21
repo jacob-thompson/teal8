@@ -15,27 +15,29 @@ main(int argc, char **argv)
 
     /* data that may be configured by args */
     uint16_t    rate;
-    int         opt, longIndex;
-    SDL_bool    mute, force;
+    int         *opt        = malloc(sizeof(int));
+    int         *longIndex  = malloc(sizeof(int));
+    SDL_bool    *mute       = malloc(sizeof(SDL_bool));
+    SDL_bool    *force      = malloc(sizeof(SDL_bool));
 
     /* defaults */
-    rate        = DEFAULT_IPS;                  // 1000 instructions per second
-    longIndex   = 0;                            // index for longOptions
-    mute        = SDL_FALSE;                    // mute audio (-m or --mute)
-    force       = SDL_FALSE;                    // force load rom (-f or --force)
+    rate        = DEFAULT_IPS;          // 1000 instructions per second
+    *longIndex  = 0;                    // index for longOptions
+    *mute       = SDL_FALSE;            // mute audio (-m or --mute)
+    *force      = SDL_FALSE;            // force load rom (-f or --force)
 
     /* parsing args */
     while (
         argc > 1
         &&
-        (opt = getopt_long(argc, argv,  "fmi:hv", longOptions, &longIndex)) != -1
+        (*opt = getopt_long(argc, argv,  "fmi:hv", longOptions, longIndex)) != -1
     ) {
-        switch (opt) {
+        switch (*opt) {
             case 'f':   // force
-                force = SDL_TRUE;
+                *force = SDL_TRUE;
                 break;
             case 'm':   // mute
-                mute = SDL_TRUE;
+                *mute = SDL_TRUE;
                 break;
             case 'i':   // ips
                 if (isNumber(optarg)) {
@@ -45,6 +47,10 @@ main(int argc, char **argv)
                         SDL_LOG_CATEGORY_APPLICATION,
                         "invalid IPS input\n"
                     );
+                    free(opt);
+                    free(longIndex);
+                    free(mute);
+                    free(force);
                     return -1;
                 }
 
@@ -63,10 +69,16 @@ main(int argc, char **argv)
                 break;
             default:    // '?'
                 printUsage(argv[0], SDL_LOG_PRIORITY_ERROR);
+                free(opt);
+                free(longIndex);
+                free(mute);
+                free(force);
                 return -1;
                 break;
         }
     }
+    free(opt);
+    free(longIndex);
 
     /* ensure that a ROM argument was given */
     if (optind >= argc) {
@@ -74,6 +86,8 @@ main(int argc, char **argv)
             SDL_LOG_CATEGORY_APPLICATION,
             "expected ROM argument after options\n"
         );
+        free(mute);
+        free(force);
         return -1;
     }
 
@@ -83,6 +97,8 @@ main(int argc, char **argv)
 
     if (!force && !isRomValid(inputFile, rom, &st)) {
         if (rom != NULL) fclose(rom);
+        free(mute);
+        free(force);
         return -1;      // error has already been logged
     } else if (force) {
         if (rom == NULL) {
@@ -91,6 +107,8 @@ main(int argc, char **argv)
                 "failed to open ROM file: %s\n",
                 inputFile
             );
+            free(mute);
+            free(force);
             return -1;
         }
         SDL_LogDebug(
@@ -105,10 +123,12 @@ main(int argc, char **argv)
             inputFile
         );
     }
+    free(force);
 
     emulator chip8;
     initializeEmulator(&chip8, rom);
-    chip8.muted = mute;
+    chip8.muted = *mute;
+    free(mute);
 
     if (chip8.muted) {
         SDL_LogDebug(
