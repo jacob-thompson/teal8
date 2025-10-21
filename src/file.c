@@ -65,7 +65,7 @@ pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url)
     return 0;
 }
 
-const char *
+char *
 getHash(FILE *romFile)
 {
     EVP_MD_CTX *shaContext = EVP_MD_CTX_new();

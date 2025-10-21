@@ -95,7 +95,7 @@ drawBackground(display *display);
  *
  * Return:
  * 0 on success,
- * 1 on failure
+ * -1 on failure
  */
 int
 drawPixels(display *display);

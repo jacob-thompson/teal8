@@ -38,7 +38,7 @@ writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
  *
  * Return:
  * 0 on success,
- * 1 on failure
+ * -1 on failure
  */
 int
 pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url);
@@ -52,7 +52,7 @@ pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url);
  * Return:
  * pointer to the hash string (must be freed by caller)
  */
-const char *
+char *
 getHash(FILE *romFile);
 
 /*
@@ -72,8 +72,8 @@ printRomInfo(cJSON *romInfo, cJSON *romHash);
  * the ROM file
  *
  * Return:
- * true if the ROM is in the database,
- * false if the ROM is not in the database
+ * SDL_TRUE if the ROM is in the database,
+ * SDL_FALSE if the ROM is not in the database
  */
 SDL_bool
 isRomInDatabase(FILE *romFile);
@@ -89,8 +89,8 @@ isRomInDatabase(FILE *romFile);
  * the stat structure
  *
  * Return:
- * 0 if the ROM is valid,
- * 1 if the ROM is not valid
+ * SDL_TRUE if the ROM is valid,
+ * SDL_FALSE if the ROM is not valid
  */
 SDL_bool
 isRomValid(const char *romName, FILE *romFile, struct stat *st);
