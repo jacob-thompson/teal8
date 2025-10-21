@@ -16,7 +16,6 @@
 
 #define DEFAULT_IPS         1000
 
-/* specification types */
 #define CHIP8               100
 #define SCHIP               101
 
