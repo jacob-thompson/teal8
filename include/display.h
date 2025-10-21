@@ -24,8 +24,8 @@ typedef struct {
     SDL_bool            *pixelDrawn;            // which pixels are drawn?
     SDL_bool            poweredOn;              // power flag
     SDL_bool            reset;                  // reset flag
-    SDL_bool            keyDown[AMOUNT_KEYS];     // which keys are pressed?
-    SDL_bool            keyUp[AMOUNT_KEYS];       // which keys are released?
+    SDL_bool            keyDown[AMOUNT_KEYS];   // which keys are pressed?
+    SDL_bool            keyUp[AMOUNT_KEYS];     // which keys are released?
     SDL_bool            dirty;                  // does display need redrawing?
     uint32_t            lastUpdate;             // tick count at last update
     int                 width;                  // current width
