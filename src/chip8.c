@@ -192,8 +192,8 @@ main(int argc, char **argv)
         return -1;
     }
 
-    const char *inputFile   = argv[optind];
-    FILE *rom               = getRom(inputFile);
+    const char  *inputFile  = argv[optind];
+    FILE        *rom        = getRom(inputFile);
     struct stat st;
 
     if (!force && !isRomValid(inputFile, rom, &st)) {
