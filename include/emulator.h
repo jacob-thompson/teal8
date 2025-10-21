@@ -10,14 +10,15 @@
 #include "../include/stack.h"
 #include "../include/timers.h"
 
-#define AMOUNT_MEMORY_BYTES         0x1000      // 4096 decimal
+#define AMOUNT_MEMORY_BYTES 0x1000
 
-#define DEFAULT_INSTRUCTION_RATE    1000        // 1000 instructions per second
+#define AMOUNT_REGISTERS    16
 
-#define AMOUNT_REGISTERS            16          // 16 8-bit registers (V0 to VF)
+#define DEFAULT_IPS         1000
 
-#define CHIP8                       100         // CHIP-8 specification
-#define SCHIP                       101         // Super CHIP-8 specification
+/* specification types */
+#define CHIP8               100
+#define SCHIP               101
 
 /* long options for getopt_long */
 static struct option longOptions[] =
@@ -83,7 +84,7 @@ getRom(const char *rom);
  * Parameter: the memory of the emulator
  */
 void
-writeFontToMemory(unsigned char *memory);
+writeFontToMemory(uint8_t *memory);
 
 /*
  * Write the rom to the memory of the emulator.
@@ -124,7 +125,7 @@ randomNumber(int min, int max);
  * Parameter: the emulator
  * Return: the opcode
  */
-uint16_t
+const uint16_t
 fetchOpcode(emulator *chip8);
 
 /*
@@ -133,6 +134,6 @@ fetchOpcode(emulator *chip8);
  * Parameter: the opcode
  */
 void
-decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode);
+decodeAndExecuteOpcode(emulator *chip8, const uint16_t opcode);
 
 #endif /* EMULATOR_H */

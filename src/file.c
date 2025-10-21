@@ -5,8 +5,8 @@
 
 #include "../include/file.h"
 
-#define SHA1_BLOCK_SIZE 20          // SHA1 outputs a 20 byte digest
-#define SHA1_STR_LEN    41          // 40 chars + null terminator
+#define SHA1_BLOCK_SIZE 20
+#define SHA1_STR_LEN    41
 
 static size_t
 writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -88,15 +88,15 @@ getHash(FILE *fp)
     }
 
     /* compute SHA1 hash of the ROM */
-    unsigned char   buffer[20]; // SHA1 produces a 20-byte hash
-    size_t          bytesRead = 0;
+    uint8_t buffer[20];
+    size_t  bytesRead = 0;
 
     /* read the ROM file in chunks and update the SHA1 context */
     while ((bytesRead = fread(buffer, 1, sizeof buffer, fp)) > 0)
         EVP_DigestUpdate(shaContext, buffer, bytesRead);
 
     /* finalize the SHA1 hash */
-    unsigned char hash[SHA1_BLOCK_SIZE];
+    uint8_t hash[SHA1_BLOCK_SIZE];
     EVP_DigestFinal_ex(shaContext, hash, NULL);
     EVP_MD_CTX_free(shaContext);
     rewind(fp); // reset file pointer to the beginning of the file
@@ -114,7 +114,7 @@ getHash(FILE *fp)
     for (int i = 0; i < SHA1_BLOCK_SIZE; i++)
         sprintf(&hashString[i << 1], "%02x", hash[i]);
 
-    hashString[SHA1_STR_LEN - 1] = '\0';
+    hashString[SHA1_STR_LEN - 1] = 0;
 
     return hashString;
 }
@@ -193,7 +193,8 @@ isRomInDatabase(FILE *fp)
         curlHandle,
         &hashChunk,
         "https://raw.githubusercontent.com/"
-        "chip-8/chip-8-database/refs/heads/master/database/sha1-hashes.json"
+        "chip-8/chip-8-database/refs/heads/master/"
+        "database/sha1-hashes.json"
     ) != 0) {
         free(hashChunk.memory);
         free(infoChunk.memory);
@@ -282,7 +283,8 @@ isRomInDatabase(FILE *fp)
         curlHandle,
         &infoChunk,
         "https://raw.githubusercontent.com/"
-        "chip-8/chip-8-database/refs/heads/master/database/programs.json"
+        "chip-8/chip-8-database/refs/heads/master/"
+        "database/programs.json"
     ) != 0) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,

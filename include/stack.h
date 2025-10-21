@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define STACK_LEVELS 16             // 16 levels of stack
+#define STACK_LEVELS 16
 
 typedef struct {
     uint16_t    s[STACK_LEVELS];    // 16 addresses
@@ -24,7 +24,7 @@ stacked(stack *stack);
  * Parameter: the value to push onto the stack
  */
 void
-stackPush(stack *stack, const unsigned short *value);
+stackPush(stack *stack, const uint16_t *value);
 
 /*
  * Pop a value from the stack.
@@ -32,6 +32,6 @@ stackPush(stack *stack, const unsigned short *value);
  * Parameter: the value to be used to store popped address
  */
 void
-stackPop(stack *stack, unsigned short *poppedValue);
+stackPop(stack *stack, uint16_t *poppedValue);
 
 #endif /* STACK_H */

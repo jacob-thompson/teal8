@@ -7,15 +7,13 @@
 #include <SDL_events.h>
 #include <SDL_image.h>
 
-#define AMOUNT_KEYS     16                      // 16 keys (0x0 to 0xF)
+#define AMOUNT_KEYS     16
 
-#define SCALE           10                      // scale factor for the display
-
-#define CHIP8_WIDTH     64                      // CHIP8 display width in px
-#define CHIP8_HEIGHT    32                      // CHIP8 display height in px
-
-#define SCHIP_WIDTH     128                     // SCHIP display width in px
-#define SCHIP_HEIGHT    64                      // SCHIP display height in px
+#define SCALE           10
+#define CHIP8_WIDTH     64
+#define CHIP8_HEIGHT    32
+#define SCHIP_WIDTH     128
+#define SCHIP_HEIGHT    64
 
 typedef struct {
     SDL_Window      *window;                // window for the display

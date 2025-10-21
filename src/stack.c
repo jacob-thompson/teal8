@@ -7,7 +7,7 @@ stacked(stack *stack)
 }
 
 void
-stackPush(stack *stack, const unsigned short *value)
+stackPush(stack *stack, const uint16_t *value)
 {
     if (stack->sp < STACK_LEVELS) {
         stack->s[stack->sp] = *value;
@@ -16,7 +16,7 @@ stackPush(stack *stack, const unsigned short *value)
 }
 
 void
-stackPop(stack *stack, unsigned short *poppedValue)
+stackPop(stack *stack, uint16_t *poppedValue)
 {
     if (stack->sp > 0) {
         stack->sp--;

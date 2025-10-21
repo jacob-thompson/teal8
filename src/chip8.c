@@ -9,7 +9,7 @@
 #include "../include/emulator.h"
 #include "../include/file.h"
 
-#define TIMER_INTERVAL (1000 / 60)      // ~16.67ms for 60Hz
+#define TIMER_DECREMENT_INTERVAL (1000 / 60)
 
 int
 main(int argc, char **argv)
@@ -134,7 +134,7 @@ main(int argc, char **argv)
     SDL_bool    mute, force;
 
     /* defaults */
-    rate        = DEFAULT_INSTRUCTION_RATE;     // 1000 instructions per second
+    rate        = DEFAULT_IPS;                  // 1000 instructions per second
     longIndex   = 0;                            // index for longOptions
     mute        = SDL_FALSE;                    // mute audio (-m or --mute)
     force       = SDL_FALSE;                    // force load rom (-f or --force)
@@ -165,7 +165,7 @@ main(int argc, char **argv)
 
                 /* validate the input before we start using it */
                 if (rate <= 0) {
-                    rate = DEFAULT_INSTRUCTION_RATE;
+                    rate = DEFAULT_IPS;
                 }
                 break;
             case 'h':   // help
@@ -277,7 +277,7 @@ main(int argc, char **argv)
          * handle timer updates at 60Hz
          * timers are decremented if they are greater than zero
          */
-        if (ticks - chip8.timers.lastUpdate >= TIMER_INTERVAL) {
+        if (ticks - chip8.timers.lastUpdate >= TIMER_DECREMENT_INTERVAL) {
             if (chip8.timers.delay > 0) {
                 chip8.timers.delay--;
             }

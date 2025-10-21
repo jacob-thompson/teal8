@@ -6,14 +6,14 @@
 
 #include "../include/emulator.h"
 
-#define FONT_START_ADDRESS      0x00            // 0 decimal
-#define AMOUNT_FONT_BYTES       0x50            // 80 decimal
+#define FONT_START_ADDRESS      0x00
+#define AMOUNT_FONT_BYTES       0x50
 
-#define PROGRAM_START_ADDRESS   0x200           // 512 decimal
+#define PROGRAM_START_ADDRESS   0x200
 
-#define VBLANK_INTERVAL         (1000 / 60)     // ~16.67ms for 60Hz
+#define VBLANK_INTERVAL         (1000 / 60)
 
-#define LAST_REGISTER_INDEX     0xF             // index of VF
+#define LAST_REGISTER_INDEX     0xF
 
 void
 printVersion(const char *programName)
@@ -46,7 +46,7 @@ printUsage(const char *programName, SDL_LogPriority priority)
         programName,
         TEAL8VERSION,
         programName,
-        DEFAULT_INSTRUCTION_RATE
+        DEFAULT_IPS
     );
 }
 
@@ -108,7 +108,7 @@ getRom(const char *rom)
 }
 
 void
-writeFontToMemory(unsigned char *memory)
+writeFontToMemory(uint8_t *memory)
 {
     const uint8_t font[AMOUNT_FONT_BYTES] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -218,7 +218,7 @@ randomNumber(int min, int max)
     return x % range + min;
 }
 
-uint16_t
+const uint16_t
 fetchOpcode(emulator *chip8)
 {
     if (chip8->pc >= AMOUNT_MEMORY_BYTES - 1) {
@@ -233,7 +233,7 @@ fetchOpcode(emulator *chip8)
 }
 
 void
-decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
+decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
 {
     uint8_t minuend, subtrahend, operand, addend;
 

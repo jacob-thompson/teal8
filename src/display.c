@@ -2,8 +2,8 @@
 
 #include "../include/display.h"
 
-#define BLACK_PIXEL_COLOR 0, 0, 0, 255            // RGBA for black pixel
-#define WHITE_PIXEL_COLOR 255, 255, 255, 255      // RGBA for white pixel
+#define BLACK_PIXEL_COLOR 0, 0, 0, 255
+#define WHITE_PIXEL_COLOR 255, 255, 255, 255
 
 void
 resetDisplay(display *display)
