@@ -139,19 +139,21 @@ initDisplay(display *display, const char *iconPath)
         return -1;
     }
 
-    SDL_Surface *iconSurface = IMG_Load(iconPath);
-    if (iconSurface == NULL) {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "failed to load icon: %s\n",
-            IMG_GetError()
-        );
-        SDL_DestroyRenderer(display->renderer);
-        SDL_DestroyWindow(display->window);
-        return -1;
+    if (iconPath != NULL) {
+        SDL_Surface *iconSurface = IMG_Load(iconPath);
+        if (iconSurface == NULL) {
+            SDL_LogError(
+                SDL_LOG_CATEGORY_APPLICATION,
+                "failed to load icon: %s\n",
+                IMG_GetError()
+            );
+            SDL_DestroyRenderer(display->renderer);
+            SDL_DestroyWindow(display->window);
+            return -1;
+        }
+        SDL_SetWindowIcon(display->window, iconSurface);
+        SDL_FreeSurface(iconSurface);
     }
-    SDL_SetWindowIcon(display->window, iconSurface);
-    SDL_FreeSurface(iconSurface);
 
     display->pixels     = NULL;
     display->pixelDrawn = NULL;

@@ -1,9 +1,3 @@
-#if defined(__APPLE__)
-#include <mach-o/dyld.h>
-#endif
-
-#include <sys/syslimits.h>
-
 #include <SDL.h>
 
 #include "../include/emulator.h"
@@ -14,115 +8,6 @@
 int
 main(int argc, char **argv)
 {
-    char *binPath, *iconPath;
-    uint32_t size;
-
-    /* get resource path in order to set the window icon */
-#if defined(__APPLE__) // macOS
-
-    _NSGetExecutablePath(NULL, &size); // get the size needed
-    binPath = malloc(sizeof(char) * PATH_MAX);
-    if (binPath == NULL) {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "failed to allocate memory for executable path\n"
-        );
-        return -1;
-    }
-
-    if (_NSGetExecutablePath(binPath, &size) == 0) {
-        SDL_LogDebug(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "path = %s\n",
-            binPath
-        );
-    }
-
-    iconPath = malloc(sizeof(char) * PATH_MAX);
-    if (iconPath == NULL) {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "failed to allocate memory for resource path\n"
-        );
-        return -1;
-    }
-
-    int len, charsToTrim;
-    len         = strlen(binPath);
-    charsToTrim = 10; // /bin/teal8 is 10 characters
-
-    if (len >= charsToTrim) {
-        binPath[len - charsToTrim] = '\0'; // trim
-    } else {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "executable path is unexpectedly short\n"
-        );
-        free(binPath);
-        free(iconPath);
-        return -1;
-    }
-
-    /* construct the path to the icon */
-    snprintf(iconPath, PATH_MAX, "%s/resources/icon.png", binPath);
-
-#elif defined(__linux__)
-
-    binPath = malloc(sizeof(char) * PATH_MAX);
-    if (binPath == NULL) {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "failed to allocate memory for executable path\n"
-        );
-        return -1;
-    }
-
-    ssize_t count = readlink("/proc/self/exe", binPath, PATH_MAX);
-    if (count != -1) {
-        binPath[count] = '\0'; // null-terminate the string
-        SDL_LogDebug(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "path = %s\n",
-            binPath
-        );
-    } else {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "failed to read /proc/self/exe\n"
-        );
-        free(binPath);
-        return -1;
-    }
-
-    iconPath = malloc(sizeof(char) * PATH_MAX);
-    if (iconPath == NULL) {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "failed to allocate memory for resource path\n"
-        );
-        return -1;
-    }
-
-    int len, charsToTrim;
-    len         = strlen(binPath);
-    charsToTrim = 10; // /bin/teal8 is 10 characters
-
-    if (len >= charsToTrim) {
-        binPath[len - charsToTrim] = '\0'; // trim
-    } else {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "executable path is unexpectedly short\n"
-        );
-        free(binPath);
-        free(iconPath);
-        return -1;
-    }
-
-    /* construct the path to the icon */
-    snprintf(iconPath, PATH_MAX, "%s/resources/icon.png", binPath);
-
-#endif
 
     srand(time(NULL));
 
@@ -233,8 +118,25 @@ main(int argc, char **argv)
         );
     }
 
+#if defined(__APPLE__)
+
+    char *bin = getExecutablePathMACOS();
+
+#elif defined(__linux__)
+
+    char *bin = getExecutablePathLINUX();
+
+#endif
+
+    const char *iconPath = getWindowIconPath(bin);
+
     if (initDisplay(&chip8.display, iconPath) != 0) {
+        free((void *)bin);
+        free((void *)iconPath);
         return -1;      // error has already been logged
+    } else {
+        free((void *)bin);
+        free((void *)iconPath);
     }
 
     if (!chip8.muted && initAudio(&chip8.sound) != 0) {
@@ -379,9 +281,6 @@ main(int argc, char **argv)
         SDL_LOG_CATEGORY_APPLICATION,
         "cleaning up\n"
     );
-
-    free(binPath);
-    free(iconPath);
 
     if (chip8.sound.poweredOn) {
         SDL_LogDebug(

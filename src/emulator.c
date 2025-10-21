@@ -1,5 +1,10 @@
+#if defined(__APPLE__)
+#include <mach-o/dyld.h>
+#endif
+
 #include <stdio.h>
 #include <string.h>
+#include <sys/syslimits.h>
 
 #include <SDL_log.h>
 #include <SDL_timer.h>
@@ -46,6 +51,110 @@ printUsage(const char *programName, const SDL_LogPriority priority)
     );
 }
 
+char *
+getExecutablePathMACOS()
+{
+    char        *binPath;
+    uint32_t    size;
+
+    _NSGetExecutablePath(NULL, &size); // get the size needed
+
+    binPath = malloc(sizeof(char) * PATH_MAX);
+
+    if (binPath == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to allocate memory for executable path\n"
+        );
+        return NULL;
+    }
+
+    if (_NSGetExecutablePath(binPath, &size) == 0) {
+        SDL_LogDebug(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "path = %s\n",
+            binPath
+        );
+    } else {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to get executable path\n"
+        );
+        free(binPath);
+        return NULL;
+    }
+
+    return binPath;
+}
+
+char *
+getExecutablePathLINUX()
+{
+    char        *binPath;
+
+    binPath = malloc(sizeof(char) * PATH_MAX);
+
+    if (binPath == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to allocate memory for executable path\n"
+        );
+        return NULL;
+    }
+
+    ssize_t count = readlink("/proc/self/exe", binPath, PATH_MAX);
+    if (count != -1) {
+        binPath[count] = '\0'; // null-terminate the string
+        SDL_LogDebug(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "path = %s\n",
+            binPath
+        );
+    } else {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to read /proc/self/exe\n"
+        );
+        free(binPath);
+        return NULL;
+    }
+
+    return binPath;
+}
+
+char *
+getWindowIconPath(char *binPath)
+{
+    if (binPath == NULL) return NULL;
+
+    char *iconPath = malloc(sizeof(char) * PATH_MAX);
+    if (iconPath == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to allocate memory for resource path\n"
+        );
+        return NULL;
+    }
+
+    int len         = strlen(binPath);
+    int charsToTrim = 10; // /bin/teal8 is 10 characters
+
+    if (len >= charsToTrim) {
+        binPath[len - charsToTrim] = '\0'; // trim
+    } else {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "executable path is unexpectedly short\n"
+        );
+        return NULL;
+    }
+
+    /* construct the path to the icon */
+    snprintf(iconPath, PATH_MAX, "%s/resources/icon.png", binPath);
+
+    return iconPath;
+}
+
 SDL_bool
 isNumber(const char num[])
 {
@@ -54,10 +163,9 @@ isNumber(const char num[])
         return SDL_FALSE;
 
     /* check if each character is a numeral */
-    for (int i = 0; num[i] != 0; ++i) {
-        if (!isdigit(num[i]))
-            return SDL_FALSE;
-    }
+    for (int i = 0; num[i] != 0; ++i)
+        if (!isdigit(num[i])) return SDL_FALSE;
+
     return SDL_TRUE;
 }
 

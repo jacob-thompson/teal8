@@ -59,6 +59,15 @@ printVersion(const char *programName);
 void
 printUsage(const char *programName, const SDL_LogPriority priority);
 
+char *
+getExecutablePathMACOS();
+
+char *
+getExecutablePathLINUX();
+
+char *
+getWindowIconPath(char *binPath);
+
 /*
  * Check if a string is a number.
  * Parameter: the string to check
