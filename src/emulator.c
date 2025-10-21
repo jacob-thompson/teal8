@@ -156,10 +156,8 @@ void initializeEmulator(emulator *chip8, FILE *rom)
     chip8->timers.lastUpdate = 0;
 
     /* ensure registers and stack are cleared */
-    for (int i = 0x0; i <= LAST_REGISTER; i++) {
-        chip8->v[i] = 0;
-        chip8->stack.s[i] = 0;
-    }
+    memset(chip8->v, 0, sizeof chip8->v);
+    memset(chip8->stack.s, 0, sizeof chip8->stack.s);
     chip8->stack.sp = 0;
 
     chip8->specType = CHIP8;

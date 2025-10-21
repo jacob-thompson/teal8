@@ -7,9 +7,16 @@ void resetDisplay(display *display)
     if (display->pixelDrawn == NULL)
         return;
 
-    for (int y = 0; y < display->pixelHeight; y++)
-        for (int x = 0; x < display->pixelWidth; x++)
-            display->pixelDrawn[y * display->pixelWidth + x] = SDL_FALSE;
+    memset(
+        display->pixelDrawn,
+        SDL_FALSE,
+        display->pixelHeight
+        *
+        display->pixelWidth
+        *
+        sizeof *display->pixelDrawn
+    );
+
     display->dirty = SDL_TRUE;
 }
 
@@ -331,6 +338,5 @@ int drawPixels(display *display)
 
 void clearKeys(SDL_bool *keys)
 {
-    for (int i = 0x0; i <= 0xF; i++)
-        keys[i] = SDL_FALSE;
+    memset(keys, SDL_FALSE, KEY_COUNT * sizeof *keys);
 }
