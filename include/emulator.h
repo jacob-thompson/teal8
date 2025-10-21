@@ -46,42 +46,63 @@ typedef struct {
 
 /*
  * Print the version of the program.
- * Parameter: the name of the program
+ *
+ * Parameter:
+ * the name of the program
  */
 void
 printVersion(const char *programName);
 
 /*
  * Print the usage of the program.
- * Parameter: the name of the program
- * Parameter: the log priority to use
+ *
+ * Parameter:
+ * the name of the program,
+ * the log priority to use
  */
 void
 printUsage(const char *programName, const SDL_LogPriority priority);
 
+/*
+ * TODO
+ */
 char *
 getExecutablePathMACOS();
 
+/*
+ * TODO
+ */
 char *
 getExecutablePathLINUX();
 
+/*
+ * TODO
+ */
 char *
 getWindowIconPath(char *binPath);
 
 /*
  * Check if a string is a number.
- * Parameter: the string to check
- * Return: true if the string is a number
- * Return: false if the string is not a number
+ *
+ * Parameter:
+ * the string to check
+ *
+ * Return:
+ * true if the string is a number,
+ * false if the string contains non-digit characters
  */
 SDL_bool
 isNumber(const char num[]);
 
 /*
  * Get the rom file.
- * Parameter: a string representing the path to the rom file
- * Return: the rom file
- * Return: NULL if the rom file could not be opened
+ *
+ * Parameter:
+ * a string representing the path to the rom file
+ *
+ * Return:
+ * the rom file,
+ * NULL if the rom file could not be opened
  */
 FILE *
 getRom(const char *rom);
@@ -89,7 +110,9 @@ getRom(const char *rom);
 /*
  * Write the font to memory.
  * Font data is written into memory between addresses 0x00 and 0x50.
- * Parameter: the memory of the emulator
+ *
+ * Parameter:
+ * the memory of the emulator
  */
 void
 writeFontToMemory(uint8_t *memory);
@@ -97,16 +120,20 @@ writeFontToMemory(uint8_t *memory);
 /*
  * Write the rom to memory.
  * The program counter is set to 0x200.
- * Parameter: the emulator
- * Parameter: the rom file
+ *
+ * Parameters:
+ * the emulator,
+ * the rom file
  */
 void
 writeRomToMemory(emulator *chip8, FILE *rom);
 
 /*
  * Initialize the emulator.
- * Parameter: the emulator
- * Parameter: a rom file
+ *
+ * Parameters:
+ * the emulator,
+ * a rom file
  */
 void
 initializeEmulator(emulator *chip8, FILE *rom);
@@ -114,15 +141,21 @@ initializeEmulator(emulator *chip8, FILE *rom);
 /*
  * Print the memory of the emulator.
  * For debugging purposes.
- * Parameter: the emulator
+ *
+ * Parameter:
+ * the emulator
  */
 //void printMemory(emulator *chip8);
 
 /*
  * Generate a random number between min and max.
- * Parameter: the minimum number
- * Parameter: the maximum number
- * Return: a random number between min and max
+ *
+ * Parameters:
+ * the minimum number,
+ * the maximum number
+ *
+ * Return:
+ * a random number between the minimum and maximum
  */
 int
 randomNumber(int min, int max);
@@ -130,16 +163,22 @@ randomNumber(int min, int max);
 /*
  * Fetch the current opcode from memory.
  * The opcode is 2 bytes long.
- * Parameter: the emulator
- * Return: the current opcode
+ *
+ * Parameter:
+ * the emulator
+ *
+ * Return:
+ * the current opcode
  */
 uint16_t
 fetchOpcode(emulator *chip8);
 
 /*
  * Decode and execute an opcode.
- * Parameter: the emulator
- * Parameter: an opcode
+ *
+ * Parameters:
+ * the emulator,
+ * an opcode
  */
 void
 decodeAndExecuteOpcode(emulator *chip8, const uint16_t opcode);

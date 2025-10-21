@@ -34,58 +34,79 @@ typedef struct {
 
 /*
  * Clear the pixels of the display.
- * Parameter: the display structure
+ *
+ * Parameter:
+ * the display structure
  */
 void
 resetDisplay(display *display);
 
 /*
  * Create the pixels of the display.
- * Parameter: the display structure
+ *
+ * Parameter:
+ * the display structure
  */
 void
 createPixels(display *display);
 
 /*
  * Initialize the display.
- * Parameter: the display structure
- * Parameter: a string representing the path to the icon file
- * Return: 0 on success
- * Return: 1 on failure
+ *
+ * Parameters:
+ * the display structure,
+ * a string representing the path to the icon file
+ *
+ * Return:
+ * 0 on success,
+ * -1 on failure
  */
 int
 initDisplay(display *display, const char *iconPath);
 
 /*
  * Handle an event.
- * Parameter: the display structure
- * Parameter: the event to handle
+ *
+ * Parameters:
+ * the display structure,
+ * the event to handle
  */
 void
 handleEvent(display *display, const SDL_Event *event);
 
 /*
  * Draw the background of the display.
- * Parameter: the display structure
- * Return: 0 on success
- * Return: 1 on failure
+ *
+ * Parameter:
+ * the display structure
+ *
+ * Return:
+ * 0 on success,
+ * -1 on failure
  */
 int
 drawBackground(display *display);
 
 /*
  * Draw the pixels of the display.
- * Parameter: the display structure
- * Return: 0 on success
- * Return: 1 on failure
+ *
+ * Parameter:
+ * the display structure
+ *
+ * Return:
+ * 0 on success,
+ * 1 on failure
  */
 int
 drawPixels(display *display);
 
 /*
  * Clear keypress events.
+ *
  * Sets all key states to SDL_FALSE.
- * Parameter: the list of key states to be cleared
+ *
+ * Parameter:
+ * the list of key states to be cleared
 */
 void
 clearKeys(SDL_bool *keys);

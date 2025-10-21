@@ -12,24 +12,32 @@ typedef struct {
 
 /*
  * Get the number of stacked addresses.
- * Parameter: the stack
- * Return: the number of stacked addresses
+ *
+ * Parameter:
+ * the stack
+ *
+ * Return:
+ * the number of stacked addresses
  */
 int
 stacked(stack *stack);
 
 /*
  * Push a value onto the stack.
- * Parameter: the stack
- * Parameter: the value to push onto the stack
+ *
+ * Parameters:
+ * the stack,
+ * the value to push onto the stack
  */
 void
 stackPush(stack *stack, const uint16_t *value);
 
 /*
  * Pop a value from the stack.
- * Parameter: the stack
- * Parameter: the value to be used to store popped address
+ *
+ * Parameters:
+ * the stack,
+ * the value to be used to store popped address
  */
 void
 stackPop(stack *stack, uint16_t *poppedValue);
