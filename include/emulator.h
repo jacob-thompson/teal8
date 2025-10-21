@@ -64,19 +64,31 @@ void
 printUsage(const char *programName, const SDL_LogPriority priority);
 
 /*
- * TODO
+ * Get a string representing the binary path on macOS.
+ *
+ * Return:
+ * the path to the binary executable
  */
 char *
 getExecutablePathMACOS();
 
 /*
- * TODO
+ * Get a string representing the binary path on Linux.
+ *
+ * Return:
+ * the path to the binary executable
  */
 char *
 getExecutablePathLINUX();
 
 /*
- * TODO
+ * Get the path to the window icon resource.
+ *
+ * Parameter:
+ * the path to the binary executable
+ *
+ * Return:
+ * the path to the window icon
  */
 char *
 getWindowIconPath(char *binPath);
