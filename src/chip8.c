@@ -26,7 +26,7 @@ int main(int argc, char **argv)
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to allocate memory for executable path\n"
         );
-        return EXIT_FAILURE;
+        return -1;
     }
 
     if (_NSGetExecutablePath(binPath, &size) == 0) {
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to allocate memory for resource path\n"
         );
-        return EXIT_FAILURE;
+        return -1;
     }
 
     int len, charsToTrim;
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
         );
         free(binPath);
         free(iconPath);
-        return EXIT_FAILURE;
+        return -1;
     }
 
     /* construct the path to the icon */
@@ -72,7 +72,7 @@ int main(int argc, char **argv)
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to allocate memory for executable path\n"
         );
-        return EXIT_FAILURE;
+        return -1;
     }
 
     ssize_t count = readlink("/proc/self/exe", binPath, PATH_MAX);
@@ -89,7 +89,7 @@ int main(int argc, char **argv)
             "failed to read /proc/self/exe\n"
         );
         free(binPath);
-        return EXIT_FAILURE;
+        return -1;
     }
 
     iconPath = malloc(sizeof(char) * PATH_MAX);
@@ -98,7 +98,7 @@ int main(int argc, char **argv)
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to allocate memory for resource path\n"
         );
-        return EXIT_FAILURE;
+        return -1;
     }
 
     int len, charsToTrim;
@@ -113,7 +113,7 @@ int main(int argc, char **argv)
         );
         free(binPath);
         free(iconPath);
-        return EXIT_FAILURE;
+        return -1;
     }
 
     /* construct the path to the icon */
@@ -157,7 +157,7 @@ int main(int argc, char **argv)
                         SDL_LOG_CATEGORY_APPLICATION,
                         "invalid IPS input\n"
                     );
-                    return EXIT_FAILURE;
+                    return -1;
                 }
 
                 /* validate the input before we start using it */
@@ -167,15 +167,15 @@ int main(int argc, char **argv)
                 break;
             case 'h': // help
                 printUsage(argv[0], SDL_LOG_PRIORITY_INFO);
-                return EXIT_SUCCESS;
+                return 0;
                 break;
             case 'v': // version
                 printVersion(argv[0]);
-                return EXIT_SUCCESS;
+                return 0;
                 break;
             default: // '?'
                 printUsage(argv[0], SDL_LOG_PRIORITY_ERROR);
-                return EXIT_FAILURE;
+                return -1;
                 break;
         }
     }
@@ -186,7 +186,7 @@ int main(int argc, char **argv)
             SDL_LOG_CATEGORY_APPLICATION,
             "expected ROM argument after options\n"
         );
-        return EXIT_FAILURE;
+        return -1;
     }
 
     const char *inputFile = argv[optind];
@@ -195,7 +195,7 @@ int main(int argc, char **argv)
 
     if (!force && !isFileValid(inputFile, rom, &st)) {
         if (rom != NULL) fclose(rom);
-        return EXIT_FAILURE; // error has already been logged
+        return -1; // error has already been logged
     } else if (force) {
         if (rom == NULL) {
             SDL_LogError(
@@ -203,7 +203,7 @@ int main(int argc, char **argv)
                 "failed to open ROM file: %s\n",
                 inputFile
             );
-            return EXIT_FAILURE;
+            return -1;
         }
         SDL_LogDebug(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -231,7 +231,7 @@ int main(int argc, char **argv)
     }
 
     if (initDisplay(&chip8.display, iconPath) != 0) {
-        return EXIT_FAILURE; // error has already been logged
+        return -1; // error has already been logged
     }
 
     if (!chip8.muted && initAudio(&chip8.sound) != 0) {
@@ -240,7 +240,7 @@ int main(int argc, char **argv)
             "error creating SDL audio: %s\n",
             SDL_GetError()
         );
-        return EXIT_FAILURE;
+        return -1;
     }
 
     SDL_LogDebug(
@@ -354,7 +354,7 @@ int main(int argc, char **argv)
                     "error drawing background: %s\n",
                     SDL_GetError()
                 );
-                return EXIT_FAILURE;
+                return -1;
             }
 
             if (drawPixels(&chip8.display) != 0) {
@@ -363,7 +363,7 @@ int main(int argc, char **argv)
                     "error drawing pixels: %s\n",
                     SDL_GetError()
                 );
-                return EXIT_FAILURE;
+                return -1;
             }
 
             SDL_RenderPresent(chip8.display.renderer);
@@ -409,5 +409,5 @@ int main(int argc, char **argv)
     IMG_Quit();
     SDL_Quit();
 
-    return EXIT_SUCCESS;
+    return 0;
 }

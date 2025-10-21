@@ -79,13 +79,13 @@ int initDisplay(display *display, const char *iconPath)
             SDL_INIT_VIDEO
             |
             SDL_INIT_EVENTS
-        ) != EXIT_SUCCESS) {
+        ) != 0) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to initialize SDL (display): %s\n",
             SDL_GetError()
         );
-        return EXIT_FAILURE;
+        return -1;
     }
 
     if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
@@ -94,7 +94,7 @@ int initDisplay(display *display, const char *iconPath)
             "failed to initialize SDL_image: %s\n",
             IMG_GetError()
         );
-        return EXIT_FAILURE;
+        return -1;
     }
 
     display->window = SDL_CreateWindow(
@@ -111,7 +111,7 @@ int initDisplay(display *display, const char *iconPath)
             "failed to create window: %s\n",
             SDL_GetError()
         );
-        return EXIT_FAILURE;
+        return -1;
     }
 
     SDL_GetWindowSize(
@@ -132,7 +132,7 @@ int initDisplay(display *display, const char *iconPath)
             SDL_GetError()
         );
         SDL_DestroyWindow(display->window);
-        return EXIT_FAILURE;
+        return -1;
     }
 
     SDL_Surface *iconSurface = IMG_Load(iconPath);
@@ -144,7 +144,7 @@ int initDisplay(display *display, const char *iconPath)
         );
         SDL_DestroyRenderer(display->renderer);
         SDL_DestroyWindow(display->window);
-        return EXIT_FAILURE;
+        return -1;
     }
     SDL_SetWindowIcon(display->window, iconSurface);
     SDL_FreeSurface(iconSurface);
@@ -162,7 +162,7 @@ int initDisplay(display *display, const char *iconPath)
 
     display->lastUpdate = 0;
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 void handleEvent(display *display, SDL_Event *event)
@@ -311,17 +311,17 @@ int drawBackground(display *display)
 {
     if (
         SDL_SetRenderDrawColor(display->renderer, BLACK_PIXEL_COLOR)
-        != EXIT_SUCCESS
+        != 0
         ||
         SDL_RenderClear(display->renderer)
-        != EXIT_SUCCESS
+        != 0
     )
-        return EXIT_FAILURE;
+        return -1;
 
-    if (SDL_RenderClear(display->renderer) != EXIT_SUCCESS)
-        return EXIT_FAILURE;
+    if (SDL_RenderClear(display->renderer) != 0)
+        return -1;
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 int drawPixels(display *display)
@@ -332,9 +332,9 @@ int drawPixels(display *display)
         display->pixels == NULL
         ||
         SDL_SetRenderDrawColor(display->renderer, WHITE_PIXEL_COLOR)
-        != EXIT_SUCCESS
+        != 0
     )
-        return EXIT_FAILURE;
+        return -1;
 
     for (int y = 0; y < display->pixelHeight; y++)
         for (int x = 0; x < display->pixelWidth; x++)
@@ -345,12 +345,11 @@ int drawPixels(display *display)
                     display->renderer,
                     &display->pixels[y * display->pixelWidth + x]
                 )
-                !=
-                EXIT_SUCCESS
+                != 0
             )
-                return EXIT_FAILURE;
+                return -1;
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 void clearKeys(SDL_bool *keys)

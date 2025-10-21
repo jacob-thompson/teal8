@@ -9,9 +9,6 @@
 
 #define KEY_COUNT 16 // 16 keys (0x0 to 0xF)
 
-#define EXIT_SUCCESS 0
-#define EXIT_FAILURE 1
-
 #define SCALE 10 // scale factor for the display
 #define CHIP8_WIDTH 64 // width of the CHIP8 display in pixels
 #define CHIP8_HEIGHT 32 // height of the CHIP8 display in pixels
