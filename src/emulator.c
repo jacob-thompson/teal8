@@ -6,16 +6,17 @@
 
 #include "../include/emulator.h"
 
-#define FONT_START_ADDRESS 0x000                // 0 decimal
-#define FONT_BYTES 0x50                         // 80 decimal
+#define FONT_START_ADDRESS      0x00            // 0 decimal
+#define FONT_BYTES              0x50            // 80 decimal
 
-#define PROGRAM_START_ADDRESS 0x200             // 512 decimal
+#define PROGRAM_START_ADDRESS   0x200           // 512 decimal
 
-#define VBLANK_INTERVAL (1000 / 60)             // ~16.67ms for 60Hz vertical blank
+#define VBLANK_INTERVAL         (1000 / 60)     // ~16.67ms for 60Hz
 
-#define LAST_REGISTER 0xF                       // index of the last register (VF)
+#define LAST_REGISTER_INDEX     0xF             // index of VF
 
-void printVersion(const char *programName)
+void
+printVersion(const char *programName)
 {
     SDL_LogInfo(
         SDL_LOG_CATEGORY_APPLICATION,
@@ -25,7 +26,8 @@ void printVersion(const char *programName)
     );
 }
 
-void printUsage(const char *programName, SDL_LogPriority priority)
+void
+printUsage(const char *programName, SDL_LogPriority priority)
 {
     SDL_LogMessage(
         SDL_LOG_CATEGORY_APPLICATION,
@@ -48,7 +50,8 @@ void printUsage(const char *programName, SDL_LogPriority priority)
     );
 }
 
-SDL_bool isNumber(const char num[])
+SDL_bool
+isNumber(const char num[])
 {
     /* check if string is empty */
     if (num == NULL || num[0] == '\0')
@@ -62,7 +65,8 @@ SDL_bool isNumber(const char num[])
     return SDL_TRUE;
 }
 
-FILE *getRom(const char *rom)
+FILE *
+getRom(const char *rom)
 {
     /*
      * allocate memory for the filename
@@ -103,7 +107,8 @@ FILE *getRom(const char *rom)
     return romFile; // null
 }
 
-void writeFontToMemory(unsigned char *memory)
+void
+writeFontToMemory(unsigned char *memory)
 {
     uint8_t font[FONT_BYTES] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -128,7 +133,8 @@ void writeFontToMemory(unsigned char *memory)
         memory[FONT_START_ADDRESS + i] = font[i];
 }
 
-void writeRomToMemory(emulator *chip8, FILE *rom)
+void
+writeRomToMemory(emulator *chip8, FILE *rom)
 {
     chip8->pc = PROGRAM_START_ADDRESS;
 
@@ -151,7 +157,8 @@ void writeRomToMemory(emulator *chip8, FILE *rom)
     chip8->pc = PROGRAM_START_ADDRESS; // 0x200
 }
 
-void initializeEmulator(emulator *chip8, FILE *rom)
+void
+initializeEmulator(emulator *chip8, FILE *rom)
 {
     writeFontToMemory(chip8->memory);
     writeRomToMemory(chip8, rom);
@@ -171,7 +178,8 @@ void initializeEmulator(emulator *chip8, FILE *rom)
 }
 
 /*
-void printMemory(emulator *chip8)
+void
+printMemory(emulator *chip8)
 {
     for (int i = 0x0; i < AMOUNT_MEMORY_BYTES; i++) {
         if (i % 0x10 == 0)
@@ -182,7 +190,8 @@ void printMemory(emulator *chip8)
 }
 */
 
-int randomNumber(int min, int max)
+int
+randomNumber(int min, int max)
 {
     if (min == max)
         return min;
@@ -210,7 +219,8 @@ int randomNumber(int min, int max)
     return x % range + min;
 }
 
-uint16_t fetchOpcode(emulator *chip8)
+uint16_t
+fetchOpcode(emulator *chip8)
 {
     if (chip8->pc >= AMOUNT_MEMORY_BYTES - 1) {
         SDL_LogError(
@@ -223,15 +233,16 @@ uint16_t fetchOpcode(emulator *chip8)
     return (chip8->memory[chip8->pc] << 8) | chip8->memory[chip8->pc + 1];
 }
 
-void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
+void
+decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
 {
     uint8_t minuend, subtrahend, operand, addend;
 
-    uint8_t x = (opcode & 0x0F00) >> 8;
-    uint8_t y = (opcode & 0x00F0) >> 4;
-    uint8_t n = opcode & 0x000F;
-    uint8_t nn = opcode & 0x00FF;
-    uint16_t nnn = opcode & 0x0FFF;
+    uint8_t     x   =   (opcode & 0x0F00) >> 8;
+    uint8_t     y   =   (opcode & 0x00F0) >> 4;
+    uint8_t     n   =   opcode & 0x000F;
+    uint8_t     nn  =   opcode & 0x00FF;
+    uint16_t    nnn =   opcode & 0x0FFF;
 
     switch (opcode >> 12) {
         case 0x0:
@@ -515,7 +526,7 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                      * and store the value of the key in Vx
                      */
                     chip8->pc -= 2;
-                    for (int i = 0x0; i <= LAST_REGISTER; i++)
+                    for (int i = 0x0; i <= LAST_REGISTER_INDEX; i++)
                         if (chip8->display.keyUp[i]) {
                             chip8->v[x] = i;
                             chip8->pc += 2;

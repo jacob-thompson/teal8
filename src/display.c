@@ -2,10 +2,11 @@
 
 #include "../include/display.h"
 
-#define BLACK_PIXEL_COLOR 0, 0, 0, 255              // RGBA for black pixel
-#define WHITE_PIXEL_COLOR 255, 255, 255, 255        // RGBA for white pixel
+#define BLACK_PIXEL_COLOR       0, 0, 0, 255            // RGBA for black pixel
+#define WHITE_PIXEL_COLOR       255, 255, 255, 255      // RGBA for white pixel
 
-void resetDisplay(display *display)
+void
+resetDisplay(display *display)
 {
     if (display->pixelDrawn == NULL)
         return;
@@ -23,7 +24,8 @@ void resetDisplay(display *display)
     display->dirty = SDL_TRUE;
 }
 
-void createPixels(display *display)
+void
+createPixels(display *display)
 {
     if (display->pixels != NULL)
         free(display->pixels);
@@ -31,8 +33,8 @@ void createPixels(display *display)
     if (display->pixelDrawn != NULL)
         free(display->pixelDrawn);
 
-    display->pixelWidth = display->width / SCALE;
-    display->pixelHeight = display->height / SCALE;
+    display->pixelWidth     =   display->width / SCALE;
+    display->pixelHeight    =   display->height / SCALE;
 
     display->pixels = calloc(
         display->pixelHeight * display->pixelWidth,
@@ -70,7 +72,8 @@ void createPixels(display *display)
     }
 }
 
-int initDisplay(display *display, const char *iconPath)
+int
+initDisplay(display *display, const char *iconPath)
 {
     if (
         SDL_InitSubSystem(
@@ -149,23 +152,24 @@ int initDisplay(display *display, const char *iconPath)
     SDL_SetWindowIcon(display->window, iconSurface);
     SDL_FreeSurface(iconSurface);
 
-    display->pixels = NULL;
+    display->pixels     = NULL;
     display->pixelDrawn = NULL;
 
     createPixels(display);
 
     resetDisplay(display);
 
-    display->poweredOn = SDL_TRUE;
-    display->reset = SDL_FALSE;
-    display->dirty = SDL_TRUE;
+    display->poweredOn  = SDL_TRUE;
+    display->reset      = SDL_FALSE;
+    display->dirty      = SDL_TRUE;
 
     display->lastUpdate = 0;
 
     return 0;
 }
 
-void handleEvent(display *display, SDL_Event *event)
+void
+handleEvent(display *display, SDL_Event *event)
 {
     switch (event->type) {
         /* handle key presses */
@@ -307,7 +311,8 @@ void handleEvent(display *display, SDL_Event *event)
     }
 }
 
-int drawBackground(display *display)
+int
+drawBackground(display *display)
 {
     if (
         SDL_SetRenderDrawColor(display->renderer, BLACK_PIXEL_COLOR)
@@ -324,7 +329,8 @@ int drawBackground(display *display)
     return 0;
 }
 
-int drawPixels(display *display)
+int
+drawPixels(display *display)
 {
     if (
         display->pixelDrawn == NULL
@@ -352,7 +358,8 @@ int drawPixels(display *display)
     return 0;
 }
 
-void clearKeys(SDL_bool *keys)
+void
+clearKeys(SDL_bool *keys)
 {
     memset(keys, SDL_FALSE, KEY_COUNT * sizeof *keys);
 }

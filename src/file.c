@@ -5,10 +5,11 @@
 
 #include "../include/file.h"
 
-#define SHA1_BLOCK_SIZE 20          // SHA1 outputs a 20 byte digest
-#define SHA1_HASH_SIZE 41           // SHA1 hash string is 40 chars + null terminator
+#define SHA1_BLOCK_SIZE     20          // SHA1 outputs a 20 byte digest
+#define SHA1_HASH_SIZE      41          // 40 chars + null terminator
 
-static size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
+static size_t
+writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
     size_t realsize = size * nmemb;
     struct MemoryStruct *mem = (struct MemoryStruct *)userp;
@@ -31,7 +32,8 @@ static size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, voi
     return realsize;
 }
 
-int pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url)
+int
+pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url)
 {
     CURLcode res;
 
@@ -63,7 +65,8 @@ int pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url)
     return 0;
 }
 
-char *getHash(FILE *fp)
+char *
+getHash(FILE *fp)
 {
     EVP_MD_CTX *shaContext = EVP_MD_CTX_new();
     if (shaContext == NULL) {
@@ -116,7 +119,8 @@ char *getHash(FILE *fp)
     return hashString;
 }
 
-void printRomInfo(cJSON *romInfo, cJSON *romHash)
+void
+printRomInfo(cJSON *romInfo, cJSON *romHash)
 {
     const char *infoString = cJSON_Print(romInfo);
     SDL_LogDebug(
@@ -151,7 +155,8 @@ void printRomInfo(cJSON *romInfo, cJSON *romHash)
     );
 }
 
-SDL_bool isRomInDatabase(FILE *fp)
+SDL_bool
+isRomInDatabase(FILE *fp)
 {
     struct MemoryStruct hashChunk, infoChunk;
 
@@ -336,7 +341,8 @@ SDL_bool isRomInDatabase(FILE *fp)
     return SDL_TRUE;
 }
 
-SDL_bool isFileValid(const char *filename, FILE *fp, struct stat *st)
+SDL_bool
+isFileValid(const char *filename, FILE *fp, struct stat *st)
 {
     /* check if file exists and is readable */
     if (fp == NULL || fstat(fileno(fp), st) == -1) {

@@ -9,9 +9,10 @@
 #include "../include/emulator.h"
 #include "../include/file.h"
 
-#define TIMER_INTERVAL (1000 / 60) // ~16.67ms for 60Hz timer update
+#define TIMER_INTERVAL  (1000 / 60)     // ~16.67ms for 60Hz
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
     char *binPath, *iconPath;
     uint32_t size;
@@ -126,15 +127,15 @@ int main(int argc, char **argv)
     //SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
 
     /* data that may be configured by args */
-    uint16_t rate;
-    int opt, longIndex;
-    SDL_bool mute, force;
+    uint16_t    rate;
+    int         opt, longIndex;
+    SDL_bool    mute, force;
 
     /* defaults */
-    rate = DEFAULT_INSTRUCTION_RATE;    // 1000 instructions per second
-    longIndex = 0;                      // used as the index for longOptions
-    mute = SDL_FALSE;                   // mute audio (-m or --mute)
-    force = SDL_FALSE;                  // force load rom (-f or --force)
+    rate        = DEFAULT_INSTRUCTION_RATE;     // 1000 instructions per second
+    longIndex   = 0;                            // index for longOptions
+    mute        = SDL_FALSE;                    // mute audio (-m or --mute)
+    force       = SDL_FALSE;                    // force load rom (-f or --force)
 
     /* parsing args */
     while (
@@ -143,13 +144,13 @@ int main(int argc, char **argv)
         (opt = getopt_long(argc, argv,  "fmi:hv", longOptions, &longIndex)) != -1
     ) {
         switch (opt) {
-            case 'f': // force
+            case 'f':   // force
                 force = SDL_TRUE;
                 break;
-            case 'm': // mute
+            case 'm':   // mute
                 mute = SDL_TRUE;
                 break;
-            case 'i': // ips
+            case 'i':   // ips
                 if (isNumber(optarg)) {
                     rate = atoi(optarg);
                 } else {
@@ -165,15 +166,15 @@ int main(int argc, char **argv)
                     rate = DEFAULT_INSTRUCTION_RATE;
                 }
                 break;
-            case 'h': // help
+            case 'h':   // help
                 printUsage(argv[0], SDL_LOG_PRIORITY_INFO);
                 return 0;
                 break;
-            case 'v': // version
+            case 'v':   // version
                 printVersion(argv[0]);
                 return 0;
                 break;
-            default: // '?'
+            default:    // '?'
                 printUsage(argv[0], SDL_LOG_PRIORITY_ERROR);
                 return -1;
                 break;
@@ -195,7 +196,7 @@ int main(int argc, char **argv)
 
     if (!force && !isFileValid(inputFile, rom, &st)) {
         if (rom != NULL) fclose(rom);
-        return -1; // error has already been logged
+        return -1;      // error has already been logged
     } else if (force) {
         if (rom == NULL) {
             SDL_LogError(
@@ -231,7 +232,7 @@ int main(int argc, char **argv)
     }
 
     if (initDisplay(&chip8.display, iconPath) != 0) {
-        return -1; // error has already been logged
+        return -1;      // error has already been logged
     }
 
     if (!chip8.muted && initAudio(&chip8.sound) != 0) {
@@ -250,7 +251,7 @@ int main(int argc, char **argv)
         rate
     );
 
-    fclose(rom); // the rom is written to memory, so we can close it now
+    fclose(rom);        // the rom is already written to memory
 
     uint32_t ticks;
     uint16_t opcode;
@@ -265,7 +266,7 @@ int main(int argc, char **argv)
 
         /* check if it is time to execute the next instruction */
         if ((double)ticks < nextInstructionTime) {
-            continue; // not time yet
+            continue;   // not time yet
         }
 
         /* schedule next instruction */

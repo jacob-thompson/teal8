@@ -9,8 +9,8 @@
 
 /* MemoryStruct holds data for curl callback */
 struct MemoryStruct {
-    char *memory;                   // pointer to the data
-    size_t size;                    // size of the data in bytes
+    char        *memory;                // pointer to the data
+    size_t      size;                   // size of the data in bytes
 };
 
 /*
@@ -21,7 +21,8 @@ struct MemoryStruct {
  * Parameter: pointer to the MemoryStruct
  * Return: number of bytes written
  */
-static size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
+static size_t
+writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
 
 /*
  * Pull data from a URL into a MemoryStruct.
@@ -31,21 +32,24 @@ static size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, voi
  * Return: 0 on success
  * Return: 1 on failure
  */
-int pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url);
+int
+pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url);
 
 /*
  * Get the SHA1 hash of a file.
  * Parameter: the file
  * Return: pointer to the hash string (must be freed by caller)
  */
-char *getHash(FILE *fp);
+char *
+getHash(FILE *fp);
 
 /*
  * Print ROM information from a cJSON object.
  * Parameter: cJSON object containing information about the ROM
  * Parameter: cJSON object containing the ROM hash
  */
-void printRomInfo(cJSON *romInfo, cJSON *romHash);
+void
+printRomInfo(cJSON *romInfo, cJSON *romHash);
 
 /*
  * Check if a ROM file is in the database.
@@ -53,7 +57,8 @@ void printRomInfo(cJSON *romInfo, cJSON *romHash);
  * Return: true if the ROM is in the database
  * Return: false if the ROM is not in the database
  */
-SDL_bool isRomInDatabase(FILE *fp);
+SDL_bool
+isRomInDatabase(FILE *fp);
 
 /*
  * Check if a file is valid.
@@ -65,6 +70,7 @@ SDL_bool isRomInDatabase(FILE *fp);
  * Return: 0 if the file is valid
  * Return: 1 if the file is not valid
  */
-SDL_bool isFileValid(const char *filename, FILE *fp, struct stat *st);
+SDL_bool
+isFileValid(const char *filename, FILE *fp, struct stat *st);
 
 #endif /* FILE_H */

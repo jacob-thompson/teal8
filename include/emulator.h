@@ -10,14 +10,14 @@
 #include "../include/stack.h"
 #include "../include/timers.h"
 
-#define AMOUNT_MEMORY_BYTES 0x1000              // 4096 decimal
+#define AMOUNT_MEMORY_BYTES         0x1000      // 4096 decimal
 
-#define DEFAULT_INSTRUCTION_RATE 1000           // 1000 instructions per second
+#define DEFAULT_INSTRUCTION_RATE    1000        // 1000 instructions per second
 
-#define AMOUNT_REGISTERS 16                     // 16 8-bit registers (V0 to VF)
+#define AMOUNT_REGISTERS            16          // 16 8-bit registers (V0 to VF)
 
-#define CHIP8 100
-#define SCHIP 101
+#define CHIP8                       100         // CHIP-8 specification
+#define SCHIP                       101         // Super CHIP-8 specification
 
 /* long options for getopt_long */
 static struct option longOptions[] =
@@ -30,32 +30,34 @@ static struct option longOptions[] =
     {0, 0, 0, 0} // end of array
 };
 
-typedef struct emulator {
-    uint8_t memory[AMOUNT_MEMORY_BYTES];        // 4KB memory
-    uint8_t v[AMOUNT_REGISTERS];                // 16 8-bit registers
-    uint8_t specType;                           // chip8 or schip
-    uint16_t i;                                 // 16-bit address register
-    uint16_t pc;                                // program counter
-    uint32_t lastUpdate;                        // last update tick
-    timers timers;                              // delay & sound timers
-    stack stack;                                // stack & stack pointer
-    display display;                            // display structure
-    audio sound;                                // sound structure
-    SDL_bool muted;                             // is the sound muted?
+typedef struct {
+    uint8_t         memory[AMOUNT_MEMORY_BYTES];    // 4KB memory
+    uint8_t         v[AMOUNT_REGISTERS];            // 16 8-bit registers
+    uint8_t         specType;                       // chip8 or schip
+    uint16_t        i;                              // 16-bit address register
+    uint16_t        pc;                             // program counter
+    uint32_t        lastUpdate;                     // last update tick
+    timers          timers;                         // delay & sound timers
+    stack           stack;                          // stack & stack pointer
+    display         display;                        // display structure
+    audio           sound;                          // sound structure
+    SDL_bool        muted;                          // is the sound muted?
 } emulator;
 
 /*
  * Print the version of the program.
  * Parameter: the name of the program
  */
-void printVersion(const char *programName);
+void
+printVersion(const char *programName);
 
 /*
  * Print the usage of the program.
  * Parameter: the name of the program
  * Parameter: the log priority to use
  */
-void printUsage(const char *programName, SDL_LogPriority priority);
+void
+printUsage(const char *programName, SDL_LogPriority priority);
 
 /*
  * Check if a string is a number.
@@ -63,7 +65,8 @@ void printUsage(const char *programName, SDL_LogPriority priority);
  * Return: true if the string is a number
  * Return: false if the string is not a number
  */
-SDL_bool isNumber(const char num[]);
+SDL_bool
+isNumber(const char num[]);
 
 /*
  * Get the rom file.
@@ -71,14 +74,16 @@ SDL_bool isNumber(const char num[]);
  * Return: the rom file
  * Return: NULL if the rom file could not be opened
  */
-FILE *getRom(const char *rom);
+FILE *
+getRom(const char *rom);
 
 /*
  * Write the font to the memory of the emulator.
  * Font data is written into memory between 0x00 and 0x50.
  * Parameter: the memory of the emulator
  */
-void writeFontToMemory(unsigned char *memory);
+void
+writeFontToMemory(unsigned char *memory);
 
 /*
  * Write the rom to the memory of the emulator.
@@ -86,14 +91,16 @@ void writeFontToMemory(unsigned char *memory);
  * Parameter: the emulator
  * Parameter: the rom file
  */
-void writeRomToMemory(emulator *chip8, FILE *rom);
+void
+writeRomToMemory(emulator *chip8, FILE *rom);
 
 /*
  * Initialize the emulator.
  * Parameter: the emulator
  * Parameter: the rom file
  */
-void initializeEmulator(emulator *chip8, FILE *rom);
+void
+initializeEmulator(emulator *chip8, FILE *rom);
 
 /*
  * Print the memory of the emulator.
@@ -108,7 +115,8 @@ void initializeEmulator(emulator *chip8, FILE *rom);
  * Parameter: the maximum number
  * Return: the random number
  */
-int randomNumber(int min, int max);
+int
+randomNumber(int min, int max);
 
 /*
  * Fetch the opcode from the memory of the emulator.
@@ -116,13 +124,15 @@ int randomNumber(int min, int max);
  * Parameter: the emulator
  * Return: the opcode
  */
-uint16_t fetchOpcode(emulator *chip8);
+uint16_t
+fetchOpcode(emulator *chip8);
 
 /*
  * Decode the opcode.
  * Parameter: the emulator
  * Parameter: the opcode
  */
-void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode);
+void
+decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode);
 
 #endif /* EMULATOR_H */
