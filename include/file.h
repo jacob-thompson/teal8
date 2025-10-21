@@ -9,8 +9,8 @@
 
 /* MemoryStruct holds data for curl callback */
 struct MemoryStruct {
-    char        *memory;                // pointer to the data
-    size_t      size;                   // size of the data in bytes
+    char    *memory;    // pointer to the data
+    size_t  size;       // size of the data in bytes
 };
 
 /*

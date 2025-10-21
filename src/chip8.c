@@ -267,9 +267,8 @@ main(int argc, char **argv)
         ticks = SDL_GetTicks();
 
         /* check if it is time to execute the next instruction */
-        if ((double)ticks < nextInstructionTime) {
-            continue;   // not time yet
-        }
+        if ((double)ticks < nextInstructionTime)
+            continue;
 
         /* schedule next instruction */
         nextInstructionTime += msPerInstruction;

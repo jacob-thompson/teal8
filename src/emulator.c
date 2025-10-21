@@ -237,11 +237,11 @@ decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
 {
     uint8_t minuend, subtrahend, operand, addend;
 
-    const uint8_t     x   =   (opcode & 0x0F00) >> 8;
-    const uint8_t     y   =   (opcode & 0x00F0) >> 4;
-    const uint8_t     n   =   opcode & 0x000F;
-    const uint8_t     nn  =   opcode & 0x00FF;
-    const uint16_t    nnn =   opcode & 0x0FFF;
+    const uint8_t   x   =   (opcode & 0x0F00) >> 8;
+    const uint8_t   y   =   (opcode & 0x00F0) >> 4;
+    const uint8_t   n   =   opcode & 0x000F;
+    const uint8_t   nn  =   opcode & 0x00FF;
+    const uint16_t  nnn =   opcode & 0x0FFF;
 
     switch (opcode >> 12) {
         case 0x0:

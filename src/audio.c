@@ -50,9 +50,9 @@ initAudio(audio *audio)
         return -1;
     }
 
-    audio->poweredOn    = SDL_TRUE;
-    audio->playing      = SDL_FALSE;
-    audio->phase        = 0.0;
+    audio->poweredOn        = SDL_TRUE;
+    audio->playing          = SDL_FALSE;
+    audio->phase            = 0.0;
 
     return 0;
 }

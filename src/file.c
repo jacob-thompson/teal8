@@ -5,8 +5,8 @@
 
 #include "../include/file.h"
 
-#define SHA1_BLOCK_SIZE     20          // SHA1 outputs a 20 byte digest
-#define SHA1_STR_LEN        41          // 40 chars + null terminator
+#define SHA1_BLOCK_SIZE 20          // SHA1 outputs a 20 byte digest
+#define SHA1_STR_LEN    41          // 40 chars + null terminator
 
 static size_t
 writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)

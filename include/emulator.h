@@ -31,17 +31,17 @@ static struct option longOptions[] =
 };
 
 typedef struct {
-    uint8_t         memory[AMOUNT_MEMORY_BYTES];    // 4KB memory
-    uint8_t         v[AMOUNT_REGISTERS];            // 16 8-bit registers
-    uint8_t         specType;                       // chip8 or schip
-    uint16_t        i;                              // 16-bit address register
-    uint16_t        pc;                             // program counter
-    uint32_t        lastUpdate;                     // last update tick
-    timers          timers;                         // delay & sound timers
-    stack           stack;                          // stack & stack pointer
-    display         display;                        // display structure
-    audio           sound;                          // sound structure
-    SDL_bool        muted;                          // is the sound muted?
+    uint8_t     memory[AMOUNT_MEMORY_BYTES];    // 4KB memory
+    uint8_t     v[AMOUNT_REGISTERS];            // 16 8-bit registers
+    uint8_t     specType;                       // chip8 or schip
+    uint16_t    i;                              // 16-bit address register
+    uint16_t    pc;                             // program counter
+    uint32_t    lastUpdate;                     // last update tick
+    timers      timers;                         // delay & sound timers
+    stack       stack;                          // stack & stack pointer
+    display     display;                        // display structure
+    audio       sound;                          // sound structure
+    SDL_bool    muted;                          // is the sound muted?
 } emulator;
 
 /*
