@@ -14,7 +14,7 @@
 #define FONT_START_ADDRESS      0x00
 #define PROGRAM_START_ADDRESS   0x200
 
-#define VBLANK_INTERVAL         (1000 / 60)
+#define VBLANK_INTERVAL_MS      (1000 / 60)
 
 void
 printVersion(const char *programName)
@@ -568,7 +568,7 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
              * set VF to 1 if any set pixels are changed to unset, 0 otherwise
              */
             while (1) { // wait for vertical blank interrupt
-                if (chip8->display.lastUpdate + VBLANK_INTERVAL < SDL_GetTicks())
+                if (chip8->display.lastUpdate + VBLANK_INTERVAL_MS < SDL_GetTicks())
                     break;
             }
 

@@ -3,7 +3,7 @@
 #include "../include/emulator.h"
 #include "../include/file.h"
 
-#define TIMER_DECREMENT_INTERVAL (1000 / 60)
+#define TIMER_DECREMENT_INTERVAL_MS (1000 / 60)
 
 int
 main(int argc, char **argv)
@@ -199,7 +199,7 @@ main(int argc, char **argv)
          * handle timer updates at 60Hz
          * timers are decremented if they are greater than zero
          */
-        if (ticks - chip8.timers.lastUpdate >= TIMER_DECREMENT_INTERVAL) {
+        if (ticks - chip8.timers.lastUpdate >= TIMER_DECREMENT_INTERVAL_MS) {
             if (chip8.timers.delay > 0) {
                 chip8.timers.delay--;
             }
