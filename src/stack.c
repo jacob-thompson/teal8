@@ -7,7 +7,7 @@ int stacked(stack *stack)
 
 void stackPush(stack *stack, unsigned short *value)
 {
-    if (stack->sp < STACK_SIZE) {
+    if (stack->sp < STACK_LEVELS) {
         stack->s[stack->sp] = *value;
         stack->sp++;
     }

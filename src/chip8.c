@@ -131,10 +131,10 @@ int main(int argc, char **argv)
     SDL_bool mute, force;
 
     /* defaults */
-    rate = DEFAULT_INSTRUCTION_RATE; // 1000 instructions per second
-    longIndex = 0; // used as the index for longOptions
-    mute = SDL_FALSE; // mute audio (-m or --mute)
-    force = SDL_FALSE; // force load rom regardless of validity (-f or --force)
+    rate = DEFAULT_INSTRUCTION_RATE;    // 1000 instructions per second
+    longIndex = 0;                      // used as the index for longOptions
+    mute = SDL_FALSE;                   // mute audio (-m or --mute)
+    force = SDL_FALSE;                  // force load rom (-f or --force)
 
     /* parsing args */
     while (

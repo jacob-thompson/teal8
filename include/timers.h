@@ -4,9 +4,9 @@
 #include <stdint.h>
 
 typedef struct timers {
-    uint8_t delay;
-    uint8_t sound;
-    uint32_t lastUpdate;
+    uint8_t delay;                      // delay timer
+    uint8_t sound;                      // sound timer
+    uint32_t lastUpdate;                // tick count at last update
 } timers;
 
 #endif /* TIMERS_H */
