@@ -255,7 +255,7 @@ main(int argc, char **argv)
 
     uint32_t ticks;
     uint16_t opcode;
-    double msPerInstruction = 1000.0 / rate;
+    const double msPerInstruction = 1000.0 / rate;
     double nextInstructionTime = SDL_GetTicks();
 
     /* main loop */

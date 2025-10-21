@@ -40,7 +40,7 @@ pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url);
  * Parameter: the file
  * Return: pointer to the hash string (must be freed by caller)
  */
-char *
+const char *
 getHash(FILE *fp);
 
 /*

@@ -110,7 +110,7 @@ getRom(const char *rom)
 void
 writeFontToMemory(unsigned char *memory)
 {
-    uint8_t font[FONT_BYTES] = {
+    const uint8_t font[FONT_BYTES] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
         0x20, 0x60, 0x20, 0x20, 0x70, // 1
         0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -203,7 +203,7 @@ randomNumber(int min, int max)
         min ^= max;
     }
 
-    int range = max - min + 1;
+    const int range = max - min + 1;
 
     /*
      * chop off the high end of rand()
@@ -212,8 +212,7 @@ randomNumber(int min, int max)
     int x;
     while (1) {
         x = rand();
-        if (x < RAND_MAX / range * range)
-            break;
+        if (x < RAND_MAX / range * range) break;
     }
 
     return x % range + min;
@@ -238,11 +237,11 @@ decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
 {
     uint8_t minuend, subtrahend, operand, addend;
 
-    uint8_t     x   =   (opcode & 0x0F00) >> 8;
-    uint8_t     y   =   (opcode & 0x00F0) >> 4;
-    uint8_t     n   =   opcode & 0x000F;
-    uint8_t     nn  =   opcode & 0x00FF;
-    uint16_t    nnn =   opcode & 0x0FFF;
+    const uint8_t     x   =   (opcode & 0x0F00) >> 8;
+    const uint8_t     y   =   (opcode & 0x00F0) >> 4;
+    const uint8_t     n   =   opcode & 0x000F;
+    const uint8_t     nn  =   opcode & 0x00FF;
+    const uint16_t    nnn =   opcode & 0x0FFF;
 
     switch (opcode >> 12) {
         case 0x0:
@@ -469,11 +468,9 @@ decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                     break;
             }
 
-
-            uint8_t sX, sY, sH;
-            sX = chip8->v[x] % chip8->display.pixelWidth;
-            sY = chip8->v[y] % chip8->display.pixelHeight;
-            sH = n;
+            const uint8_t sX = chip8->v[x] % chip8->display.pixelWidth;
+            const uint8_t sY = chip8->v[y] % chip8->display.pixelHeight;
+            const uint8_t sH = n;
 
             chip8->v[0xF] = 0;
 
@@ -484,7 +481,7 @@ decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                 if (chip8->i + yline >= AMOUNT_MEMORY_BYTES)
                     break; // prevent buffer overflow
 
-                uint8_t pixel = chip8->memory[chip8->i + yline];
+                const uint8_t pixel = chip8->memory[chip8->i + yline];
                 for (int xline = 0; xline < 8; xline++) {
                     if ((pixel & (0x80 >> xline)) != 0) {
                         if (sX + xline >= chip8->display.pixelWidth)

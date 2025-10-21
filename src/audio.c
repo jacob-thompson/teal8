@@ -13,10 +13,10 @@
 void
 audioCallback(void *userdata, Uint8 *stream, int len)
 {
-    audio *aud = (audio *)userdata;
-    double phaseIncrement = 2.0 * M_PI * TONE_FREQ / SAMPLE_RATE;
-    Sint16 *samples = (Sint16 *) stream;
-    int sampleCount = len / sizeof(Sint16);
+    audio           *aud            = (audio *)userdata;
+    Sint16          *samples        = (Sint16 *)stream;
+    const double    phaseIncrement  = 2.0 * M_PI * TONE_FREQ / SAMPLE_RATE;
+    const int       sampleCount     = len / sizeof(Sint16);
 
     for (int i = 0; i < sampleCount; ++i) {
         /* square wave for beep tone */
@@ -37,22 +37,22 @@ initAudio(audio *audio)
     }
 
     SDL_zero(audio->spec);
-    audio->spec.freq = SAMPLE_RATE;
-    audio->spec.format = AUDIO_S16SYS;
-    audio->spec.channels = 1;
-    audio->spec.samples = BUFFER_SIZE;
-    audio->spec.callback = audioCallback;
-    audio->spec.userdata = audio;
-    audio->deviceId = SDL_OpenAudioDevice(NULL, 0, &audio->spec, NULL, 0);
+    audio->spec.freq        = SAMPLE_RATE;
+    audio->spec.format      = AUDIO_S16SYS;
+    audio->spec.channels    = 1;
+    audio->spec.samples     = BUFFER_SIZE;
+    audio->spec.callback    = audioCallback;
+    audio->spec.userdata    = audio;
+    audio->deviceId         = SDL_OpenAudioDevice(NULL, 0, &audio->spec, NULL, 0);
 
     if (audio->deviceId == 0) {
         audio->poweredOn = SDL_FALSE;
         return -1;
     }
 
-    audio->poweredOn = SDL_TRUE;
-    audio->playing = SDL_FALSE;
-    audio->phase = 0.0;
+    audio->poweredOn    = SDL_TRUE;
+    audio->playing      = SDL_FALSE;
+    audio->phase        = 0.0;
 
     return 0;
 }

@@ -11,10 +11,10 @@
 static size_t
 writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
-    size_t realsize = size * nmemb;
-    struct MemoryStruct *mem = (struct MemoryStruct *)userp;
+    size_t              realsize    = size * nmemb;
+    struct MemoryStruct *mem        = (struct MemoryStruct *)userp;
+    char                *ptr        = realloc(mem->memory, mem->size + realsize + 1);
 
-    char *ptr = realloc(mem->memory, mem->size + realsize + 1);
     if(!ptr) {
         /* out of memory! */
         SDL_LogError(
@@ -65,7 +65,7 @@ pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url)
     return 0;
 }
 
-char *
+const char *
 getHash(FILE *fp)
 {
     EVP_MD_CTX *shaContext = EVP_MD_CTX_new();
@@ -88,13 +88,12 @@ getHash(FILE *fp)
     }
 
     /* compute SHA1 hash of the ROM */
-    unsigned char buffer[20]; // SHA1 produces a 20-byte hash
-    size_t bytesRead = 0;
+    unsigned char   buffer[20]; // SHA1 produces a 20-byte hash
+    size_t          bytesRead = 0;
 
     /* read the ROM file in chunks and update the SHA1 context */
-    while ((bytesRead = fread(buffer, 1, sizeof buffer, fp)) > 0) {
+    while ((bytesRead = fread(buffer, 1, sizeof buffer, fp)) > 0)
         EVP_DigestUpdate(shaContext, buffer, bytesRead);
-    }
 
     /* finalize the SHA1 hash */
     unsigned char hash[SHA1_BLOCK_SIZE];
@@ -111,9 +110,10 @@ getHash(FILE *fp)
         );
         return NULL;
     }
-    for (int i = 0; i < SHA1_BLOCK_SIZE; i++) {
+
+    for (int i = 0; i < SHA1_BLOCK_SIZE; i++)
         sprintf(&hashString[i << 1], "%02x", hash[i]);
-    }
+
     hashString[SHA1_HASH_SIZE - 1] = '\0';
 
     return hashString;
@@ -130,8 +130,8 @@ printRomInfo(cJSON *romInfo, cJSON *romHash)
     );
     free((void *)infoString);
 
-    cJSON *title = cJSON_GetObjectItemCaseSensitive(romInfo, "title");
-    cJSON *release = cJSON_GetObjectItemCaseSensitive(romInfo, "release");
+    const cJSON *title    = cJSON_GetObjectItemCaseSensitive(romInfo, "title");
+    const cJSON *release  = cJSON_GetObjectItemCaseSensitive(romInfo, "release");
     SDL_LogInfo(
         SDL_LOG_CATEGORY_APPLICATION,
         "Title: %s (%s)\n",
@@ -147,7 +147,7 @@ printRomInfo(cJSON *romInfo, cJSON *romHash)
             );
         }
     }
-    cJSON *description = cJSON_GetObjectItemCaseSensitive(romInfo, "description");
+    const cJSON *description = cJSON_GetObjectItemCaseSensitive(romInfo, "description");
     SDL_LogInfo(
         SDL_LOG_CATEGORY_APPLICATION,
         "Description: %s\n",
@@ -174,13 +174,11 @@ isRomInDatabase(FILE *fp)
         return SDL_FALSE;
     }
 
-    /* initial size is 0 */
-    hashChunk.size = 0;
-    infoChunk.size = 0;
+    /* initial sizes are 0 */
+    hashChunk.size = infoChunk.size = 0;
 
     curl_global_init(CURL_GLOBAL_ALL);
-    CURL *curlHandle;
-    curlHandle = curl_easy_init();
+    CURL *curlHandle = curl_easy_init();
 
     if (curlHandle == NULL) {
         SDL_LogError(
@@ -320,8 +318,8 @@ isRomInDatabase(FILE *fp)
     );
 
     /* get ROM info using the index found earlier */
-    int index = romHash->valueint;
-    cJSON *romInfo = cJSON_GetArrayItem(infoJson, index);
+    int     index   = romHash->valueint;
+    cJSON *romInfo  = cJSON_GetArrayItem(infoJson, index);
     if (romInfo == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,

@@ -24,7 +24,7 @@ stacked(stack *stack);
  * Parameter: the value to push onto the stack
  */
 void
-stackPush(stack *stack, unsigned short *value);
+stackPush(stack *stack, const unsigned short *value);
 
 /*
  * Pop a value from the stack.
