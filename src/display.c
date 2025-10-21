@@ -59,7 +59,8 @@ createPixels(display *display)
 
     display->pixelDrawn = calloc(
         display->pixelHeight * display->pixelWidth,
-        sizeof(SDL_bool));
+        sizeof(SDL_bool)
+    );
 
     if (display->pixelDrawn == NULL) {
         SDL_LogError(
