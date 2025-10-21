@@ -9,7 +9,7 @@
 #include "../include/emulator.h"
 #include "../include/file.h"
 
-#define TIMER_INTERVAL  (1000 / 60)     // ~16.67ms for 60Hz
+#define TIMER_INTERVAL (1000 / 60)      // ~16.67ms for 60Hz
 
 int
 main(int argc, char **argv)
@@ -48,8 +48,9 @@ main(int argc, char **argv)
     }
 
     int len, charsToTrim;
-    len = strlen(binPath);
+    len         = strlen(binPath);
     charsToTrim = 10; // /bin/teal8 is 10 characters
+
     if (len >= charsToTrim) {
         binPath[len - charsToTrim] = '\0'; // trim
     } else {
@@ -103,8 +104,9 @@ main(int argc, char **argv)
     }
 
     int len, charsToTrim;
-    len = strlen(binPath);
+    len         = strlen(binPath);
     charsToTrim = 10; // /bin/teal8 is 10 characters
+
     if (len >= charsToTrim) {
         binPath[len - charsToTrim] = '\0'; // trim
     } else {
@@ -190,8 +192,8 @@ main(int argc, char **argv)
         return -1;
     }
 
-    const char *inputFile = argv[optind];
-    FILE *rom = getRom(inputFile);
+    const char *inputFile   = argv[optind];
+    FILE *rom               = getRom(inputFile);
     struct stat st;
 
     if (!force && !isFileValid(inputFile, rom, &st)) {
@@ -255,8 +257,8 @@ main(int argc, char **argv)
 
     uint32_t ticks;
     uint16_t opcode;
-    const double msPerInstruction = 1000.0 / rate;
-    double nextInstructionTime = SDL_GetTicks();
+    const double msPerInstruction   = 1000.0 / rate;
+    double nextInstructionTime      = SDL_GetTicks();
 
     /* main loop */
     while (chip8.display.poweredOn) {
@@ -294,7 +296,7 @@ main(int argc, char **argv)
             } else if (chip8.sound.playing && !chip8.muted) {
                 /* stop audio playback and reset phase */
                 chip8.sound.playing = SDL_FALSE;
-                chip8.sound.phase = 0.0;
+                chip8.sound.phase   = 0.0;
                 SDL_PauseAudioDevice(chip8.sound.deviceId, 1);
             }
             chip8.timers.lastUpdate = ticks;

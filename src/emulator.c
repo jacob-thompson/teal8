@@ -166,8 +166,8 @@ initializeEmulator(emulator *chip8, FILE *rom)
     clearKeys(chip8->display.keyDown);
     clearKeys(chip8->display.keyUp);
 
-    chip8->lastUpdate = 0;
-    chip8->timers.lastUpdate = 0;
+    chip8->lastUpdate           = 0;
+    chip8->timers.lastUpdate    = 0;
 
     /* ensure registers and stack are cleared */
     memset(chip8->v, 0, sizeof chip8->v);
@@ -376,7 +376,7 @@ decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                      * set VF to 1 if there is a carry
                      */
                     operand = chip8->v[x];
-                    addend = chip8->v[y];
+                    addend  = chip8->v[y];
                     chip8->v[x] += chip8->v[y];
                     if (operand > 0xFF - addend)
                         chip8->v[0xF] = 1;
@@ -388,8 +388,8 @@ decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                      * subtract Vy from Vx;
                      * set VF to 0 if there is a borrow
                      */
-                    minuend = chip8->v[x];
-                    subtrahend = chip8->v[y];
+                    minuend     = chip8->v[x];
+                    subtrahend  = chip8->v[y];
                     chip8->v[x] -= chip8->v[y];
                     if (minuend < subtrahend)
                         chip8->v[0xF] = 0;
@@ -412,8 +412,8 @@ decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                      * set Vx to Vy - Vx;
                      * set VF to 0 if there is a borrow
                      */
-                    minuend = chip8->v[y];
-                    subtrahend = chip8->v[x];
+                    minuend     = chip8->v[y];
+                    subtrahend  = chip8->v[x];
                     chip8->v[x] = minuend - subtrahend;
                     if (minuend < subtrahend)
                         chip8->v[0xF] = 0;
@@ -468,11 +468,11 @@ decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                     break;
             }
 
-            const uint8_t sX = chip8->v[x] % chip8->display.pixelWidth;
-            const uint8_t sY = chip8->v[y] % chip8->display.pixelHeight;
-            const uint8_t sH = n;
+            const uint8_t sX    = chip8->v[x] % chip8->display.pixelWidth;
+            const uint8_t sY    = chip8->v[y] % chip8->display.pixelHeight;
+            const uint8_t sH    = n;
 
-            chip8->v[0xF] = 0;
+            chip8->v[0xF]       = 0;
 
             for (int yline = 0; yline < sH; yline++) {
                 if (sY + yline >= chip8->display.pixelHeight)

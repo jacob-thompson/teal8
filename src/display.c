@@ -33,8 +33,8 @@ createPixels(display *display)
     if (display->pixelDrawn != NULL)
         free(display->pixelDrawn);
 
-    display->pixelWidth     =   display->width / SCALE;
-    display->pixelHeight    =   display->height / SCALE;
+    display->pixelWidth     = display->width / SCALE;
+    display->pixelHeight    = display->height / SCALE;
 
     display->pixels = calloc(
         display->pixelHeight * display->pixelWidth,
