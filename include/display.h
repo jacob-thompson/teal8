@@ -56,7 +56,7 @@ createPixels(display *display);
  * Return: 1 on failure
  */
 int
-initDisplay(display *display, const char* iconPath);
+initDisplay(display *display, const char *iconPath);
 
 /*
  * Handle an event.
