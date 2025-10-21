@@ -58,7 +58,7 @@ printVersion(const char *programName);
  * Parameter: the log priority to use
  */
 void
-printUsage(const char *programName, SDL_LogPriority priority);
+printUsage(const char *programName, const SDL_LogPriority priority);
 
 /*
  * Check if a string is a number.

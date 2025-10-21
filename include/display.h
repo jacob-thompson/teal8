@@ -62,7 +62,7 @@ initDisplay(display *display, const char *iconPath);
  * Parameter: the event to handle
  */
 void
-handleEvent(display *display, SDL_Event *event);
+handleEvent(display *display, const SDL_Event *event);
 
 /*
  * Draw the background of the display.

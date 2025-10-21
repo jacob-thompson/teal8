@@ -170,7 +170,7 @@ initDisplay(display *display, const char *iconPath)
 }
 
 void
-handleEvent(display *display, SDL_Event *event)
+handleEvent(display *display, const SDL_Event *event)
 {
     switch (event->type) {
         /* handle key presses */

@@ -18,7 +18,7 @@ typedef struct {
  * Parameter: length of the audio buffer in bytes
  */
 void
-audioCallback(void *userdata, Uint8 *stream, int len);
+audioCallback(void *userdata, Uint8 *stream, const int len);
 
 /*
  * Initialize the audio system.

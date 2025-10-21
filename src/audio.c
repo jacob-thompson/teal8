@@ -11,7 +11,7 @@
 #define AUDIO_BUFFER_SIZE   512
 
 void
-audioCallback(void *userdata, Uint8 *stream, int len)
+audioCallback(void *userdata, Uint8 *stream, const int len)
 {
     audio           *aud            = (audio *)userdata;
     Sint16          *samples        = (Sint16 *)stream;

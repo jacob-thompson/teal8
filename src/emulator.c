@@ -7,13 +7,9 @@
 #include "../include/emulator.h"
 
 #define FONT_START_ADDRESS      0x00
-#define AMOUNT_FONT_BYTES       0x50
-
 #define PROGRAM_START_ADDRESS   0x200
 
 #define VBLANK_INTERVAL         (1000 / 60)
-
-#define LAST_REGISTER_INDEX     0xF
 
 void
 printVersion(const char *programName)
@@ -27,7 +23,7 @@ printVersion(const char *programName)
 }
 
 void
-printUsage(const char *programName, SDL_LogPriority priority)
+printUsage(const char *programName, const SDL_LogPriority priority)
 {
     SDL_LogMessage(
         SDL_LOG_CATEGORY_APPLICATION,
@@ -69,25 +65,25 @@ FILE *
 getRom(const char *rom)
 {
     /*
-     * allocate memory for the filename
+     * allocate memory for the file name
      * and 4 additional bytes for appending
      * the file extension if necessary
      */
-    char *filename = malloc(sizeof(char) * (strlen(rom) + 5));
-    if (filename == NULL) {
+    char *fileName = malloc(sizeof(char) * (strlen(rom) + 5));
+    if (fileName == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
-            "failed to allocate memory for filename\n"
+            "failed to allocate memory for fileName\n"
         );
         return NULL;
     }
 
     FILE *romFile = NULL; // file to be returned
 
-    snprintf(filename, strlen(rom) + 1, "%s", rom);
-    romFile = fopen(filename, "rb");
+    snprintf(fileName, strlen(rom) + 1, "%s", rom);
+    romFile = fopen(fileName, "rb");
     if (romFile != NULL) {
-        free(filename);
+        free(fileName);
         return romFile;
     }
 
@@ -95,22 +91,22 @@ getRom(const char *rom)
      * opening the file as given did not work,
      * so try appending the file extension
      */
-    snprintf(filename, strlen(rom) + 5, "%s.ch8", rom);
-    romFile = fopen(filename, "rb");
+    snprintf(fileName, strlen(rom) + 5, "%s.ch8", rom);
+    romFile = fopen(fileName, "rb");
     if (romFile != NULL) {
-        free(filename);
+        free(fileName);
         return romFile;
     }
 
     /* nothing worked */
-    free(filename);
+    free(fileName);
     return romFile; // null
 }
 
 void
 writeFontToMemory(uint8_t *memory)
 {
-    const uint8_t font[AMOUNT_FONT_BYTES] = {
+    const uint8_t font[] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
         0x20, 0x60, 0x20, 0x20, 0x70, // 1
         0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -129,7 +125,7 @@ writeFontToMemory(uint8_t *memory)
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
     };
 
-    for (int i = 0x0; i < AMOUNT_FONT_BYTES; i++)
+    for (int i = 0x0; font[i] != 0; i++)
         memory[FONT_START_ADDRESS + i] = font[i];
 }
 
@@ -523,7 +519,7 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                      * and store the value of the key in Vx
                      */
                     chip8->pc -= 2;
-                    for (int i = 0x0; i <= LAST_REGISTER_INDEX; i++)
+                    for (int i = 0x0; i <= 0xF; i++)
                         if (chip8->display.keyUp[i]) {
                             chip8->v[x] = i;
                             chip8->pc += 2;
