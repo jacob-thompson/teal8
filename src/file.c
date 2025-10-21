@@ -342,14 +342,14 @@ isRomInDatabase(FILE *fp)
 }
 
 SDL_bool
-isFileValid(const char *filename, FILE *fp, struct stat *st)
+isFileValid(const char *fileName, FILE *fp, struct stat *st)
 {
     /* check if file exists and is readable */
     if (fp == NULL || fstat(fileno(fp), st) == -1) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to open %s\n",
-            filename
+            fileName
         );
         return SDL_FALSE;
     }
@@ -358,7 +358,7 @@ isFileValid(const char *filename, FILE *fp, struct stat *st)
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "%s not found in database\n",
-            filename
+            fileName
         );
         SDL_LogInfo(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -370,7 +370,7 @@ isFileValid(const char *filename, FILE *fp, struct stat *st)
     SDL_LogDebug(
         SDL_LOG_CATEGORY_APPLICATION,
         "%s opened successfully\n",
-        filename
+        fileName
     );
     return SDL_TRUE;
 }

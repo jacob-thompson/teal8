@@ -71,6 +71,6 @@ isRomInDatabase(FILE *fp);
  * Return: 1 if the file is not valid
  */
 SDL_bool
-isFileValid(const char *filename, FILE *fp, struct stat *st);
+isFileValid(const char *fileName, FILE *fp, struct stat *st);
 
 #endif /* FILE_H */
