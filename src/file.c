@@ -89,7 +89,7 @@ char *getHash(FILE *fp)
     size_t bytesRead = 0;
 
     /* read the ROM file in chunks and update the SHA1 context */
-    while ((bytesRead = fread(buffer, 1, sizeof(buffer), fp)) > 0) {
+    while ((bytesRead = fread(buffer, 1, sizeof buffer, fp)) > 0) {
         EVP_DigestUpdate(shaContext, buffer, bytesRead);
     }
 
