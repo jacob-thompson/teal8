@@ -12,16 +12,15 @@
 
 #define AMOUNT_MEMORY_BYTES 0x1000
 
-#define AMOUNT_REGISTERS    16
+#define AMOUNT_REGISTERS 16
 
-#define DEFAULT_IPS         1000
+#define DEFAULT_IPS 1000
 
-#define CHIP8               100
-#define SCHIP               101
+#define CHIP8 100
+#define SCHIP 101
 
 /* long options for getopt_long */
-static struct option longOptions[] =
-{
+static struct option longOptions[] = {
     {"force", no_argument, NULL, 'f'},
     {"mute", no_argument, NULL, 'm'},
     {"ips", required_argument, NULL, 'i'},
@@ -31,17 +30,17 @@ static struct option longOptions[] =
 };
 
 typedef struct {
-    uint8_t     memory[AMOUNT_MEMORY_BYTES];    // 4KB memory
-    uint8_t     v[AMOUNT_REGISTERS];            // 16 8-bit registers
-    uint8_t     specType;                       // chip8 or schip
-    uint16_t    i;                              // 16-bit address register
-    uint16_t    pc;                             // program counter
-    uint32_t    lastUpdate;                     // last update tick
-    timers      timers;                         // delay & sound timers
-    stack       stack;                          // stack & stack pointer
-    display     display;                        // display structure
-    audio       sound;                          // sound structure
-    SDL_bool    muted;                          // is the sound muted?
+    uint8_t memory[AMOUNT_MEMORY_BYTES];    // 4KB memory
+    uint8_t v[AMOUNT_REGISTERS];            // 16 8-bit registers
+    uint8_t specType;                       // chip8 or schip
+    uint16_t i;                             // 16-bit address register
+    uint16_t pc;                            // program counter
+    uint32_t lastUpdate;                    // last update tick
+    timers timers;                          // delay & sound timers
+    stack stack;                            // stack & stack pointer
+    display display;                        // display structure
+    audio sound;                            // sound structure
+    SDL_bool muted;                         // is the sound muted?
 } emulator;
 
 /*
@@ -194,5 +193,23 @@ fetchOpcode(emulator *chip8);
  */
 void
 decodeAndExecuteOpcode(emulator *chip8, const uint16_t opcode);
+
+/*
+ * Skip the next opcode.
+ *
+ * Parameter:
+ * the emulator
+ */
+void
+skipNextInstruction(emulator *chip8);
+
+/*
+ * Free memory used by the emulator.
+ *
+ * Parameter:
+ * the emulator
+ */
+void
+cleanUp(emulator *chip8);
 
 #endif /* EMULATOR_H */

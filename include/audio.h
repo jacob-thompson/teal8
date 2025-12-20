@@ -4,11 +4,11 @@
 #include <SDL_audio.h>
 
 typedef struct {
-    SDL_AudioDeviceID   deviceId;           // audio device ID
-    SDL_AudioSpec       spec;               // audio specification
-    SDL_bool            playing;            // is audio playing?
-    SDL_bool            poweredOn;          // power flag
-    double              phase;              // phase for waveform generation
+    SDL_AudioDeviceID deviceId; // audio device ID
+    SDL_AudioSpec spec;         // audio specification
+    SDL_bool playing;           // is audio currently playing?
+    SDL_bool poweredOn;         // is audio system being used?
+    double phase;               // phase for waveform generation
 } audio;
 
 /*

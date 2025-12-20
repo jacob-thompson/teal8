@@ -11,10 +11,10 @@
 
 #include "../include/emulator.h"
 
-#define FONT_START_ADDRESS      0x00
-#define PROGRAM_START_ADDRESS   0x200
+#define FONT_START_ADDRESS 0x00
+#define PROGRAM_START_ADDRESS 0x200
 
-#define VBLANK_INTERVAL_MS      (1000 / 60)
+#define VBLANK_INTERVAL_MS (1000 / 60)
 
 void
 printVersion(const char *programName)
@@ -54,20 +54,19 @@ printUsage(const char *programName, const SDL_LogPriority priority)
 char *
 getExecutablePathMACOS()
 {
-    char        *binPath;
-    uint32_t    size;
-
-    _NSGetExecutablePath(NULL, &size); // get the size needed
-
-    binPath = malloc(sizeof(char) * PATH_MAX);
+    char *binPath = calloc(PATH_MAX, sizeof *binPath);
 
     if (binPath == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to allocate memory for executable path\n"
         );
+
         return NULL;
     }
+
+    uint32_t size;
+    _NSGetExecutablePath(NULL, &size); // get the size needed
 
     if (_NSGetExecutablePath(binPath, &size) == 0) {
         SDL_LogDebug(
@@ -80,7 +79,9 @@ getExecutablePathMACOS()
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to get executable path\n"
         );
+
         free(binPath);
+
         return NULL;
     }
 
@@ -90,7 +91,7 @@ getExecutablePathMACOS()
 char *
 getExecutablePathLINUX()
 {
-    char        *binPath;
+    char *binPath;
 
     binPath = malloc(sizeof(char) * PATH_MAX);
 
@@ -99,12 +100,15 @@ getExecutablePathLINUX()
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to allocate memory for executable path\n"
         );
+
         return NULL;
     }
 
     ssize_t count = readlink("/proc/self/exe", binPath, PATH_MAX);
+
     if (count != -1) {
-        binPath[count] = '\0'; // null-terminate the string
+        binPath[count] = '\0';
+
         SDL_LogDebug(
             SDL_LOG_CATEGORY_APPLICATION,
             "path = %s\n",
@@ -115,7 +119,9 @@ getExecutablePathLINUX()
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to read /proc/self/exe\n"
         );
+
         free(binPath);
+
         return NULL;
     }
 
@@ -127,25 +133,28 @@ getWindowIconPath(char *binPath)
 {
     if (binPath == NULL) return NULL;
 
-    char *iconPath = malloc(sizeof(char) * PATH_MAX);
+    char *iconPath = calloc(PATH_MAX, sizeof *iconPath);
+
     if (iconPath == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to allocate memory for resource path\n"
         );
+
         return NULL;
     }
 
-    int len         = strlen(binPath);
-    int charsToTrim = 10; // /bin/teal8 is 10 characters
+    const int len = strlen(binPath);
+    const int charsToTrim = 10; // /bin/teal8 is 10 characters
 
-    if (len >= charsToTrim) {
-        binPath[len - charsToTrim] = '\0'; // trim
-    } else {
+    if (len >= charsToTrim)
+        binPath[len - charsToTrim] = '\0';
+    else {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "executable path is unexpectedly short\n"
         );
+
         return NULL;
     }
 
@@ -158,11 +167,8 @@ getWindowIconPath(char *binPath)
 SDL_bool
 isNumber(const char num[])
 {
-    /* check if string is empty */
-    if (num == NULL || num[0] == '\0')
-        return SDL_FALSE;
+    if (num == NULL || num[0] == '\0') return SDL_FALSE;
 
-    /* check if each character is a numeral */
     for (int i = 0; num[i] != 0; ++i)
         if (!isdigit(num[i])) return SDL_FALSE;
 
@@ -177,12 +183,14 @@ getRom(const char *rom)
      * and 4 additional bytes for appending
      * the file extension if necessary
      */
-    char *fileName = malloc(sizeof(char) * (strlen(rom) + 5));
+    char *fileName = calloc(strlen(rom) + 5, sizeof *fileName);
+
     if (fileName == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to allocate memory for fileName\n"
         );
+
         return NULL;
     }
 
@@ -190,6 +198,7 @@ getRom(const char *rom)
 
     snprintf(fileName, strlen(rom) + 1, "%s", rom);
     romFile = fopen(fileName, "rb");
+
     if (romFile != NULL) {
         free(fileName);
         return romFile;
@@ -201,6 +210,7 @@ getRom(const char *rom)
      */
     snprintf(fileName, strlen(rom) + 5, "%s.ch8", rom);
     romFile = fopen(fileName, "rb");
+
     if (romFile != NULL) {
         free(fileName);
         return romFile;
@@ -208,7 +218,8 @@ getRom(const char *rom)
 
     /* nothing worked */
     free(fileName);
-    return romFile; // null
+
+    return NULL;
 }
 
 void
@@ -246,19 +257,16 @@ writeRomToMemory(emulator *chip8, FILE *rom)
         chip8->pc < AMOUNT_MEMORY_BYTES
         &&
         fread(&chip8->memory[chip8->pc], 1, 1, rom) == 1
-    ) {
-        chip8->pc++;
-    }
+    ) chip8->pc++;
 
-    if (chip8->pc >= AMOUNT_MEMORY_BYTES) {
+    if (chip8->pc >= AMOUNT_MEMORY_BYTES)
         SDL_LogWarn(
             SDL_LOG_CATEGORY_APPLICATION,
             "ROM too large, truncated at %d bytes\n",
             AMOUNT_MEMORY_BYTES - PROGRAM_START_ADDRESS
         );
-    }
 
-    chip8->pc = PROGRAM_START_ADDRESS; // 0x200
+    chip8->pc = PROGRAM_START_ADDRESS;
 }
 
 void
@@ -270,8 +278,8 @@ initializeEmulator(emulator *chip8, FILE *rom)
     clearKeys(chip8->display.keyDown);
     clearKeys(chip8->display.keyUp);
 
-    chip8->lastUpdate           = 0;
-    chip8->timers.lastUpdate    = 0;
+    chip8->lastUpdate = 0;
+    chip8->timers.lastUpdate = 0;
 
     /* ensure registers and stack are cleared */
     memset(chip8->v, 0, sizeof chip8->v);
@@ -297,8 +305,7 @@ printMemory(emulator *chip8)
 int
 randomNumber(int min, int max)
 {
-    if (min == max)
-        return min;
+    if (min == max) return min;
 
     /* swap the numbers if min is greater than max */
     if (min > max) {
@@ -313,13 +320,11 @@ randomNumber(int min, int max)
      * chop off the high end of rand()
      * so that the entire range is evenly divided by range
      */
-    int x;
-    while (1) {
-        x = rand();
-        if (x < RAND_MAX / range * range) break;
-    }
+    int r = rand();
 
-    return x % range + min;
+    for (; r >= RAND_MAX / range * range; r = rand());
+
+    return r % range + min;
 }
 
 uint16_t
@@ -331,8 +336,10 @@ fetchOpcode(emulator *chip8)
             "program counter out of bounds: 0x%04X\n",
             chip8->pc
         );
+
         return 0;
     }
+
     return (chip8->memory[chip8->pc] << 8) | chip8->memory[chip8->pc + 1];
 }
 
@@ -341,11 +348,11 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
 {
     uint8_t minuend, subtrahend, operand, addend;
 
-    const uint8_t   x   =   (opcode & 0x0F00) >> 8;
-    const uint8_t   y   =   (opcode & 0x00F0) >> 4;
-    const uint8_t   n   =   opcode & 0x000F;
-    const uint8_t   nn  =   opcode & 0x00FF;
-    const uint16_t  nnn =   opcode & 0x0FFF;
+    const uint8_t x = (opcode & 0x0F00) >> 8;
+    const uint8_t y = (opcode & 0x00F0) >> 4;
+    const uint8_t n = opcode & 0x000F;
+    const uint8_t nn = opcode & 0x00FF;
+    const uint16_t nnn = opcode & 0x0FFF;
 
     switch (opcode >> 12) {
         case 0x0:
@@ -353,28 +360,35 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                 case 0xC:
                     /* scroll the display N lines down */
                     chip8->specType = SCHIP;
+
                     break;
             }
+
             switch (opcode & 0x00FF) {
                 case 0xE0:
                     /* clear the display */
                     resetDisplay(&chip8->display);
+
                     break;
                 case 0xEE:
                     /* return from subroutine */
                     stackPop(&chip8->stack, &chip8->pc);
+
                     break;
                 case 0xFB:
                     /* scroll the display 4 pixels to the right */
                     chip8->specType = SCHIP;
+
                     break;
                 case 0xFC:
                     /* scroll the display 4 pixels to the left */
                     chip8->specType = SCHIP;
+
                     break;
                 case 0xFD:
                     /* exit the interpreter */
                     chip8->display.poweredOn = SDL_FALSE;
+
                     break;
                 case 0xFE:
                     /* set the CHIP-8 display mode to 64x32 */
@@ -389,6 +403,7 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                         );
                     }
                     chip8->specType = SCHIP;
+
                     break;
                 case 0xFF:
                     /* set the CHIP-8 display mode to 128x64 */
@@ -403,49 +418,53 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                         );
                     }
                     chip8->specType = SCHIP;
-                    break;
-                default:
-                    /* call RCA 1802 program at address NNN */
-                    break;
+
+                default: break;
             }
+
             break;
         case 0x1:
             /* jump to address NNN */
             chip8->pc = nnn;
+
             break;
         case 0x2:
             /* call subroutine at address NNN */
             stackPush(&chip8->stack, &chip8->pc);
             chip8->pc = nnn;
+
             break;
         case 0x3:
             /* skip next instruction if Vx == NN */
-            if (chip8->v[x] == nn)
-                chip8->pc += 2;
+            if (chip8->v[x] == nn) skipNextInstruction(chip8);
+
             break;
         case 0x4:
             /* skip next instruction if Vx != NN */
-            if (chip8->v[x] != nn)
-                chip8->pc += 2;
+            if (chip8->v[x] != nn) skipNextInstruction(chip8);
+
             break;
         case 0x5:
             /* skip next instruction if Vx == Vy */
-            if (chip8->v[x] == chip8->v[y])
-                chip8->pc += 2;
+            if (chip8->v[x] == chip8->v[y]) skipNextInstruction(chip8);
+
             break;
         case 0x6:
             /* set Vx to NN */
             chip8->v[x] = nn;
+
             break;
         case 0x7:
             /* add NN to Vx */
             chip8->v[x] += nn;
+
             break;
         case 0x8:
             switch (opcode & 0x000F) {
                 case 0x0:
                     /* set Vx to Vy */
                     chip8->v[x] = chip8->v[y];
+
                     break;
                 case 0x1:
                     /*
@@ -453,8 +472,10 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                      * reset VF to 0
                      */
                     chip8->v[x] |= chip8->v[y];
+
                     if (chip8->specType == CHIP8)
                         chip8->v[0xF] = 0;
+
                     break;
                 case 0x2:
                     /*
@@ -462,8 +483,10 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                      * reset VF to 0
                      */
                     chip8->v[x] &= chip8->v[y];
+
                     if (chip8->specType == CHIP8)
                         chip8->v[0xF] = 0;
+
                     break;
                 case 0x3:
                     /*
@@ -471,8 +494,10 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                      * reset VF to 0
                      */
                     chip8->v[x] ^= chip8->v[y];
+
                     if (chip8->specType == CHIP8)
                         chip8->v[0xF] = 0;
+
                     break;
                 case 0x4:
                     /*
@@ -482,10 +507,11 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                     operand = chip8->v[x];
                     addend  = chip8->v[y];
                     chip8->v[x] += chip8->v[y];
+
                     if (operand > 0xFF - addend)
                         chip8->v[0xF] = 1;
-                    else
-                        chip8->v[0xF] = 0;
+                    else chip8->v[0xF] = 0;
+
                     break;
                 case 0x5:
                     /*
@@ -497,8 +523,8 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                     chip8->v[x] -= chip8->v[y];
                     if (minuend < subtrahend)
                         chip8->v[0xF] = 0;
-                    else
-                        chip8->v[0xF] = 1;
+                    else chip8->v[0xF] = 1;
+
                     break;
                 case 0x6:
                     /*
@@ -506,8 +532,10 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                      * set VF to the least significant bit of Vx before the shift
                      */
                     operand = chip8->v[x];
+
                     if (chip8->specType == CHIP8)
                         chip8->v[x] = chip8->v[y];
+
                     chip8->v[x] >>= 1;
                     chip8->v[0xF] = operand & 0x01;
                     break;
@@ -519,10 +547,11 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                     minuend     = chip8->v[y];
                     subtrahend  = chip8->v[x];
                     chip8->v[x] = minuend - subtrahend;
+
                     if (minuend < subtrahend)
                         chip8->v[0xF] = 0;
-                    else
-                        chip8->v[0xF] = 1;
+                    else chip8->v[0xF] = 1;
+
                     break;
                 case 0xE:
                     /*
@@ -530,21 +559,27 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                      * set VF to the least significant bit of Vx before the shift
                      */
                     operand = chip8->v[x];
+
                     if (chip8->specType == CHIP8)
                         chip8->v[x] = chip8->v[y];
+
                     chip8->v[x] <<= 1;
                     chip8->v[0xF] = operand >> 7;
+
                     break;
             }
+
             break;
         case 0x9:
             /* skip next instruction if Vx != Vy */
             if (chip8->v[x] != chip8->v[y])
-                chip8->pc += 2;
+                skipNextInstruction(chip8);
+
             break;
         case 0xA:
             /* set I to address NNN */
             chip8->i = nnn;
+
             break;
         case 0xB:
             /*
@@ -553,12 +588,13 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
              */
             if (chip8->specType == CHIP8)
                 chip8->pc = nnn + chip8->v[0];
-            else
-                chip8->pc = nnn + chip8->v[x];
+            else chip8->pc = nnn + chip8->v[x];
+
             break;
         case 0xC:
             /* set Vx to a random number AND NN */
             chip8->v[x] = randomNumber(0, 255) & nn;
+
             break;
         case 0xD: // DXYN
             /*
@@ -567,29 +603,29 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
              * on/off based on value in I;
              * set VF to 1 if any set pixels are changed to unset, 0 otherwise
              */
-            while (1) { // wait for vertical blank interrupt
-                if (chip8->display.lastUpdate + VBLANK_INTERVAL_MS < SDL_GetTicks())
-                    break;
-            }
 
-            const uint8_t sX    = chip8->v[x] % chip8->display.pixelWidth;
-            const uint8_t sY    = chip8->v[y] % chip8->display.pixelHeight;
-            const uint8_t sH    = n;
+            /* wait for vertical blank interrupt */
+            for(; SDL_GetTicks() < chip8->display.lastUpdate + VBLANK_INTERVAL_MS;);
 
-            chip8->v[0xF]       = 0;
+            const uint8_t sX = chip8->v[x] % chip8->display.pixelWidth;
+            const uint8_t sY = chip8->v[y] % chip8->display.pixelHeight;
+            const uint8_t sH = n;
+
+            chip8->v[0xF] = 0;
 
             for (int yline = 0; yline < sH; yline++) {
-                if (sY + yline >= chip8->display.pixelHeight)
-                    continue; // clip vertically
+                /* clip vertically */
+                if (sY + yline >= chip8->display.pixelHeight) continue;
 
-                if (chip8->i + yline >= AMOUNT_MEMORY_BYTES)
-                    break; // prevent buffer overflow
+                /* prevent overflow */
+                if (chip8->i + yline >= AMOUNT_MEMORY_BYTES) break;
 
                 const uint8_t pixel = chip8->memory[chip8->i + yline];
+
                 for (int xline = 0; xline < 8; xline++) {
                     if ((pixel & (0x80 >> xline)) != 0) {
-                        if (sX + xline >= chip8->display.pixelWidth)
-                            continue; // clip horizontally
+                        /* clip horizontally */
+                        if (sX + xline >= chip8->display.pixelWidth) continue;
 
                         if (chip8->display.pixelDrawn[(sY + yline) * chip8->display.pixelWidth + (sX + xline)])
                             chip8->v[0xF] = 1;
@@ -599,19 +635,23 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                     }
                 }
             }
+
             chip8->display.lastUpdate = SDL_GetTicks();
+
             break;
         case 0xE:
             switch (opcode & 0x00FF) {
                 case 0x9E:
                     /* skip next instruction if key with the value of Vx is pressed */
                     if (chip8->display.keyDown[chip8->v[x]])
-                        chip8->pc += 2;
+                        skipNextInstruction(chip8);
+
                     break;
                 case 0xA1:
                     /* skip next instruction if key with the value of Vx is not pressed */
                     if (!chip8->display.keyDown[chip8->v[x]])
-                        chip8->pc += 2;
+                        skipNextInstruction(chip8);
+
                     break;
             }
             break;
@@ -620,6 +660,7 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                 case 0x07:
                     /* set Vx to the value of the delay timer */
                     chip8->v[x] = chip8->timers.delay;
+
                     break;
                 case 0x0A:
                     /*
@@ -627,10 +668,12 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                      * and store the value of the key in Vx
                      */
                     chip8->pc -= 2;
+
                     for (int i = 0x0; i <= 0xF; i++)
                         if (chip8->display.keyUp[i]) {
                             chip8->v[x] = i;
-                            chip8->pc += 2;
+                            skipNextInstruction(chip8);
+
                             break;
                         }
 
@@ -638,18 +681,22 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                 case 0x15:
                     /* set the delay timer to Vx */
                     chip8->timers.delay = chip8->v[x];
+
                     break;
                 case 0x18:
                     /* set the sound timer to Vx */
                     chip8->timers.sound = chip8->v[x];
+
                     break;
                 case 0x1E:
                     /* add Vx to I */
                     chip8->i += chip8->v[x];
+
                     break;
                 case 0x29:
                     /* set I to the location of the sprite for the character in Vx */
                     chip8->i = (chip8->v[x] & 0x0F) * 5;
+
                     break;
                 case 0x33:
                     /*
@@ -658,37 +705,89 @@ decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
                      */
                     if (chip8->i < AMOUNT_MEMORY_BYTES)
                         chip8->memory[chip8->i] = chip8->v[x] / 100;
+
                     if (chip8->i + 1 < AMOUNT_MEMORY_BYTES)
                         chip8->memory[chip8->i + 1] = (chip8->v[x] / 10) % 10;
+
                     if (chip8->i + 2 < AMOUNT_MEMORY_BYTES)
                         chip8->memory[chip8->i + 2] = chip8->v[x] % 10;
+
                     break;
                 case 0x55:
                     /* store V0 to Vx in memory starting at address I */
-                    for (int i = 0; i <= x; i++) {
+                    for (int i = 0; i <= x; i++)
                         if (chip8->i + i < AMOUNT_MEMORY_BYTES)
                             chip8->memory[chip8->i + i] = chip8->v[i];
-                    }
+
                     if (chip8->specType == CHIP8)
                         chip8->i += x + 1;
+
                     break;
                 case 0x65:
                     /* fill V0 to Vx with values from memory starting at address I */
-                    for (int i = 0; i <= x; i++) {
+                    for (int i = 0; i <= x; i++)
                         if (chip8->i + i < AMOUNT_MEMORY_BYTES)
                             chip8->v[i] = chip8->memory[chip8->i + i];
-                    }
+
                     if (chip8->specType == CHIP8)
                         chip8->i += x + 1;
+
                     break;
                 case 0x75:
                     /* store V0 to Vx in the RPL user flags */
                     chip8->specType = SCHIP;
+
                     break;
                 case 0x85:
                     /* fill V0 to Vx with values from the RPL user flags */
                     chip8->specType = SCHIP;
+
                     break;
             }
     }
+}
+
+void
+skipNextInstruction(emulator *chip8)
+{
+    chip8->pc += 2;
+}
+
+void
+cleanUp(emulator *chip8)
+{
+    SDL_LogDebug(
+        SDL_LOG_CATEGORY_APPLICATION,
+        "cleaning up\n"
+    );
+
+    if (chip8->sound.poweredOn) {
+        SDL_LogDebug(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "shutting down audio\n"
+        );
+
+        if (chip8->sound.playing)
+            SDL_PauseAudioDevice(chip8->sound.deviceId, 1);
+
+        SDL_CloseAudioDevice(chip8->sound.deviceId);
+    }
+
+    SDL_LogDebug(
+        SDL_LOG_CATEGORY_APPLICATION,
+        "shutting down display\n"
+    );
+
+    free(chip8->display.pixels);
+    free(chip8->display.pixelDrawn);
+    SDL_DestroyRenderer(chip8->display.renderer);
+    SDL_DestroyWindow(chip8->display.window);
+
+    SDL_LogDebug(
+        SDL_LOG_CATEGORY_APPLICATION,
+        "quitting SDL\n"
+    );
+
+    IMG_Quit();
+    SDL_Quit();
 }

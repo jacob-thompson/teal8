@@ -6,8 +6,8 @@
 #define STACK_LEVELS 16
 
 typedef struct {
-    uint16_t    s[STACK_LEVELS];    // 16 addresses
-    uint8_t     sp;                 // stack pointer index (0x0-0xF)
+    uint16_t s[STACK_LEVELS];   // 16 addresses
+    uint8_t sp;                 // stack pointer index (0x0-0xF)
 } stack;
 
 /*

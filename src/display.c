@@ -8,8 +8,7 @@
 void
 resetDisplay(display *display)
 {
-    if (display->pixelDrawn == NULL)
-        return;
+    if (display->pixelDrawn == NULL) return;
 
     memset(
         display->pixelDrawn,
@@ -27,24 +26,24 @@ resetDisplay(display *display)
 void
 createPixels(display *display)
 {
-    if (display->pixels != NULL)
-        free(display->pixels);
+    if (display->pixels != NULL) free(display->pixels);
 
-    if (display->pixelDrawn != NULL)
-        free(display->pixelDrawn);
+    if (display->pixelDrawn != NULL) free(display->pixelDrawn);
 
-    display->pixelWidth     = display->width / SCALE;
-    display->pixelHeight    = display->height / SCALE;
+    display->pixelWidth = display->width / SCALE;
+    display->pixelHeight = display->height / SCALE;
 
     display->pixels = calloc(
         display->pixelHeight * display->pixelWidth,
-        sizeof(SDL_Rect));
+        sizeof(SDL_Rect)
+    );
 
     if (display->pixels == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to allocate memory for pixels\n"
         );
+
         return;
     }
 
@@ -67,8 +66,10 @@ createPixels(display *display)
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to allocate memory for pixelDrawn\n"
         );
+
         free(display->pixels);
         display->pixels = NULL;
+
         return;
     }
 }
@@ -76,19 +77,17 @@ createPixels(display *display)
 int
 initDisplay(display *display, const char *iconPath)
 {
-    if (
-        SDL_InitSubSystem(
-            SDL_INIT_TIMER
-            |
-            SDL_INIT_VIDEO
-            |
-            SDL_INIT_EVENTS
-        ) != 0) {
+    int init = SDL_InitSubSystem(
+        SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS
+    );
+
+    if (init != 0) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to initialize SDL (display): %s\n",
             SDL_GetError()
         );
+
         return -1;
     }
 
@@ -98,6 +97,7 @@ initDisplay(display *display, const char *iconPath)
             "failed to initialize SDL_image: %s\n",
             IMG_GetError()
         );
+
         return -1;
     }
 
@@ -109,12 +109,14 @@ initDisplay(display *display, const char *iconPath)
         CHIP8_HEIGHT * SCALE,
         0
     );
+
     if (display->window == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to create window: %s\n",
             SDL_GetError()
         );
+
         return -1;
     }
 
@@ -129,28 +131,35 @@ initDisplay(display *display, const char *iconPath)
         -1,
         SDL_RENDERER_ACCELERATED
     );
+
     if (display->renderer == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to create renderer: %s\n",
             SDL_GetError()
         );
+
         SDL_DestroyWindow(display->window);
+
         return -1;
     }
 
     if (iconPath != NULL) {
         SDL_Surface *iconSurface = IMG_Load(iconPath);
+
         if (iconSurface == NULL) {
             SDL_LogError(
                 SDL_LOG_CATEGORY_APPLICATION,
                 "failed to load icon: %s\n",
                 IMG_GetError()
             );
+
             SDL_DestroyRenderer(display->renderer);
             SDL_DestroyWindow(display->window);
+
             return -1;
         }
+
         SDL_SetWindowIcon(display->window, iconSurface);
         SDL_FreeSurface(iconSurface);
     }
@@ -308,26 +317,18 @@ handleEvent(display *display, const SDL_Event *event)
             }
             break;
 
-        /* quit gracefully */
-        case SDL_QUIT:
-            display->poweredOn = SDL_FALSE;
+        case SDL_QUIT: display->poweredOn = SDL_FALSE;
     }
 }
 
 int
 drawBackground(display *display)
 {
-    if (
-        SDL_SetRenderDrawColor(display->renderer, BLACK_PIXEL_COLOR)
-        != 0
-        ||
-        SDL_RenderClear(display->renderer)
-        != 0
-    )
-        return -1;
+    int draw, clear;
+    draw = SDL_SetRenderDrawColor(display->renderer, BLACK_PIXEL_COLOR);
+    clear = SDL_RenderClear(display->renderer);
 
-    if (SDL_RenderClear(display->renderer) != 0)
-        return -1;
+    if (draw != 0 || clear != 0) return -1;
 
     return 0;
 }
@@ -335,15 +336,9 @@ drawBackground(display *display)
 int
 drawPixels(display *display)
 {
-    if (
-        display->pixelDrawn == NULL
-        ||
-        display->pixels == NULL
-        ||
-        SDL_SetRenderDrawColor(display->renderer, WHITE_PIXEL_COLOR)
-        != 0
-    )
-        return -1;
+    int color = SDL_SetRenderDrawColor(display->renderer, WHITE_PIXEL_COLOR);
+
+    if (color != 0) return -1;
 
     for (int y = 0; y < display->pixelHeight; y++)
         for (int x = 0; x < display->pixelWidth; x++)
@@ -353,10 +348,8 @@ drawPixels(display *display)
                 SDL_RenderFillRect(
                     display->renderer,
                     &display->pixels[y * display->pixelWidth + x]
-                )
-                != 0
-            )
-                return -1;
+                ) != 0
+            ) return -1;
 
     return 0;
 }

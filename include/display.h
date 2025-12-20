@@ -7,29 +7,29 @@
 #include <SDL_events.h>
 #include <SDL_image.h>
 
-#define AMOUNT_KEYS     16
+#define AMOUNT_KEYS 16
 
-#define SCALE           10
-#define CHIP8_WIDTH     64
-#define CHIP8_HEIGHT    32
-#define SCHIP_WIDTH     128
-#define SCHIP_HEIGHT    64
+#define SCALE 10
+#define CHIP8_WIDTH 64
+#define CHIP8_HEIGHT 32
+#define SCHIP_WIDTH 128
+#define SCHIP_HEIGHT 64
 
 typedef struct {
-    SDL_Window      *window;                // window for the display
-    SDL_Renderer    *renderer;              // renderer for the display
-    SDL_Rect        *pixels;                // rectangles for each pixel
-    SDL_bool        *pixelDrawn;            // which pixels are drawn?
-    SDL_bool        poweredOn;              // power flag
-    SDL_bool        reset;                  // reset flag
-    SDL_bool        keyDown[AMOUNT_KEYS];   // which keys are pressed?
-    SDL_bool        keyUp[AMOUNT_KEYS];     // which keys are released?
-    SDL_bool        dirty;                  // does display need redrawing?
-    uint32_t        lastUpdate;             // tick count at last update
-    int             width;                  // current width
-    int             height;                 // current height
-    int             pixelWidth;             // cached width / SCALE
-    int             pixelHeight;            // cached height / SCALE
+    SDL_Window *window;             // window for the display
+    SDL_Renderer *renderer;         // renderer for the display
+    SDL_Rect *pixels;               // rectangles for each pixel
+    SDL_bool *pixelDrawn;           // which pixels are drawn?
+    SDL_bool poweredOn;             // power flag
+    SDL_bool reset;                 // reset flag
+    SDL_bool keyDown[AMOUNT_KEYS];  // which keys are pressed?
+    SDL_bool keyUp[AMOUNT_KEYS];    // which keys are released?
+    SDL_bool dirty;                 // does display need redrawing?
+    uint32_t lastUpdate;            // tick count at last update
+    int width;                      // current width
+    int height;                     // current height
+    int pixelWidth;                 // cached width / SCALE
+    int pixelHeight;                // cached height / SCALE
 } display;
 
 /*

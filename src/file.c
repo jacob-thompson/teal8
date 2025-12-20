@@ -6,21 +6,22 @@
 #include "../include/file.h"
 
 #define SHA1_BLOCK_SIZE 20
-#define SHA1_STR_LEN    41
+#define SHA1_STR_LEN 41
 
 static size_t
 writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
-    size_t              realsize    = size * nmemb;
-    struct MemoryStruct *mem        = (struct MemoryStruct *)userp;
-    char                *ptr        = realloc(mem->memory, mem->size + realsize + 1);
+    size_t realsize = size * nmemb;
+    struct MemoryStruct *mem = (struct MemoryStruct *)userp;
+    char *ptr = realloc(mem->memory, mem->size + realsize + 1);
 
-    if(!ptr) {
+    if (!ptr) {
         /* out of memory! */
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "not enough memory (realloc returned NULL)\n"
         );
+
         return 0;
     }
 
@@ -59,6 +60,7 @@ pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url)
             "curl query failed: %s\n",
             curl_easy_strerror(res)
         );
+
         return -1;
     }
 
@@ -69,11 +71,13 @@ char *
 getHash(FILE *romFile)
 {
     EVP_MD_CTX *shaContext = EVP_MD_CTX_new();
+
     if (shaContext == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to create SHA1 context\n"
         );
+
         return NULL;
     }
 
@@ -83,7 +87,9 @@ getHash(FILE *romFile)
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to initialize SHA1 context\n"
         );
+
         EVP_MD_CTX_free(shaContext);
+
         return NULL;
     }
 
@@ -99,15 +105,18 @@ getHash(FILE *romFile)
     uint8_t hash[SHA1_BLOCK_SIZE];
     EVP_DigestFinal_ex(shaContext, hash, NULL);
     EVP_MD_CTX_free(shaContext);
-    rewind(romFile); // reset file pointer to the beginning of the file
+
+    rewind(romFile); // reset file pointer
 
     /* convert hash to hex string */
     char *hashString = malloc(SHA1_STR_LEN * sizeof(char));
+
     if (hashString == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to allocate memory for hash string\n"
         );
+
         return NULL;
     }
 
@@ -123,31 +132,35 @@ void
 printRomInfo(cJSON *romInfo, cJSON *romHash)
 {
     const char *infoString = cJSON_Print(romInfo);
+
     SDL_LogDebug(
         SDL_LOG_CATEGORY_APPLICATION,
         "ROM info: %s\n",
         infoString
     );
+
     free((void *)infoString);
 
-    const cJSON *title    = cJSON_GetObjectItemCaseSensitive(romInfo, "title");
-    const cJSON *release  = cJSON_GetObjectItemCaseSensitive(romInfo, "release");
+    const cJSON *title = cJSON_GetObjectItemCaseSensitive(romInfo, "title");
+    const cJSON *release = cJSON_GetObjectItemCaseSensitive(romInfo, "release");
+
     SDL_LogInfo(
         SDL_LOG_CATEGORY_APPLICATION,
         "Title: %s (%s)\n",
         title ? title->valuestring : "Title Unknown",
         release ? release->valuestring : "Release Date Unknown"
     );
-    cJSON_ArrayForEach(romHash, cJSON_GetObjectItemCaseSensitive(romInfo, "authors")) {
-        if (cJSON_IsString(romHash) && (romHash->valuestring != NULL)) {
+
+    cJSON_ArrayForEach(romHash, cJSON_GetObjectItemCaseSensitive(romInfo, "authors"))
+        if (cJSON_IsString(romHash) && (romHash->valuestring != NULL))
             SDL_LogInfo(
                 SDL_LOG_CATEGORY_APPLICATION,
                 "Author: %s\n",
                 romHash->valuestring
             );
-        }
-    }
+
     const cJSON *description = cJSON_GetObjectItemCaseSensitive(romInfo, "description");
+
     SDL_LogInfo(
         SDL_LOG_CATEGORY_APPLICATION,
         "Description: %s\n",
@@ -169,8 +182,11 @@ isRomInDatabase(FILE *romFile)
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to allocate memory for database chunks\n"
         );
+
         if (hashChunk.memory != NULL) free(hashChunk.memory);
+
         if (infoChunk.memory != NULL) free(infoChunk.memory);
+
         return SDL_FALSE;
     }
 
@@ -185,55 +201,67 @@ isRomInDatabase(FILE *romFile)
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to initialize curl\n"
         );
+
         return SDL_FALSE;
     }
 
     /* pull the SHA1 hash database */
-    if (pullDatabase(
+    int pullSHA = pullDatabase(
         curlHandle,
         &hashChunk,
         "https://raw.githubusercontent.com/"
         "chip-8/chip-8-database/refs/heads/master/"
         "database/sha1-hashes.json"
-    ) != 0) {
+    );
+
+    if (pullSHA != 0) {
         free(hashChunk.memory);
         free(infoChunk.memory);
         curl_easy_cleanup(curlHandle);
+
         return SDL_FALSE;
     }
 
     /* parse the JSON data */
     cJSON *hashJson = cJSON_Parse(hashChunk.memory);
+
     if (hashJson == NULL) {
         const char *error_ptr = cJSON_GetErrorPtr();
-        if (error_ptr != NULL) {
+
+        if (error_ptr != NULL)
             SDL_LogError(
                 SDL_LOG_CATEGORY_APPLICATION,
                 "failed to parse json: %s\n",
                 error_ptr
             );
-        }
+
         free(hashChunk.memory);
         free(infoChunk.memory);
         curl_easy_cleanup(curlHandle);
+
         return SDL_FALSE;
     }
 
     /*
     const char *str = cJSON_Print(hashJson);
+
     if (str == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to print json\n"
         );
+
         cJSON_Delete(hashJson);
         curl_easy_cleanup(curlHandle);
+
         return SDL_FALSE;
     }
+
     SDL_LogDebug(
         SDL_LOG_CATEGORY_APPLICATION,
         "JSON data: %s\n",
         str);
+
     free((void *)str);
     */
 
@@ -244,30 +272,36 @@ isRomInDatabase(FILE *romFile)
     );
 
     const char *hashString = getHash(romFile);
+
     if (hashString == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to compute ROM hash\n"
         );
+
         free(hashChunk.memory);
         free(infoChunk.memory);
         cJSON_Delete(hashJson);
         curl_easy_cleanup(curlHandle);
+
         return SDL_FALSE;
     }
 
     /* check if the hash is in the database */
     cJSON *romHash = cJSON_GetObjectItemCaseSensitive(hashJson, hashString);
+
     if (cJSON_IsNull(romHash) || romHash == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "ROM hash not found in database: %s\n",
             hashString
         );
+
         free((void *)hashString);
         free(hashChunk.memory);
         cJSON_Delete(hashJson);
         curl_easy_cleanup(curlHandle);
+
         return SDL_FALSE;
     } else {
         SDL_LogDebug(
@@ -275,41 +309,49 @@ isRomInDatabase(FILE *romFile)
             "ROM hash found in database: %s\n",
             hashString
         );
+
         free((void *)hashString);
     }
 
     /* pull the program info database */
-    if (pullDatabase(
+    int pullInfo = pullDatabase(
         curlHandle,
         &infoChunk,
         "https://raw.githubusercontent.com/"
         "chip-8/chip-8-database/refs/heads/master/"
         "database/programs.json"
-    ) != 0) {
+    );
+
+    if (pullInfo != 0) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to pull ROM info database\n"
         );
+
         free(hashChunk.memory);
         cJSON_Delete(hashJson);
         curl_easy_cleanup(curlHandle);
+
         return SDL_FALSE;
     }
 
     /* parse the JSON data */
     cJSON *infoJson = cJSON_Parse(infoChunk.memory);
+
     if (infoJson == NULL) {
         const char *error_ptr = cJSON_GetErrorPtr();
-        if (error_ptr != NULL) {
+
+        if (error_ptr != NULL)
             SDL_LogError(
                 SDL_LOG_CATEGORY_APPLICATION,
                 "failed to parse json: %s\n",
                 error_ptr
             );
-        }
+
         free(hashChunk.memory);
         cJSON_Delete(hashJson);
         curl_easy_cleanup(curlHandle);
+
         return SDL_FALSE;
     }
 
@@ -320,16 +362,15 @@ isRomInDatabase(FILE *romFile)
     );
 
     /* get ROM info using the index found earlier */
-    int     index   = romHash->valueint;
-    cJSON *romInfo  = cJSON_GetArrayItem(infoJson, index);
-    if (romInfo == NULL) {
+    int index = romHash->valueint;
+    cJSON *romInfo = cJSON_GetArrayItem(infoJson, index);
+
+    if (romInfo == NULL)
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to retrieve ROM info from database\n"
         );
-    } else {
-        printRomInfo(romInfo, romHash);
-    }
+    else printRomInfo(romInfo, romHash);
 
     /* cleanup */
     free(hashChunk.memory);
@@ -351,6 +392,7 @@ isRomValid(const char *romName, FILE *romFile, struct stat *st)
             "failed to open %s\n",
             romName
         );
+
         return SDL_FALSE;
     }
 
@@ -360,10 +402,12 @@ isRomValid(const char *romName, FILE *romFile, struct stat *st)
             "%s not found in database\n",
             romName
         );
+
         SDL_LogInfo(
             SDL_LOG_CATEGORY_APPLICATION,
             "pass -f to force load ROM\n"
         );
+
         return SDL_FALSE;
     }
 
@@ -372,5 +416,6 @@ isRomValid(const char *romName, FILE *romFile, struct stat *st)
         "%s opened successfully\n",
         romName
     );
+
     return SDL_TRUE;
 }
