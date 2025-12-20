@@ -18,7 +18,7 @@
 <h1 align="center">teal8</h3>
 
 <p align="center">
-CHIP-8 interpreter written in pure C.
+CHIP-8 Interpreter
 <br />
 </p>
 
