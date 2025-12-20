@@ -1,5 +1,3 @@
-CC = cc
-
 GIT_VERSION := "$(shell git describe --abbrev=4 --dirty --always --tags)"
 
 CFLAGS = -Wall -Wno-unused-function -DTEAL8VERSION=\"$(GIT_VERSION)\"
@@ -32,13 +30,10 @@ OUT = bin/teal8
 .PHONY: clean test force
 
 $(BDIR)/%.o: src/%.c $(DEPS) compiler_flags
-	$(CC) $(CFLAGS) -c -o $@ $<
+	cc $(CFLAGS) -c -o $@ $<
 
 $(OUT): $(OBJ)
-	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
-
-test:
-	./$(OUT) roms/test/quirks
+	cc -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 clean:
 	rm -f $(OBJ) $(OUT)
