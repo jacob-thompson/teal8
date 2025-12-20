@@ -5,15 +5,16 @@
 
 #include "../include/file.h"
 
-#define SHA1_BLOCK_SIZE 20 // SHA1 outputs a 20 byte digest
-#define SHA1_HASH_SIZE 41 // SHA1 hash string is 40 chars + null terminator
+#define SHA1_BLOCK_SIZE 20
+#define SHA1_STR_LEN    41
 
-static size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
+static size_t
+writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
-    size_t realsize = size * nmemb;
-    struct MemoryStruct *mem = (struct MemoryStruct *)userp;
+    size_t              realsize    = size * nmemb;
+    struct MemoryStruct *mem        = (struct MemoryStruct *)userp;
+    char                *ptr        = realloc(mem->memory, mem->size + realsize + 1);
 
-    char *ptr = realloc(mem->memory, mem->size + realsize + 1);
     if(!ptr) {
         /* out of memory! */
         SDL_LogError(
@@ -31,7 +32,8 @@ static size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, voi
     return realsize;
 }
 
-int pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url)
+int
+pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url)
 {
     CURLcode res;
 
@@ -63,7 +65,8 @@ int pullDatabase(CURL *handle, struct MemoryStruct *chunk, const char *url)
     return 0;
 }
 
-char *getHash(FILE *fp)
+char *
+getHash(FILE *romFile)
 {
     EVP_MD_CTX *shaContext = EVP_MD_CTX_new();
     if (shaContext == NULL) {
@@ -85,22 +88,21 @@ char *getHash(FILE *fp)
     }
 
     /* compute SHA1 hash of the ROM */
-    unsigned char buffer[20]; // SHA1 produces a 20-byte hash
-    size_t bytesRead = 0;
+    uint8_t buffer[20];
+    size_t  bytesRead = 0;
 
     /* read the ROM file in chunks and update the SHA1 context */
-    while ((bytesRead = fread(buffer, 1, sizeof(buffer), fp)) > 0) {
+    while ((bytesRead = fread(buffer, 1, sizeof buffer, romFile)) > 0)
         EVP_DigestUpdate(shaContext, buffer, bytesRead);
-    }
 
     /* finalize the SHA1 hash */
-    unsigned char hash[SHA1_BLOCK_SIZE];
+    uint8_t hash[SHA1_BLOCK_SIZE];
     EVP_DigestFinal_ex(shaContext, hash, NULL);
     EVP_MD_CTX_free(shaContext);
-    rewind(fp); // reset file pointer to the beginning of the file
+    rewind(romFile); // reset file pointer to the beginning of the file
 
     /* convert hash to hex string */
-    char *hashString = malloc(SHA1_HASH_SIZE * sizeof(char));
+    char *hashString = malloc(SHA1_STR_LEN * sizeof(char));
     if (hashString == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -108,15 +110,17 @@ char *getHash(FILE *fp)
         );
         return NULL;
     }
-    for (int i = 0; i < SHA1_BLOCK_SIZE; i++) {
+
+    for (int i = 0; i < SHA1_BLOCK_SIZE; i++)
         sprintf(&hashString[i << 1], "%02x", hash[i]);
-    }
-    hashString[SHA1_HASH_SIZE - 1] = '\0';
+
+    hashString[SHA1_STR_LEN - 1] = 0;
 
     return hashString;
 }
 
-void printRomInfo(cJSON *romInfo, cJSON *romHash)
+void
+printRomInfo(cJSON *romInfo, cJSON *romHash)
 {
     const char *infoString = cJSON_Print(romInfo);
     SDL_LogDebug(
@@ -126,8 +130,8 @@ void printRomInfo(cJSON *romInfo, cJSON *romHash)
     );
     free((void *)infoString);
 
-    cJSON *title = cJSON_GetObjectItemCaseSensitive(romInfo, "title");
-    cJSON *release = cJSON_GetObjectItemCaseSensitive(romInfo, "release");
+    const cJSON *title    = cJSON_GetObjectItemCaseSensitive(romInfo, "title");
+    const cJSON *release  = cJSON_GetObjectItemCaseSensitive(romInfo, "release");
     SDL_LogInfo(
         SDL_LOG_CATEGORY_APPLICATION,
         "Title: %s (%s)\n",
@@ -143,7 +147,7 @@ void printRomInfo(cJSON *romInfo, cJSON *romHash)
             );
         }
     }
-    cJSON *description = cJSON_GetObjectItemCaseSensitive(romInfo, "description");
+    const cJSON *description = cJSON_GetObjectItemCaseSensitive(romInfo, "description");
     SDL_LogInfo(
         SDL_LOG_CATEGORY_APPLICATION,
         "Description: %s\n",
@@ -151,7 +155,8 @@ void printRomInfo(cJSON *romInfo, cJSON *romHash)
     );
 }
 
-SDL_bool isRomInDatabase(FILE *fp)
+SDL_bool
+isRomInDatabase(FILE *romFile)
 {
     struct MemoryStruct hashChunk, infoChunk;
 
@@ -169,13 +174,11 @@ SDL_bool isRomInDatabase(FILE *fp)
         return SDL_FALSE;
     }
 
-    /* initial size is 0 */
-    hashChunk.size = 0;
-    infoChunk.size = 0;
+    /* initial sizes are 0 */
+    hashChunk.size = infoChunk.size = 0;
 
     curl_global_init(CURL_GLOBAL_ALL);
-    CURL *curlHandle;
-    curlHandle = curl_easy_init();
+    CURL *curlHandle = curl_easy_init();
 
     if (curlHandle == NULL) {
         SDL_LogError(
@@ -189,7 +192,9 @@ SDL_bool isRomInDatabase(FILE *fp)
     if (pullDatabase(
         curlHandle,
         &hashChunk,
-        "https://raw.githubusercontent.com/chip-8/chip-8-database/refs/heads/master/database/sha1-hashes.json"
+        "https://raw.githubusercontent.com/"
+        "chip-8/chip-8-database/refs/heads/master/"
+        "database/sha1-hashes.json"
     ) != 0) {
         free(hashChunk.memory);
         free(infoChunk.memory);
@@ -238,7 +243,7 @@ SDL_bool isRomInDatabase(FILE *fp)
         (unsigned long)hashChunk.size
     );
 
-    const char *hashString = getHash(fp);
+    const char *hashString = getHash(romFile);
     if (hashString == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -277,7 +282,9 @@ SDL_bool isRomInDatabase(FILE *fp)
     if (pullDatabase(
         curlHandle,
         &infoChunk,
-        "https://raw.githubusercontent.com/chip-8/chip-8-database/refs/heads/master/database/programs.json"
+        "https://raw.githubusercontent.com/"
+        "chip-8/chip-8-database/refs/heads/master/"
+        "database/programs.json"
     ) != 0) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -313,8 +320,8 @@ SDL_bool isRomInDatabase(FILE *fp)
     );
 
     /* get ROM info using the index found earlier */
-    int index = romHash->valueint;
-    cJSON *romInfo = cJSON_GetArrayItem(infoJson, index);
+    int     index   = romHash->valueint;
+    cJSON *romInfo  = cJSON_GetArrayItem(infoJson, index);
     if (romInfo == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -334,23 +341,24 @@ SDL_bool isRomInDatabase(FILE *fp)
     return SDL_TRUE;
 }
 
-SDL_bool isFileValid(const char *filename, FILE *fp, struct stat *st)
+SDL_bool
+isRomValid(const char *romName, FILE *romFile, struct stat *st)
 {
     /* check if file exists and is readable */
-    if (fp == NULL || fstat(fileno(fp), st) == -1) {
+    if (romFile == NULL || fstat(fileno(romFile), st) == -1) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "failed to open %s\n",
-            filename
+            romName
         );
         return SDL_FALSE;
     }
 
-    if (!isRomInDatabase(fp)) {
+    if (!isRomInDatabase(romFile)) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "%s not found in database\n",
-            filename
+            romName
         );
         SDL_LogInfo(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -362,7 +370,7 @@ SDL_bool isFileValid(const char *filename, FILE *fp, struct stat *st)
     SDL_LogDebug(
         SDL_LOG_CATEGORY_APPLICATION,
         "%s opened successfully\n",
-        filename
+        romName
     );
     return SDL_TRUE;
 }

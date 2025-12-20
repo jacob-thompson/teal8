@@ -1,152 +1,45 @@
-#if defined(__APPLE__)
-#include <mach-o/dyld.h>
-#endif
-
-#include <sys/syslimits.h>
-
 #include <SDL.h>
 
 #include "../include/emulator.h"
 #include "../include/file.h"
 
-#define TIMER_INTERVAL (1000 / 60) // ~16.67ms for 60Hz timer update
+#define TIMER_DECREMENT_INTERVAL_MS (1000 / 60)
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
-    char *binPath, *iconPath;
-    uint32_t size;
-
-    /* get resource path in order to set the window icon */
-#if defined(__APPLE__) // macOS
-
-    _NSGetExecutablePath(NULL, &size); // get the size needed
-    binPath = malloc(sizeof(char) * PATH_MAX);
-    if (binPath == NULL) {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "failed to allocate memory for executable path\n"
-        );
-        return EXIT_FAILURE;
-    }
-
-    if (_NSGetExecutablePath(binPath, &size) == 0) {
-        SDL_LogDebug(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "path = %s\n",
-            binPath
-        );
-    }
-
-    iconPath = malloc(sizeof(char) * PATH_MAX);
-    if (iconPath == NULL) {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "failed to allocate memory for resource path\n"
-        );
-        return EXIT_FAILURE;
-    }
-
-    int len, charsToTrim;
-    len = strlen(binPath);
-    charsToTrim = 10; // /bin/teal8 is 10 characters
-    if (len >= charsToTrim) {
-        binPath[len - charsToTrim] = '\0'; // trim
-    } else {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "executable path is unexpectedly short\n"
-        );
-        free(binPath);
-        free(iconPath);
-        return EXIT_FAILURE;
-    }
-
-    /* construct the path to the icon */
-    snprintf(iconPath, PATH_MAX, "%s/resources/icon.png", binPath);
-
-#elif defined(__linux__)
-
-    binPath = malloc(sizeof(char) * PATH_MAX);
-    if (binPath == NULL) {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "failed to allocate memory for executable path\n"
-        );
-        return EXIT_FAILURE;
-    }
-
-    ssize_t count = readlink("/proc/self/exe", binPath, PATH_MAX);
-    if (count != -1) {
-        binPath[count] = '\0'; // null-terminate the string
-        SDL_LogDebug(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "path = %s\n",
-            binPath
-        );
-    } else {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "failed to read /proc/self/exe\n"
-        );
-        free(binPath);
-        return EXIT_FAILURE;
-    }
-
-    iconPath = malloc(sizeof(char) * PATH_MAX);
-    if (iconPath == NULL) {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "failed to allocate memory for resource path\n"
-        );
-        return EXIT_FAILURE;
-    }
-
-    int len, charsToTrim;
-    len = strlen(binPath);
-    charsToTrim = 10; // /bin/teal8 is 10 characters
-    if (len >= charsToTrim) {
-        binPath[len - charsToTrim] = '\0'; // trim
-    } else {
-        SDL_LogError(
-            SDL_LOG_CATEGORY_APPLICATION,
-            "executable path is unexpectedly short\n"
-        );
-        free(binPath);
-        free(iconPath);
-        return EXIT_FAILURE;
-    }
-
-    /* construct the path to the icon */
-    snprintf(iconPath, PATH_MAX, "%s/resources/icon.png", binPath);
-
-#endif
 
     srand(time(NULL));
 
     //SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
 
     /* data that may be configured by args */
-    uint16_t rate;
-    int opt, longIndex;
-    SDL_bool mute, force;
+    uint16_t    rate;
+    int         *opt        = malloc(sizeof(int));
+    int         *longIndex  = malloc(sizeof(int));
+    SDL_bool    *mute       = malloc(sizeof(SDL_bool));
+    SDL_bool    *force      = malloc(sizeof(SDL_bool));
 
     /* defaults */
-    rate = DEFAULT_INSTRUCTION_RATE; // 1000 instructions per second
-    longIndex = 0; // used as the index for longOptions
-    mute = SDL_FALSE; // mute audio (-m or --mute)
-    force = SDL_FALSE; // force load rom regardless of validity (-f or --force)
+    rate        = DEFAULT_IPS;          // 1000 instructions per second
+    *longIndex  = 0;                    // index for longOptions
+    *mute       = SDL_FALSE;            // mute audio (-m or --mute)
+    *force      = SDL_FALSE;            // force load rom (-f or --force)
 
     /* parsing args */
-    while (argc > 1 &&
-          (opt = getopt_long(argc, argv,  "fmi:hv", longOptions, &longIndex)) != -1) {
-        switch (opt) {
-            case 'f': // force
-                force = SDL_TRUE;
+    while (
+        argc > 1
+        &&
+        (*opt = getopt_long(argc, argv,  "fmi:hv", longOptions, longIndex)) != -1
+    ) {
+        switch (*opt) {
+            case 'f':   // force
+                *force = SDL_TRUE;
                 break;
-            case 'm': // mute
-                mute = SDL_TRUE;
+            case 'm':   // mute
+                *mute = SDL_TRUE;
                 break;
-            case 'i': // ips
+            case 'i':   // ips
                 if (isNumber(optarg)) {
                     rate = atoi(optarg);
                 } else {
@@ -154,28 +47,38 @@ int main(int argc, char **argv)
                         SDL_LOG_CATEGORY_APPLICATION,
                         "invalid IPS input\n"
                     );
-                    return EXIT_FAILURE;
+                    free(opt);
+                    free(longIndex);
+                    free(mute);
+                    free(force);
+                    return -1;
                 }
 
                 /* validate the input before we start using it */
                 if (rate <= 0) {
-                    rate = DEFAULT_INSTRUCTION_RATE;
+                    rate = DEFAULT_IPS;
                 }
                 break;
-            case 'h': // help
+            case 'h':   // help
                 printUsage(argv[0], SDL_LOG_PRIORITY_INFO);
-                return EXIT_SUCCESS;
+                return 0;
                 break;
-            case 'v': // version
+            case 'v':   // version
                 printVersion(argv[0]);
-                return EXIT_SUCCESS;
+                return 0;
                 break;
-            default: // '?'
+            default:    // '?'
                 printUsage(argv[0], SDL_LOG_PRIORITY_ERROR);
-                return EXIT_FAILURE;
+                free(opt);
+                free(longIndex);
+                free(mute);
+                free(force);
+                return -1;
                 break;
         }
     }
+    free(opt);
+    free(longIndex);
 
     /* ensure that a ROM argument was given */
     if (optind >= argc) {
@@ -183,16 +86,20 @@ int main(int argc, char **argv)
             SDL_LOG_CATEGORY_APPLICATION,
             "expected ROM argument after options\n"
         );
-        return EXIT_FAILURE;
+        free(mute);
+        free(force);
+        return -1;
     }
 
-    const char *inputFile = argv[optind];
-    FILE *rom = getRom(inputFile);
+    const char  *inputFile  = argv[optind];
+    FILE        *rom        = getRom(inputFile);
     struct stat st;
 
-    if (!force && !isFileValid(inputFile, rom, &st)) {
+    if (!force && !isRomValid(inputFile, rom, &st)) {
         if (rom != NULL) fclose(rom);
-        return EXIT_FAILURE; // error has already been logged
+        free(mute);
+        free(force);
+        return -1;      // error has already been logged
     } else if (force) {
         if (rom == NULL) {
             SDL_LogError(
@@ -200,7 +107,9 @@ int main(int argc, char **argv)
                 "failed to open ROM file: %s\n",
                 inputFile
             );
-            return EXIT_FAILURE;
+            free(mute);
+            free(force);
+            return -1;
         }
         SDL_LogDebug(
             SDL_LOG_CATEGORY_APPLICATION,
@@ -214,10 +123,12 @@ int main(int argc, char **argv)
             inputFile
         );
     }
+    free(force);
 
     emulator chip8;
     initializeEmulator(&chip8, rom);
-    chip8.muted = mute;
+    chip8.muted = *mute;
+    free(mute);
 
     if (chip8.muted) {
         SDL_LogDebug(
@@ -227,8 +138,25 @@ int main(int argc, char **argv)
         );
     }
 
+#if defined(__APPLE__)
+
+    char *bin = getExecutablePathMACOS();
+
+#elif defined(__linux__)
+
+    char *bin = getExecutablePathLINUX();
+
+#endif
+
+    const char *iconPath = getWindowIconPath(bin);
+
     if (initDisplay(&chip8.display, iconPath) != 0) {
-        return EXIT_FAILURE; // error has already been logged
+        free((void *)bin);
+        free((void *)iconPath);
+        return -1;      // error has already been logged
+    } else {
+        free((void *)bin);
+        free((void *)iconPath);
     }
 
     if (!chip8.muted && initAudio(&chip8.sound) != 0) {
@@ -237,7 +165,7 @@ int main(int argc, char **argv)
             "error creating SDL audio: %s\n",
             SDL_GetError()
         );
-        return EXIT_FAILURE;
+        return -1;
     }
 
     SDL_LogDebug(
@@ -247,12 +175,12 @@ int main(int argc, char **argv)
         rate
     );
 
-    fclose(rom); // the rom is written to memory, so we can close it now
+    fclose(rom);        // the rom is already written to memory
 
     uint32_t ticks;
     uint16_t opcode;
-    double msPerInstruction = 1000.0 / rate;
-    double nextInstructionTime = SDL_GetTicks();
+    const double msPerInstruction   = 1000.0 / rate;
+    double nextInstructionTime      = SDL_GetTicks();
 
     /* main loop */
     while (chip8.display.poweredOn) {
@@ -261,9 +189,8 @@ int main(int argc, char **argv)
         ticks = SDL_GetTicks();
 
         /* check if it is time to execute the next instruction */
-        if ((double)ticks < nextInstructionTime) {
-            continue; // not time yet
-        }
+        if ((double)ticks < nextInstructionTime)
+            continue;
 
         /* schedule next instruction */
         nextInstructionTime += msPerInstruction;
@@ -272,7 +199,7 @@ int main(int argc, char **argv)
          * handle timer updates at 60Hz
          * timers are decremented if they are greater than zero
          */
-        if (ticks - chip8.timers.lastUpdate >= TIMER_INTERVAL) {
+        if (ticks - chip8.timers.lastUpdate >= TIMER_DECREMENT_INTERVAL_MS) {
             if (chip8.timers.delay > 0) {
                 chip8.timers.delay--;
             }
@@ -290,7 +217,7 @@ int main(int argc, char **argv)
             } else if (chip8.sound.playing && !chip8.muted) {
                 /* stop audio playback and reset phase */
                 chip8.sound.playing = SDL_FALSE;
-                chip8.sound.phase = 0.0;
+                chip8.sound.phase   = 0.0;
                 SDL_PauseAudioDevice(chip8.sound.deviceId, 1);
             }
             chip8.timers.lastUpdate = ticks;
@@ -351,7 +278,7 @@ int main(int argc, char **argv)
                     "error drawing background: %s\n",
                     SDL_GetError()
                 );
-                return EXIT_FAILURE;
+                return -1;
             }
 
             if (drawPixels(&chip8.display) != 0) {
@@ -360,7 +287,7 @@ int main(int argc, char **argv)
                     "error drawing pixels: %s\n",
                     SDL_GetError()
                 );
-                return EXIT_FAILURE;
+                return -1;
             }
 
             SDL_RenderPresent(chip8.display.renderer);
@@ -374,9 +301,6 @@ int main(int argc, char **argv)
         SDL_LOG_CATEGORY_APPLICATION,
         "cleaning up\n"
     );
-
-    free(binPath);
-    free(iconPath);
 
     if (chip8.sound.poweredOn) {
         SDL_LogDebug(
@@ -406,5 +330,5 @@ int main(int argc, char **argv)
     IMG_Quit();
     SDL_Quit();
 
-    return EXIT_SUCCESS;
+    return 0;
 }

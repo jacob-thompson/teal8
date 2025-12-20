@@ -3,32 +3,43 @@
 
 #include <stdint.h>
 
-#define STACK_SIZE 16 // 16 levels of stack
+#define STACK_LEVELS 16
 
-typedef struct stack {
-    uint16_t s[STACK_SIZE]; // 16 addresses
-    uint8_t sp; // stack pointer index (0x0-0xF)
+typedef struct {
+    uint16_t    s[STACK_LEVELS];    // 16 addresses
+    uint8_t     sp;                 // stack pointer index (0x0-0xF)
 } stack;
 
 /*
  * Get the number of stacked addresses.
- * @param stack the stack
- * @return the number of stacked addresses
+ *
+ * Parameter:
+ * the stack
+ *
+ * Return:
+ * the number of stacked addresses
  */
-int stacked(stack *stack);
+int
+stacked(stack *stack);
 
 /*
  * Push a value onto the stack.
- * @param stack the stack
- * @param value the value to push onto the stack
+ *
+ * Parameters:
+ * the stack,
+ * the value to push onto the stack
  */
-void stackPush(stack *stack, unsigned short *value);
+void
+stackPush(stack *stack, const uint16_t *value);
 
 /*
  * Pop a value from the stack.
- * @param stack the stack
- * @param poppedValue value to store popped address
+ *
+ * Parameters:
+ * the stack,
+ * the value to be used to store popped address
  */
-void stackPop(stack *stack, unsigned short *poppedValue);
+void
+stackPop(stack *stack, uint16_t *poppedValue);
 
 #endif /* STACK_H */

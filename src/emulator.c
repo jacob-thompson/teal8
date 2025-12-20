@@ -1,21 +1,23 @@
+#if defined(__APPLE__)
+#include <mach-o/dyld.h>
+#endif
+
 #include <stdio.h>
 #include <string.h>
+#include <sys/syslimits.h>
 
 #include <SDL_log.h>
 #include <SDL_timer.h>
 
 #include "../include/emulator.h"
 
-#define FONT_START_ADDRESS 0x000 // 0 decimal
-#define FONT_BYTES 0x50 // 80 decimal
+#define FONT_START_ADDRESS      0x00
+#define PROGRAM_START_ADDRESS   0x200
 
-#define PROGRAM_START_ADDRESS 0x200 // 512 decimal
+#define VBLANK_INTERVAL_MS      (1000 / 60)
 
-#define VBLANK_INTERVAL (1000 / 60)  // ~16.67ms for 60Hz vertical blank
-
-#define LAST_REGISTER 0xF // index of the last register (VF)
-
-void printVersion(const char *programName)
+void
+printVersion(const char *programName)
 {
     SDL_LogInfo(
         SDL_LOG_CATEGORY_APPLICATION,
@@ -25,12 +27,14 @@ void printVersion(const char *programName)
     );
 }
 
-void printUsage(const char *programName, SDL_LogPriority priority)
+void
+printUsage(const char *programName, const SDL_LogPriority priority)
 {
     SDL_LogMessage(
         SDL_LOG_CATEGORY_APPLICATION,
         priority,
-        "%s version %s\nusage:\t%s [-m|--mute] [-f|--force] [-i|--ips <number>] <rom>\n"
+        "%s version %s\n"
+        "usage:\t%s [-m|--mute] [-f|--force] [-i|--ips <number>] <rom>\n"
         "\t-m (--mute)\tmute audio\n"
         "\t-f (--force)\tforce load rom regardless of validity\n"
         "\t-i (--ips)\tinstructions per second (default: %d)\n"
@@ -43,46 +47,151 @@ void printUsage(const char *programName, SDL_LogPriority priority)
         programName,
         TEAL8VERSION,
         programName,
-        DEFAULT_INSTRUCTION_RATE
+        DEFAULT_IPS
     );
 }
 
-SDL_bool isNumber(const char num[])
+char *
+getExecutablePathMACOS()
+{
+    char        *binPath;
+    uint32_t    size;
+
+    _NSGetExecutablePath(NULL, &size); // get the size needed
+
+    binPath = malloc(sizeof(char) * PATH_MAX);
+
+    if (binPath == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to allocate memory for executable path\n"
+        );
+        return NULL;
+    }
+
+    if (_NSGetExecutablePath(binPath, &size) == 0) {
+        SDL_LogDebug(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "path = %s\n",
+            binPath
+        );
+    } else {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to get executable path\n"
+        );
+        free(binPath);
+        return NULL;
+    }
+
+    return binPath;
+}
+
+char *
+getExecutablePathLINUX()
+{
+    char        *binPath;
+
+    binPath = malloc(sizeof(char) * PATH_MAX);
+
+    if (binPath == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to allocate memory for executable path\n"
+        );
+        return NULL;
+    }
+
+    ssize_t count = readlink("/proc/self/exe", binPath, PATH_MAX);
+    if (count != -1) {
+        binPath[count] = '\0'; // null-terminate the string
+        SDL_LogDebug(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "path = %s\n",
+            binPath
+        );
+    } else {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to read /proc/self/exe\n"
+        );
+        free(binPath);
+        return NULL;
+    }
+
+    return binPath;
+}
+
+char *
+getWindowIconPath(char *binPath)
+{
+    if (binPath == NULL) return NULL;
+
+    char *iconPath = malloc(sizeof(char) * PATH_MAX);
+    if (iconPath == NULL) {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "failed to allocate memory for resource path\n"
+        );
+        return NULL;
+    }
+
+    int len         = strlen(binPath);
+    int charsToTrim = 10; // /bin/teal8 is 10 characters
+
+    if (len >= charsToTrim) {
+        binPath[len - charsToTrim] = '\0'; // trim
+    } else {
+        SDL_LogError(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "executable path is unexpectedly short\n"
+        );
+        return NULL;
+    }
+
+    /* construct the path to the icon */
+    snprintf(iconPath, PATH_MAX, "%s/resources/icon.png", binPath);
+
+    return iconPath;
+}
+
+SDL_bool
+isNumber(const char num[])
 {
     /* check if string is empty */
     if (num == NULL || num[0] == '\0')
         return SDL_FALSE;
 
     /* check if each character is a numeral */
-    for (int i = 0; num[i] != 0; ++i) {
-        if (!isdigit(num[i]))
-            return SDL_FALSE;
-    }
+    for (int i = 0; num[i] != 0; ++i)
+        if (!isdigit(num[i])) return SDL_FALSE;
+
     return SDL_TRUE;
 }
 
-FILE *getRom(const char *rom)
+FILE *
+getRom(const char *rom)
 {
     /*
-     * allocate memory for the filename
+     * allocate memory for the file name
      * and 4 additional bytes for appending
      * the file extension if necessary
      */
-    char *filename = malloc(sizeof(char) * (strlen(rom) + 5));
-    if (filename == NULL) {
+    char *fileName = malloc(sizeof(char) * (strlen(rom) + 5));
+    if (fileName == NULL) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
-            "failed to allocate memory for filename\n"
+            "failed to allocate memory for fileName\n"
         );
         return NULL;
     }
 
     FILE *romFile = NULL; // file to be returned
 
-    snprintf(filename, strlen(rom) + 1, "%s", rom);
-    romFile = fopen(filename, "rb");
+    snprintf(fileName, strlen(rom) + 1, "%s", rom);
+    romFile = fopen(fileName, "rb");
     if (romFile != NULL) {
-        free(filename);
+        free(fileName);
         return romFile;
     }
 
@@ -90,21 +199,22 @@ FILE *getRom(const char *rom)
      * opening the file as given did not work,
      * so try appending the file extension
      */
-    snprintf(filename, strlen(rom) + 5, "%s.ch8", rom);
-    romFile = fopen(filename, "rb");
+    snprintf(fileName, strlen(rom) + 5, "%s.ch8", rom);
+    romFile = fopen(fileName, "rb");
     if (romFile != NULL) {
-        free(filename);
+        free(fileName);
         return romFile;
     }
 
     /* nothing worked */
-    free(filename);
+    free(fileName);
     return romFile; // null
 }
 
-void writeFontToMemory(unsigned char *memory)
+void
+writeFontToMemory(uint8_t *memory)
 {
-    uint8_t font[FONT_BYTES] = {
+    const uint8_t font[] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
         0x20, 0x60, 0x20, 0x20, 0x70, // 1
         0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -123,28 +233,36 @@ void writeFontToMemory(unsigned char *memory)
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
     };
 
-    for (int i = 0x0; i < FONT_BYTES; i++)
+    for (int i = 0x0; font[i] != 0; i++)
         memory[FONT_START_ADDRESS + i] = font[i];
 }
 
-void writeRomToMemory(emulator *chip8, FILE *rom)
+void
+writeRomToMemory(emulator *chip8, FILE *rom)
 {
     chip8->pc = PROGRAM_START_ADDRESS;
-    while (chip8->pc < MEMORY_BYTES && fread(&chip8->memory[chip8->pc], 1, 1, rom) == 1)
-        chip8->pc++;
 
-    if (chip8->pc >= MEMORY_BYTES) {
+    while (
+        chip8->pc < AMOUNT_MEMORY_BYTES
+        &&
+        fread(&chip8->memory[chip8->pc], 1, 1, rom) == 1
+    ) {
+        chip8->pc++;
+    }
+
+    if (chip8->pc >= AMOUNT_MEMORY_BYTES) {
         SDL_LogWarn(
             SDL_LOG_CATEGORY_APPLICATION,
             "ROM too large, truncated at %d bytes\n",
-            MEMORY_BYTES - PROGRAM_START_ADDRESS
+            AMOUNT_MEMORY_BYTES - PROGRAM_START_ADDRESS
         );
     }
 
     chip8->pc = PROGRAM_START_ADDRESS; // 0x200
 }
 
-void initializeEmulator(emulator *chip8, FILE *rom)
+void
+initializeEmulator(emulator *chip8, FILE *rom)
 {
     writeFontToMemory(chip8->memory);
     writeRomToMemory(chip8, rom);
@@ -152,23 +270,22 @@ void initializeEmulator(emulator *chip8, FILE *rom)
     clearKeys(chip8->display.keyDown);
     clearKeys(chip8->display.keyUp);
 
-    chip8->lastUpdate = 0;
-    chip8->timers.lastUpdate = 0;
+    chip8->lastUpdate           = 0;
+    chip8->timers.lastUpdate    = 0;
 
     /* ensure registers and stack are cleared */
-    for (int i = 0x0; i <= LAST_REGISTER; i++) {
-        chip8->v[i] = 0;
-        chip8->stack.s[i] = 0;
-    }
+    memset(chip8->v, 0, sizeof chip8->v);
+    memset(chip8->stack.s, 0, sizeof chip8->stack.s);
     chip8->stack.sp = 0;
 
     chip8->specType = CHIP8;
 }
 
 /*
-void printMemory(emulator *chip8)
+void
+printMemory(emulator *chip8)
 {
-    for (int i = 0x0; i < MEMORY_BYTES; i++) {
+    for (int i = 0x0; i < AMOUNT_MEMORY_BYTES; i++) {
         if (i % 0x10 == 0)
             fprintf(stdout, "\n");
         fprintf(stdout, "%02X ", chip8->memory[i]);
@@ -177,7 +294,8 @@ void printMemory(emulator *chip8)
 }
 */
 
-int randomNumber(int min, int max)
+int
+randomNumber(int min, int max)
 {
     if (min == max)
         return min;
@@ -189,7 +307,7 @@ int randomNumber(int min, int max)
         min ^= max;
     }
 
-    int range = max - min + 1;
+    const int range = max - min + 1;
 
     /*
      * chop off the high end of rand()
@@ -198,16 +316,16 @@ int randomNumber(int min, int max)
     int x;
     while (1) {
         x = rand();
-        if (x < RAND_MAX / range * range)
-            break;
+        if (x < RAND_MAX / range * range) break;
     }
 
     return x % range + min;
 }
 
-uint16_t fetchOpcode(emulator *chip8)
+uint16_t
+fetchOpcode(emulator *chip8)
 {
-    if (chip8->pc >= MEMORY_BYTES - 1) {
+    if (chip8->pc >= AMOUNT_MEMORY_BYTES - 1) {
         SDL_LogError(
             SDL_LOG_CATEGORY_APPLICATION,
             "program counter out of bounds: 0x%04X\n",
@@ -218,15 +336,16 @@ uint16_t fetchOpcode(emulator *chip8)
     return (chip8->memory[chip8->pc] << 8) | chip8->memory[chip8->pc + 1];
 }
 
-void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
+void
+decodeAndExecuteOpcode(emulator *chip8, uint16_t opcode)
 {
     uint8_t minuend, subtrahend, operand, addend;
 
-    uint8_t x = (opcode & 0x0F00) >> 8;
-    uint8_t y = (opcode & 0x00F0) >> 4;
-    uint8_t n = opcode & 0x000F;
-    uint8_t nn = opcode & 0x00FF;
-    uint16_t nnn = opcode & 0x0FFF;
+    const uint8_t   x   =   (opcode & 0x0F00) >> 8;
+    const uint8_t   y   =   (opcode & 0x00F0) >> 4;
+    const uint8_t   n   =   opcode & 0x000F;
+    const uint8_t   nn  =   opcode & 0x00FF;
+    const uint16_t  nnn =   opcode & 0x0FFF;
 
     switch (opcode >> 12) {
         case 0x0:
@@ -361,7 +480,7 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                      * set VF to 1 if there is a carry
                      */
                     operand = chip8->v[x];
-                    addend = chip8->v[y];
+                    addend  = chip8->v[y];
                     chip8->v[x] += chip8->v[y];
                     if (operand > 0xFF - addend)
                         chip8->v[0xF] = 1;
@@ -373,8 +492,8 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                      * subtract Vy from Vx;
                      * set VF to 0 if there is a borrow
                      */
-                    minuend = chip8->v[x];
-                    subtrahend = chip8->v[y];
+                    minuend     = chip8->v[x];
+                    subtrahend  = chip8->v[y];
                     chip8->v[x] -= chip8->v[y];
                     if (minuend < subtrahend)
                         chip8->v[0xF] = 0;
@@ -397,8 +516,8 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                      * set Vx to Vy - Vx;
                      * set VF to 0 if there is a borrow
                      */
-                    minuend = chip8->v[y];
-                    subtrahend = chip8->v[x];
+                    minuend     = chip8->v[y];
+                    subtrahend  = chip8->v[x];
                     chip8->v[x] = minuend - subtrahend;
                     if (minuend < subtrahend)
                         chip8->v[0xF] = 0;
@@ -449,26 +568,24 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
              * set VF to 1 if any set pixels are changed to unset, 0 otherwise
              */
             while (1) { // wait for vertical blank interrupt
-                if (chip8->display.lastUpdate + VBLANK_INTERVAL < SDL_GetTicks())
+                if (chip8->display.lastUpdate + VBLANK_INTERVAL_MS < SDL_GetTicks())
                     break;
             }
 
+            const uint8_t sX    = chip8->v[x] % chip8->display.pixelWidth;
+            const uint8_t sY    = chip8->v[y] % chip8->display.pixelHeight;
+            const uint8_t sH    = n;
 
-            uint8_t sX, sY, sH;
-            sX = chip8->v[x] % chip8->display.pixelWidth;
-            sY = chip8->v[y] % chip8->display.pixelHeight;
-            sH = n;
-
-            chip8->v[0xF] = 0;
+            chip8->v[0xF]       = 0;
 
             for (int yline = 0; yline < sH; yline++) {
                 if (sY + yline >= chip8->display.pixelHeight)
                     continue; // clip vertically
 
-                if (chip8->i + yline >= MEMORY_BYTES)
+                if (chip8->i + yline >= AMOUNT_MEMORY_BYTES)
                     break; // prevent buffer overflow
 
-                uint8_t pixel = chip8->memory[chip8->i + yline];
+                const uint8_t pixel = chip8->memory[chip8->i + yline];
                 for (int xline = 0; xline < 8; xline++) {
                     if ((pixel & (0x80 >> xline)) != 0) {
                         if (sX + xline >= chip8->display.pixelWidth)
@@ -510,7 +627,7 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                      * and store the value of the key in Vx
                      */
                     chip8->pc -= 2;
-                    for (int i = 0x0; i <= LAST_REGISTER; i++)
+                    for (int i = 0x0; i <= 0xF; i++)
                         if (chip8->display.keyUp[i]) {
                             chip8->v[x] = i;
                             chip8->pc += 2;
@@ -539,17 +656,17 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                      * store the binary-coded base-10 representation of Vx
                      * in memory locations I, I+1, and I+2
                      */
-                    if (chip8->i < MEMORY_BYTES)
+                    if (chip8->i < AMOUNT_MEMORY_BYTES)
                         chip8->memory[chip8->i] = chip8->v[x] / 100;
-                    if (chip8->i + 1 < MEMORY_BYTES)
+                    if (chip8->i + 1 < AMOUNT_MEMORY_BYTES)
                         chip8->memory[chip8->i + 1] = (chip8->v[x] / 10) % 10;
-                    if (chip8->i + 2 < MEMORY_BYTES)
+                    if (chip8->i + 2 < AMOUNT_MEMORY_BYTES)
                         chip8->memory[chip8->i + 2] = chip8->v[x] % 10;
                     break;
                 case 0x55:
                     /* store V0 to Vx in memory starting at address I */
                     for (int i = 0; i <= x; i++) {
-                        if (chip8->i + i < MEMORY_BYTES)
+                        if (chip8->i + i < AMOUNT_MEMORY_BYTES)
                             chip8->memory[chip8->i + i] = chip8->v[i];
                     }
                     if (chip8->specType == CHIP8)
@@ -558,7 +675,7 @@ void decodeAndExecuteOpcode(emulator *chip8, unsigned short opcode)
                 case 0x65:
                     /* fill V0 to Vx with values from memory starting at address I */
                     for (int i = 0; i <= x; i++) {
-                        if (chip8->i + i < MEMORY_BYTES)
+                        if (chip8->i + i < AMOUNT_MEMORY_BYTES)
                             chip8->v[i] = chip8->memory[chip8->i + i];
                     }
                     if (chip8->specType == CHIP8)
