@@ -5,4 +5,3 @@ bin/teal8
 build/*.o
 compile_commands.json
 compiler_flags
-roms
