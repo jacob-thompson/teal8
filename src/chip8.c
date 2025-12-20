@@ -264,7 +264,7 @@ main(int argc, char **argv)
         opcode = fetchOpcode(&chip8);
         SDL_LogDebug(
             SDL_LOG_CATEGORY_APPLICATION,
-            "handling opcode %x\n",
+            "handling opcode %04x\n",
             opcode
         );
 
@@ -273,7 +273,7 @@ main(int argc, char **argv)
         decodeAndExecuteOpcode(&chip8, opcode);
         SDL_LogDebug(
             SDL_LOG_CATEGORY_APPLICATION,
-            "%x successfully executed\n",
+            "%04x successfully executed\n",
             opcode
         );
 
