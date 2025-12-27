@@ -164,16 +164,16 @@ initDisplay(display *display, const char *iconPath)
         SDL_FreeSurface(iconSurface);
     }
 
-    display->pixels     = NULL;
+    display->pixels = NULL;
     display->pixelDrawn = NULL;
 
     createPixels(display);
 
     resetDisplay(display);
 
-    display->poweredOn  = SDL_TRUE;
-    display->reset      = SDL_FALSE;
-    display->dirty      = SDL_TRUE;
+    display->poweredOn = SDL_TRUE;
+    display->reset = SDL_FALSE;
+    display->dirty = SDL_TRUE;
 
     display->lastUpdate = 0;
 
@@ -188,77 +188,75 @@ handleEvent(display *display, const SDL_Event *event)
         case SDL_KEYUP:
             switch (event->key.keysym.scancode) {
                 case SDL_SCANCODE_ESCAPE:
-                    display->poweredOn      = SDL_FALSE;
+                    display->poweredOn = SDL_FALSE;
                     break;
                 case SDL_SCANCODE_SPACE: // restart the rom
                     display->reset = SDL_TRUE;
                     break;
                 case SDL_SCANCODE_1:
-                    display->keyDown[0x1]   = SDL_FALSE;
-                    display->keyUp[0x1]     = SDL_TRUE;
+                    display->keyDown[0x1] = SDL_FALSE;
+                    display->keyUp[0x1] = SDL_TRUE;
                     break;
                 case SDL_SCANCODE_2:
-                    display->keyDown[0x2]   = SDL_FALSE;
-                    display->keyUp[0x2]     = SDL_TRUE;
+                    display->keyDown[0x2] = SDL_FALSE;
+                    display->keyUp[0x2] = SDL_TRUE;
                     break;
                 case SDL_SCANCODE_3:
-                    display->keyDown[0x3]   = SDL_FALSE;
-                    display->keyUp[0x3]     = SDL_TRUE;
+                    display->keyDown[0x3] = SDL_FALSE;
+                    display->keyUp[0x3] = SDL_TRUE;
                     break;
                 case SDL_SCANCODE_4:
-                    display->keyDown[0xC]   = SDL_FALSE;
-                    display->keyUp[0xC]     = SDL_TRUE;
+                    display->keyDown[0xC] = SDL_FALSE;
+                    display->keyUp[0xC] = SDL_TRUE;
                     break;
                 case SDL_SCANCODE_Q:
-                    display->keyDown[0x4]   = SDL_FALSE;
-                    display->keyUp[0x4]     = SDL_TRUE;
+                    display->keyDown[0x4] = SDL_FALSE;
+                    display->keyUp[0x4] = SDL_TRUE;
                     break;
                 case SDL_SCANCODE_W:
-                    display->keyDown[0x5]   = SDL_FALSE;
-                    display->keyUp[0x5]     = SDL_TRUE;
+                    display->keyDown[0x5] = SDL_FALSE;
+                    display->keyUp[0x5] = SDL_TRUE;
                     break;
                 case SDL_SCANCODE_E:
-                    display->keyDown[0x6]   = SDL_FALSE;
-                    display->keyUp[0x6]     = SDL_TRUE;
+                    display->keyDown[0x6] = SDL_FALSE;
+                    display->keyUp[0x6] = SDL_TRUE;
                     break;
                 case SDL_SCANCODE_R:
-                    display->keyDown[0xD]   = SDL_FALSE;
-                    display->keyUp[0xD]     = SDL_TRUE;
+                    display->keyDown[0xD] = SDL_FALSE;
+                    display->keyUp[0xD] = SDL_TRUE;
                     break;
                 case SDL_SCANCODE_A:
-                    display->keyDown[0x7]   = SDL_FALSE;
-                    display->keyUp[0x7]     = SDL_TRUE;
+                    display->keyDown[0x7] = SDL_FALSE;
+                    display->keyUp[0x7] = SDL_TRUE;
                     break;
                 case SDL_SCANCODE_S:
-                    display->keyDown[0x8]   = SDL_FALSE;
-                    display->keyUp[0x8]     = SDL_TRUE;
+                    display->keyDown[0x8] = SDL_FALSE;
+                    display->keyUp[0x8] = SDL_TRUE;
                     break;
                 case SDL_SCANCODE_D:
-                    display->keyDown[0x9]   = SDL_FALSE;
-                    display->keyUp[0x9]     = SDL_TRUE;
+                    display->keyDown[0x9] = SDL_FALSE;
+                    display->keyUp[0x9] = SDL_TRUE;
                     break;
                 case SDL_SCANCODE_F:
-                    display->keyDown[0xE]   = SDL_FALSE;
-                    display->keyUp[0xE]     = SDL_TRUE;
+                    display->keyDown[0xE] = SDL_FALSE;
+                    display->keyUp[0xE] = SDL_TRUE;
                     break;
                 case SDL_SCANCODE_Z:
-                    display->keyDown[0xA]   = SDL_FALSE;
-                    display->keyUp[0xA]     = SDL_TRUE;
+                    display->keyDown[0xA] = SDL_FALSE;
+                    display->keyUp[0xA] = SDL_TRUE;
                     break;
                 case SDL_SCANCODE_X:
-                    display->keyDown[0x0]   = SDL_FALSE;
-                    display->keyUp[0x0]     = SDL_TRUE;
+                    display->keyDown[0x0] = SDL_FALSE;
+                    display->keyUp[0x0] = SDL_TRUE;
                     break;
                 case SDL_SCANCODE_C:
-                    display->keyDown[0xB]   = SDL_FALSE;
-                    display->keyUp[0xB]     = SDL_TRUE;
+                    display->keyDown[0xB] = SDL_FALSE;
+                    display->keyUp[0xB] = SDL_TRUE;
                     break;
                 case SDL_SCANCODE_V:
-                    display->keyDown[0xF]   = SDL_FALSE;
-                    display->keyUp[0xF]     = SDL_TRUE;
-                    break;
-                default:
-                    break;
+                    display->keyDown[0xF] = SDL_FALSE;
+                    display->keyUp[0xF] = SDL_TRUE;
+                default: break;
             }
             break;
 
