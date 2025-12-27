@@ -95,7 +95,7 @@ getHash(FILE *romFile)
 
     /* compute SHA1 hash of the ROM */
     uint8_t buffer[20];
-    size_t  bytesRead = 0;
+    size_t bytesRead = 0;
 
     /* read the ROM file in chunks and update the SHA1 context */
     while ((bytesRead = fread(buffer, 1, sizeof buffer, romFile)) > 0)
